@@ -6,10 +6,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
-import java.util.ArrayList;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,8 +20,6 @@ public class HomePage {
 
     private Pane page;
     private Pane pageContainer;
-
-    private Button load_sgf = new Button("load sgf");
 
     // 只剩一个规则：Gomoku
     private Button gomoku;
@@ -58,9 +52,6 @@ public class HomePage {
     private Button learnOrView = new Button("Learn");
     private HBox LaunchButtons = new HBox();
 
-    private ArrayList<Map> sgfMap;
-    private boolean sgfFile = false;
-
     private Label error_file = new Label();
     private Label error_message = new Label();
 
@@ -77,12 +68,6 @@ public class HomePage {
     private Button whiteIaEasy = new Button("easy");
     private Button whiteIaMedium = new Button("medium");
     private Button whiteIaHard = new Button("hard");
-
-    private Button blackCustom = new Button("custom");
-    private Button blackBackToButton = new Button("back");
-
-    private Button whiteCustom = new Button("custom");
-    private Button whiteBackToButton = new Button("back");
 
     public HomePage() {
 
@@ -172,7 +157,6 @@ public class HomePage {
                 error_message,
                 error_file,
                 fileBox,
-                load_sgf,
                 game_button,
                 black_player,
                 white_player,
@@ -193,8 +177,6 @@ public class HomePage {
     // ============= Getter 区域 ==============
 
     Pane getHomePage() { return pageContainer; }
-    Button getLoadSgf() { return load_sgf; }
-
     Button getGomokuButton() { return gomoku; }
 
     Button getValidationButton() { return validation; }
@@ -221,66 +203,15 @@ public class HomePage {
         error_message.setManaged(true);
     }
 
-    public void removeFileBox() {
-        ObservableList<Node> children = pageContainer.getChildren();
-        children.remove(children.size() - 1);
-
-        if (!SGF.parseFile()) {
-            error_file.setText(SGF.get_file_name() + " is not a valid sgf file");
-            error_file.setManaged(true);
-            error_file.setVisible(true);
-            return;
-        }
-
-        error_file.setManaged(false);
-        error_file.setVisible(false);
-
-        sgfMap = SGF.get_game_moves();
-        load_sgf.setManaged(false);
-        load_sgf.setVisible(false);
-
-        fileName.setText(SGF.get_file_name());
-        fileBox.setManaged(true);
-        fileBox.setVisible(true);
-
-        learnOrView.setText("view SGF");
-        sgfFile = true;
-        rule_type.set("gomoku");  // 统一规则
-        rules_instance = SGF.getRuleInstance();
-
-        learnOrView.setManaged(false);
-        learnOrView.setVisible(false);
-    }
-
-    public void closeFileBox() {
-        ObservableList<Node> children = pageContainer.getChildren();
-        children.remove(children.size() - 1);
-
-        error_file.setManaged(false);
-        error_file.setVisible(false);
-        load_sgf.setManaged(true);
-        load_sgf.setVisible(true);
-        fileBox.setManaged(false);
-        fileBox.setVisible(false);
-        learnOrView.setText("learn");
-    }
-
     private void deleteFile() {
-        load_sgf.setManaged(true);
-        load_sgf.setVisible(true);
         fileName.setText("");
         fileBox.setManaged(false);
         fileBox.setVisible(false);
         learnOrView.setText("learn");
-        sgfFile = false;
         rule_type.set("gomoku");
     }
 
     public StringProperty getStringRule() { return rule_type; }
-    public boolean is_sgf() { return sgfFile; }
-
-    public ArrayList<Map> getSgfMap() { return sgfMap; }
-    public void setSgfMap(ArrayList<Map> map) { sgfMap = map; }
 
     public Rules getRuleInstance() { return rules_instance; }
     public void setRulesInstance(Rules r) { rules_instance = r; }
@@ -296,10 +227,5 @@ public class HomePage {
     public Button getWhiteEasyButton() { return whiteIaEasy; }
     public Button getWhiteMediumButton() { return whiteIaMedium; }
     public Button getWhiteHardButton() { return whiteIaHard; }
-
-    public Button getBlackBackButton() { return blackBackToButton; }
-    public Button getWhiteBackButton() { return whiteBackToButton; }
-    public Button getBlackCustom() { return blackCustom; }
-    public Button getWhiteCustom() { return whiteCustom; }
 
 }

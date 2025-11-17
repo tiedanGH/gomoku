@@ -288,11 +288,7 @@ public class Gomoku {
         _map = new ArrayList<>();
         goban = new Goban(heigh, width - _game_infos_size_x, rule.get_board_size());
 
-        if (game_infos.getSgfMap() != null) {
-            _map = cpyMapLst(game_infos.getSgfMap());
-        } else {
-            _map.add(new Map(_nb_line));
-        }
+        _map.add(new Map(_nb_line));
 
         saved = new ArrayList<>();
         game_display = new Pane();
@@ -361,11 +357,6 @@ public class Gomoku {
                 future2 = null;
                 ia_playing = false;
             }
-        });
-
-        // SGF Export
-        gameInfos.getExportButton().setOnAction(event -> {
-            SGF.createSgf(_map, rule.getGameType());
         });
 
         // Prev

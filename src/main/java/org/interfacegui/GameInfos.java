@@ -52,7 +52,6 @@ public class GameInfos {
     // 各种按钮（确保都有实例）
     private final Button _resign;
     private final Button _undo = new Button("undo");
-    private final Button _export = new Button("export");
     private final Button _prev;
     private final Button _next;
     private final Button _hint;
@@ -92,7 +91,7 @@ public class GameInfos {
 
         // 设置最小高度和默认字体，避免字体=0 导致控件高度=0（跨平台稳健）
         setButtonMinHeight(_prev, _next, _hint,
-                _resign, _undo, _export, backHomeButton);
+                _resign, _undo, backHomeButton);
 
         _prev.setPadding(Insets.EMPTY);
         _next.setPadding(Insets.EMPTY);
@@ -118,8 +117,7 @@ public class GameInfos {
                 _resign,
                 _undo,
                 _button_prev_next,
-                _results,
-                _export
+                _results
         );
 
         // 延迟绑定字体（确保控件已加入 Scene 并有尺寸）
@@ -260,10 +258,6 @@ public class GameInfos {
 
     public Button getUndoButton() {
         return _undo;
-    }
-
-    public Button getExportButton() {
-        return _export;
     }
 
     public Button getHintButton() {

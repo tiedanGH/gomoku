@@ -72,17 +72,17 @@ public class App extends Application {
         // 只支持 Gomoku 的教学 SGF
         home_page.getLearnOrViewButton().setOnMouseClicked(event -> {
 
-            SGF.setFile("./", "tuto/Gomoku.sgf");
-            if (!SGF.parseFile()) {
-                home_page.setErrorMsg("Missing Gomoku tutorial SGF.");
-                home_page.displayErrorMsg();
-                return;
-            }
+            // TODO rule
+//            SGF.setFile("./", "tuto/Gomoku.sgf");
+//            if (!SGF.parseFile()) {
+//                home_page.setErrorMsg("Missing Gomoku tutorial SGF.");
+//                home_page.displayErrorMsg();
+//                return;
+//            }
 
-            ArrayList<Map> sgfMap = SGF.get_game_moves();
-            home_page.setRulesInstance(SGF.getRuleInstance());
+//            ArrayList<Map> sgfMap = SGF.get_game_moves();
+//            home_page.setRulesInstance(SGF.getRuleInstance());
             home_page.setGameMode(Rules.GameMode.LEARNING);
-            home_page.setSgfMap(sgfMap);
 
             double scenex = stage.getWidth();
             double sceney = stage.getHeight();

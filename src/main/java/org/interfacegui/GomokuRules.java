@@ -9,22 +9,12 @@ public class GomokuRules implements Rules {
     int boardSize = 19;
     int nbMove = 0;
 
-    @Override
-    public boolean hasPass(){
-        return false;
-    }
-
 
     @Override
     public boolean undo(){
         if (nbMove > 0)
             nbMove--;
         return true;
-    }
-
-    @Override
-    public void setGameMode(Rules.GameMode newStatus){
-        gameStatus = newStatus;
     }
 
     @Override
@@ -59,53 +49,10 @@ public class GomokuRules implements Rules {
         }
         return false;
     }
-    
-    @Override
-    public String getGameType() {
-        return "Gomoku";
-    }
 
     @Override
     public Rules.GameMode getGameMode(){
         return gameStatus;
-    }
-
-    @Override
-    public ArrayList<Point> get_forbiden_moves(ArrayList<Map> maps, int index, int color)
-    {
-        return new ArrayList<Point>();
-    }
-
-    @Override
-    public void check_capture(Point point, Map map){
-        // nothing to do
-        return ;
-    }
-
-
-    @Override
-    public ArrayList<Point> get_prisonners(){
-        return new ArrayList<Point>();
-    }
-
-    @Override
-    public int get_white_prisonners(){
-        return (0);
-    }
-    
-    @Override
-    public int get_black_prisonners(){
-        return (0);
-    }
-    
-    @Override
-    public void set_black_prisonners(int nb){
-        return ;
-    }
-
-    @Override
-    public void set_white_prisonners(int nb){
-        return ;
     }
     
 
@@ -115,18 +62,8 @@ public class GomokuRules implements Rules {
     }
 
     @Override
-    public boolean areCapturable(ArrayList<Point> points, Map map, final int color, int dir){
-        return false;
-    }
-
-    @Override
     public int getWinner(){
         return this.winner;
-    }
-
-    @Override
-    public void setWinner(int w){
-        this.winner = w;
     }
 
     @Override

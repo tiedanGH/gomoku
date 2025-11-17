@@ -34,9 +34,6 @@ public class Home {
     // HomePage 是 UI 控制类
     private HomePage home_page = new HomePage();
 
-    // SGF 文件选择控件
-    private FileBox filebox = new FileBox(home_page);
-
     // 棋盘大小（默认由 UI 决定）
     private int boardSize = -1;
 
@@ -54,17 +51,7 @@ public class Home {
         String deselectedBackgroundColor = "-fx-background-color: #FFFFFF;";
         String deselectedStyle = deselectedBackgroundColor + deselectedColor;
         String selectedStyle = selectedBackgroundColor + selectedColor;
-
-        // ===========================================================
-        //                    SGF 文件加载
-        // ===========================================================
-        home_page.getLoadSgf().setOnAction(e -> {
-            home_page.addFileBox(filebox.getFileBox());
-        });
-
-        filebox.getCross().setOnAction(e -> {
-            home_page.closeFileBox();
-        });
+        
 
         // ===========================================================
         //                    玩家选择（AI / Human）
@@ -156,8 +143,6 @@ public class Home {
         // ===========================================================
 
         home_page.getGomokuButton().setOnAction(e -> {
-            if (home_page.is_sgf()) return;
-
             rule = "Gomoku";  // 唯一规则
 
             // Gomoku 不需要棋盘大小选择 → 隐藏
@@ -206,9 +191,7 @@ public class Home {
     public Button getValidationButton() { return home_page.getValidationButton(); }
     public Button getLearnOrViewButton(){ return home_page.getLearnOrViewButton(); }
 
-    public ArrayList<Map> getSgfMap(){ return home_page.getSgfMap(); }
     public Rules getRuleInstance(){ return home_page.getRuleInstance(); }
-    public void setSgfMap(ArrayList<Map> map){ home_page.setSgfMap(map); }
     public void setRulesInstance(Rules r){ home_page.setRulesInstance(r); }
 
     // ===========================================================

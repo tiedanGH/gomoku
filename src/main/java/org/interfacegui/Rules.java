@@ -15,22 +15,10 @@ public interface Rules {
 
     boolean isValidMove(Point point, ArrayList<Map> map);
     boolean endGame(Map map, Point point);
-    String getGameType();
-    ArrayList<Point> get_forbiden_moves(ArrayList<Map> map, int index, int color);
-    void check_capture(Point point, Map map);
-    ArrayList<Point> get_prisonners();
-    int get_white_prisonners();
-    int get_black_prisonners();
-    void set_white_prisonners(int nb);
-    void set_black_prisonners(int nb);
-    boolean areCapturable(ArrayList<Point> points, Map map, final int color, int dir);
     int getWinner();
-    void setWinner(int w);
     boolean hasIa();
-    boolean hasPass();
     int get_board_size();
     GameMode getGameMode();
-    void setGameMode(Rules.GameMode n);
     ArrayList<Point> verticalWin = new ArrayList<Point>();
     ArrayList<Point> horizontalWin = new ArrayList<Point>();
     ArrayList<Point> diagonalLeftWin = new ArrayList<Point>();
@@ -75,18 +63,6 @@ public interface Rules {
         checkCaptures(coord, map, -1, 1, captured);
         checkCaptures(coord, map, 1, -1, captured);
     }
-
-
-    default ArrayList<Point> GetCapturedStones(Point coord, Map map){
-        ArrayList<Point> captured = new ArrayList<Point>();
-
-        horizontalCaptures(coord, map, captured);
-        verticalCaptures(coord, map, captured);
-        diagonalLeftCaptures(coord, map, captured);
-        diagonalRightCaptures(coord, map, captured);
-        return captured;
-    }
-
 
     default boolean checkEmptySqure(int x, int y, Map map) {
         if ((x < 0 || x >= 19) || (y < 0 || y >= 19)){
