@@ -338,13 +338,29 @@ public class Gomoku {
 
             toggleHint = !toggleHint;
 
-            if (hintList == null) {
-                game.best_move(player_turn + 1, player_turn + 1, true);
-                setHint(game.m.candidat.lst, game.m.values);
-            }
+            game.best_move(player_turn + 1, player_turn + 1, true);
+            setHint(game.m.candidat.lst, game.m.values);
             changeHintVisibility(toggleHint);
 
             if (!toggleHint) goban.updateFromMap(_map.get(map_index));
+        });
+
+        gameInfos.getResignButton().setOnAction(event -> {
+            if (rule.getGameMode() == Rules.GameMode.ENDGAME)
+                return ;
+            gameLoop.stop();
+            game_end = true;
+            ia_playing = false;
+            _end_text.setText("match resigned");
+            _end_popin.setVisible(true);
+            _end_popin.setManaged(true);
+            killIa();
+            if (future2 != null){
+                if (executor2 != null)
+                    executor2.shutdownNow();
+                future2 = null;
+                ia_playing = false;
+            }
         });
 
         // SGF Export
