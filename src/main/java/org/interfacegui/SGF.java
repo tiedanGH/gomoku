@@ -28,17 +28,21 @@ public class SGF{
     private static final String[] PointCmdSet = new String[] {"B", "W"};
     private static final String[] NumCmdSet = new String[] {"SZ", "HA", "KM", "GM"};
 
-    private static void init_rules() {
-        // SGF 中的 RU[] 可能是 go/pente/renju/gomoku
-        // 但你项目现在只支持 gomoku，所以全部强制改为 gomoku
-
-        ruleInstance = new GomokuRules();
-
-        // 如果 SGF 没有提供 size，使用默认 19
-        if (size <= 0) {
-            size = 19;
+    private static void init_rules(){
+        rules = rules.toLowerCase();
+        switch (rules){
+            case "pente" :
+                ruleInstance = new PenteRules();
+                break;
+            case "renju" :
+                ruleInstance = new RenjuRules();
+                break;
+            case "go":
+                ruleInstance = new GoRules();
+                break;
+            default:
+                ruleInstance = new GomokuRules();
         }
-
         ruleInstance.setBoardSize(size);
     }
 

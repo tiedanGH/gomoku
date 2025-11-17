@@ -1,5 +1,4 @@
 package org.openjfx;
-
 import org.interfacegui.*;
 import javafx.application.Application;
 import javafx.scene.layout.Pane;
@@ -8,156 +7,183 @@ import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.io.File;
-import java.util.ArrayList;
 import org.utils.Point;
+import java.util.ArrayList;
 
 public class App extends Application {
-
     private Gomoku gomoku;
     private Stage stage;
     private Pane root;
     public Scene scene;
-
+    private Point screen = new Point();
+    Pane goban_root;
     private Scene goban, home;
     private Pane home_body = new Pane();
     private Pane home_root = new Pane();
     private Home home_page = new Home();
-
-    private ImageView background;
+    private ImageView background; 
     private ImageView title;
-
-    private void openBackground() {
-        File f1 = new File("./img/background.png");
-        File f2 = new File("./img/title.png");
-
-        Image img1 = new Image(f1.toURI().toString(), false);
-        Image img2 = new Image(f2.toURI().toString(), false);
-
+    
+    private void openBackground(){
+        File file1 = new File("./img/background.png");
+        File file2 = new File("./img/title.png");
+        Image img1 = new Image(file1.toURI().toString(), false);
+        img1.exceptionProperty().addListener((obs, oldEx, newEx) -> {
+            if (newEx != null) {
+                System.err.println("Erreur background.jpg : " + newEx.getMessage());
+                System.exit(1);
+            }
+        });
+        if (img1.getWidth() <= 0 || img1.getHeight() <= 0) {
+            System.err.println("Erreur : background.png non décodé");
+            System.exit(1);
+        }
         background = new ImageView(img1);
+        Image img2 = new Image(file2.toURI().toString(), false);
+        img2.exceptionProperty().addListener((obs, oldEx, newEx) -> {
+            if (newEx != null) {
+                System.err.println("Erreur title.png : " + newEx.getMessage());
+                System.exit(1);
+            }
+        });
+        if (img2.getWidth() <= 0 || img2.getHeight() <= 0) {
+            System.err.println("Erreur : title.pgn non décodé");
+            System.exit(1);
+        }
         title = new ImageView(img2);
-
         background.setFitWidth(home_root.getWidth());
         background.setFitHeight(home_root.getHeight());
         background.setPreserveRatio(false);
-
         title.setFitWidth(home_root.getWidth());
         title.setFitHeight(home_root.getHeight());
         title.setPreserveRatio(true);
     }
 
-    /** 主菜单按钮事件 */
-    public void set_home_event() {
-
+    public void set_home_event(){
+        home.widthProperty().addListener((observable, oldValue, newValue) -> {
+        });
+        home.heightProperty().addListener((observable, oldValue, newValue) -> {
+        });
         home_page.getValidationButton().setOnMouseClicked(event -> {
-
-            if (home_page.getErrorMsg() != null && !home_page.getErrorMsg().isEmpty()) {
-                home_page.displayErrorMsg();
-                return;
-            }
-
             double scenex = stage.getWidth();
             double sceney = stage.getHeight();
-
-            // 只创建 Gomoku，不再加载 Go/Pente
-            gomoku = new Gomoku((int) sceney, (int) scenex, home_page);
-            Pane goban_root = new Pane();
-            goban = new Scene(goban_root, scenex, sceney);
-            set_goban_event(goban_root);
+            if (home_page.getErrorMsg() != null && home_page.getErrorMsg().isEmpty() == false){
+                home_page.displayErrorMsg();
+                return ;
+            }
+            gomoku = new Gomoku((int)sceney, (int)scenex, home_page);
+            goban_root = new Pane();
+            goban = new Scene(goban_root, 800, 525);
+            set_goban_event();
             goban_root.getChildren().add(gomoku.getGameDisplay());
-
             switchScene(goban);
             stage.setResizable(true);
         });
 
-        // 只支持 Gomoku 的教学 SGF
         home_page.getLearnOrViewButton().setOnMouseClicked(event -> {
-
-            SGF.setFile("./", "tuto/Gomoku.sgf");
-            if (!SGF.parseFile()) {
-                home_page.setErrorMsg("Missing Gomoku tutorial SGF.");
-                home_page.displayErrorMsg();
-                return;
+            final String[] path = {"tuto/Go.sgf", "tuto/Pente.sgf", "tuto/Gomoku.sgf"};
+            final String[] names = {"Go", "Pente", "Gomoku"};
+            int i = 0;
+            for (; i < 3; i++)
+            {
+                if (names[i].equals(home_page.get_rules()))
+                    break;
             }
-
-            ArrayList<Map> sgfMap = SGF.get_game_moves();
+            SGF.setFile("./", path[i]);
+            if (SGF.parseFile() == false){
+                home_page.setErrorMsg("missing file please check app install");
+                home_page.displayErrorMsg();
+                return ;
+            }
+            ArrayList<Map> sgfMap;
+            try {
+                sgfMap = SGF.get_game_moves();
+            }
+            catch (Exception e) {
+                home_page.setErrorMsg("invalid config file please check app install");
+                home_page.displayErrorMsg();
+                return ;
+            }
             home_page.setRulesInstance(SGF.getRuleInstance());
+            double scenex = stage.getWidth();
+            double sceney = stage.getHeight();
             home_page.setGameMode(Rules.GameMode.LEARNING);
             home_page.setSgfMap(sgfMap);
-
-            double scenex = stage.getWidth();
-            double sceney = stage.getHeight();
-
-            gomoku = new Gomoku((int) sceney, (int) scenex, home_page);
-            Pane goban_root = new Pane();
-            goban = new Scene(goban_root, scenex, sceney);
-            set_goban_event(goban_root);
+            gomoku = new Gomoku((int)sceney, (int)scenex, home_page);
+            goban_root = new Pane();
+            goban = new Scene(goban_root, 1050, 650);
+            set_goban_event();
             goban_root.getChildren().add(gomoku.getGameDisplay());
-
             switchScene(goban);
             stage.setResizable(true);
         });
     }
 
-    private void setNewHome() {
-        home_root = new Pane();
-        home = new Scene(home_root, 962, 550);
-
-        home_page = new Home();
-        openBackground();
-
-        background.setMouseTransparent(true);
-        title.setMouseTransparent(true);
-
-        home_root.getChildren().add(background);
-        home_root.getChildren().add(title);
-
-        set_home_event();
-        home_root.getChildren().add(home_page.getHomePage());
-
-        stage.setResizable(false);
-        home_page.getHomePage().setTranslateY(160);
-
-        switchScene(home);
+    private void setNewHome(){
+            home_root = new Pane();
+            home = new Scene(home_root, 962, 550);
+            home_page = new Home();
+            openBackground();
+            background.setMouseTransparent(true);
+            title.setMouseTransparent(true);
+            home_root.getChildren().add(background);
+            home_root.getChildren().add(title);
+            set_home_event();
+            home_root.getChildren().add(home_page.getHomePage());
+            switchScene(home);
+            stage.setResizable(false);
+            home_root.getChildren().add(home_body);
+            home_page.getHomePage().setTranslateY(160);
     }
 
-    private void set_goban_event(Pane goban_root) {
+    private void set_goban_event(){
         gomoku.getBackHomeButton().setOnMouseClicked(event -> {
             gomoku.killIa();
             setNewHome();
         });
-
-        gomoku.get_home_button().setOnMouseClicked(event -> setNewHome());
-
-        gomoku.get_replay_button().setOnMouseClicked(event -> gomoku.reset_gomoku());
-
-        goban.widthProperty().addListener((obs, oldV, newV) -> {
-            gomoku.updateGameDisplay((int) goban.getHeight(), newV.intValue());
+        gomoku.get_home_button().setOnMouseClicked(event -> {
+            setNewHome();
         });
 
-        goban.heightProperty().addListener((obs, oldV, newV) -> {
-            gomoku.updateGameDisplay(newV.intValue(), (int) goban.getWidth());
+        gomoku.get_replay_button().setOnMouseClicked(event -> {
+            gomoku.reset_gomoku();
+        });
+
+        goban.widthProperty().addListener((observable, oldValue, newValue) -> {
+            double sceneWidth = goban.getWidth();
+            double sceneHeight = goban.getHeight();
+            screen.x = (int)newValue.doubleValue();
+            gomoku.updateGameDisplay((int)sceneHeight, (int)sceneWidth);
+        });
+        goban.heightProperty().addListener((observable, oldValue, newValue) -> {
+            double sceneWidth = goban.getWidth();
+            double sceneHeight = goban.getHeight();
+            screen.y = (int)newValue.doubleValue();
+            gomoku.updateGameDisplay((int)sceneHeight, (int)sceneWidth);
         });
     }
 
     @Override
     public void start(Stage primaryStage) {
-
+        primaryStage.setOnCloseRequest(event -> {
+            System.exit(0);
+        });
         stage = primaryStage;
+        stage.sizeToScene();
         stage.setTitle("Gomoku");
-
+        root = new Pane();
+        scene = new Scene(root, 962, 550);
         home = new Scene(home_root, 962, 550);
         openBackground();
-
         background.setMouseTransparent(true);
         title.setMouseTransparent(true);
         home_root.getChildren().add(background);
         home_root.getChildren().add(title);
-
         set_home_event();
+        stage.setResizable(false);
         home_root.getChildren().add(home_page.getHomePage());
         home_page.getHomePage().setTranslateY(160);
-
-        stage.setResizable(false);
+        home_root.setStyle("-fx-background-color: #FF6347;");
         stage.centerOnScreen();
         stage.setScene(home);
         stage.show();
