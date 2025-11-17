@@ -126,6 +126,12 @@ public class GameInfos {
         Platform.runLater(this::bindFonts);
     }
 
+    public void updateGameInfo(int new_y, int new_x){
+        _size_x = new_x;
+        _size_y = new_y;
+        _game_infos.setPrefSize(new_x, new_y);
+    }
+
     /**
      * 延迟绑定字体大小，避免构造阶段 _game_infos 高度为 0 导致字体变 0。
      * 同时设置字体下限（避免 min = 0）。

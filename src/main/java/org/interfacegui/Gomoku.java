@@ -518,8 +518,16 @@ public class Gomoku {
 
     public Button getBackHomeButton() { return _back_home; }
 
-
-    public void updateGameDisplay(int height, int i) {
+    public void updateGameDisplay(int new_y, int new_x){
+        _width = new_x;
+        _game_infos_size_x = new_x / 4;
+        _game_infos_size_y = new_y;
+        gameInfos.updateGameInfo(new_y, _game_infos_size_x);
+        double labelHeight = commentLabel.prefHeight(commentLabel.getMaxWidth());
+        if (commentLabel.isVisible() == false)
+            labelHeight = 0;
+        goban.updateGoban(new_y - (int)labelHeight, new_x - _game_infos_size_x);
+        _goban_pane.setLayoutX(_game_infos_size_x);
     }
 }
 
