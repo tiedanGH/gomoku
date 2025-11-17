@@ -2,7 +2,6 @@ package org.interfacegui;
 
 import java.util.ArrayList;
 
-import javafx.scene.Scene;
 import org.modelai.Game;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -24,9 +23,6 @@ import javafx.scene.paint.Color;
 import java.util.Comparator;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.Parent;
-import javafx.scene.Node;
-import javafx.geometry.Pos;
 
 public class Gomoku {
 
@@ -349,12 +345,6 @@ public class Gomoku {
             changeHintVisibility(toggleHint);
 
             if (!toggleHint) goban.updateFromMap(_map.get(map_index));
-        });
-
-        // Candidats
-        gameInfos.getCandidatsButton().setOnAction(event -> {
-            toggleCandidat = !toggleCandidat;
-            changeCandidatVisibility(toggleCandidat);
         });
 
         // SGF Export
