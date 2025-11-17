@@ -17,7 +17,6 @@ import javafx.geometry.Insets;
  *  - 白方/黑方倒计时
  *  - last move time / average move time
  *  - 所有与时间相关的字段、Label、方法
- *
  * 保留内容：
  *  - 白/黑方名称
  *  - 囚徒数量显示
@@ -36,9 +35,6 @@ public class GameInfos {
 
     private Label _white;
     private Label _black;
-
-    private final Label _black_label_prisonners = new Label();
-    private final Label _white_label_prisonners = new Label();
 
     // 结果显示（主要用于 Go 计分模式）
     private final Label _whiteResults = new Label();
@@ -79,8 +75,8 @@ public class GameInfos {
         addText();
 
         // 添加白/黑方信息框（名字 + 囚徒数）
-        _whiteBox.getChildren().addAll(_white, _white_label_prisonners);
-        _blackBox.getChildren().addAll(_black, _black_label_prisonners);
+        _whiteBox.getChildren().add(_white);
+        _blackBox.getChildren().add(_black);
         _game_infos.getChildren().addAll(_blackBox, _whiteBox);
 
         // 初始化按钮
@@ -127,7 +123,7 @@ public class GameInfos {
     public void updateGameInfo(int new_y, int new_x){
         _size_x = new_x;
         _size_y = new_y;
-        _game_infos.setPrefSize(new_x, new_y);
+        _game_infos.setPrefSize(_size_x, _size_y);
     }
 
     /**
@@ -148,8 +144,6 @@ public class GameInfos {
         bindFont(playerTurn, fontSizeBinding);
         bindFont(_white, fontSizeBinding);
         bindFont(_black, fontSizeBinding);
-        bindFont(_white_label_prisonners, fontSizeBinding);
-        bindFont(_black_label_prisonners, fontSizeBinding);
         bindFont(_whiteResults, fontSizeBinding);
         bindFont(_blackResults, fontSizeBinding);
     }
@@ -170,40 +164,18 @@ public class GameInfos {
     }
 
     private void addText() {
-        _white = new Label("white");
-        _black = new Label("black");
+        _white = new Label("white turn");
+        _black = new Label("black turn");
 
         // 给初始字体，使得在极端情况下也不会为 0
         _white.setFont(Font.font("Arial", 12));
         _black.setFont(Font.font("Arial", 12));
 
-        String _white_prisonners = "prisonners: 0";
-        String _black_prisonners = "prisonners: 0";
-
-        _white_label_prisonners.setText(_white_prisonners);
-        _black_label_prisonners.setText(_black_prisonners);
-
         // 其它字体绑定由 bindFonts() 延迟完成
     }
 
-    // ================= 供外部调用的接口（Gomoku 等会用到） =================
-
-    public void setWhiteResults(String res) {
-        _whiteResults.setText(res);
-    }
-
-    public void setBlackResults(String res) {
-        _blackResults.setText(res);
-    }
-
-    // ---------- Turn / Player ----------
-    // Gomoku 使用名为 setPLayTurn(int)（注意大小写），提供两个重载以兼容不同调用
-    public void setPLayTurn(Integer turn) {
-        playTurn.setText("Round : " + turn.toString());
-    }
-
     public void setPLayTurn(int turn) {
-        playTurn.setText("Round : " + Integer.toString(turn));
+        playTurn.setText("Round : " + turn);
     }
 
     // 旧名：setPLayerTurn（若项目中使用此名也兼容）
@@ -216,16 +188,6 @@ public class GameInfos {
 
     public VBox getResultsBox() {
         return _results;
-    }
-
-    // ---------- Prisonners ----------
-    // 注意方法名中带下划线，和 Gomoku 报错中一致
-    public void set_white_prisonners(String str) {
-        _white_label_prisonners.setText("prisonners : " + str);
-    }
-
-    public void set_black_prisonners(String str) {
-        _black_label_prisonners.setText("prisonners : " + str);
     }
 
     // ---------- Reset / Clear / Update ----------
