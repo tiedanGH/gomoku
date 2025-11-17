@@ -1,10 +1,8 @@
 package org.interfacegui;
 
+import javafx.application.Platform;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.control.Label;
 import javafx.scene.text.Font;
 import javafx.beans.binding.Bindings;
@@ -29,9 +27,9 @@ import javafx.geometry.Insets;
  */
 public class GameInfos {
 
-    private VBox _game_infos;
-    private VBox _whiteBox = new VBox();
-    private VBox _blackBox = new VBox();
+    private final VBox _game_infos;
+    private final VBox _whiteBox = new VBox();
+    private final VBox _blackBox = new VBox();
 
     private int _size_x;
     private int _size_y;
@@ -39,34 +37,26 @@ public class GameInfos {
     private Label _white;
     private Label _black;
 
-    private String _black_prisonners;
-    private String _white_prisonners;
-
-    private Label _black_label_prisonners = new Label();
-    private Label _white_label_prisonners = new Label();
+    private final Label _black_label_prisonners = new Label();
+    private final Label _white_label_prisonners = new Label();
 
     // 结果显示（主要用于 Go 计分模式）
-    private Label _whiteResults = new Label();
-    private Label _blackResults = new Label();
-    private VBox _results = new VBox();
+    private final Label _whiteResults = new Label();
+    private final Label _blackResults = new Label();
+    private final VBox _results = new VBox();
 
     // 回合显示
-    private Label playTurn = new Label("Round : 0");
-    private Label playerTurn = new Label("Black turn");
+    private final Label playTurn = new Label("Round : 0");
+    private final Label playerTurn = new Label("Black turn");
 
-    // 各种按钮
-    private Button _resign;
-    private Button _undo = new Button("undo");
-    private Button _export = new Button("export");
-    private Button _prev;
-    private Button _next;
-    private Button _pass = new Button("pass");
-    private Button _candidats;
-    private Button _hint;
-    private Button _forbidden = new Button("forbiddens");
-    private Button backHomeButton = new Button("back Home");
-
-    private HBox _button_prev_next = new HBox();
+    // 各种按钮（确保都有实例）
+    private final Button _resign;
+    private final Button _undo = new Button("undo");
+    private final Button _export = new Button("export");
+    private final Button _prev;
+    private final Button _next;
+    private final Button _hint;
+    private final Button backHomeButton = new Button("back Home");
 
     public GameInfos(int y, int x, Home infos) {
         _size_x = x;
@@ -74,6 +64,8 @@ public class GameInfos {
 
         _game_infos = new VBox();
         _game_infos.setPrefSize(x, y);
+        _game_infos.setMinWidth(Region.USE_PREF_SIZE);
+        _game_infos.setMinHeight(Region.USE_PREF_SIZE);
         _game_infos.setBackground(new Background(new BackgroundFill(Color.web("#ADBAC0"), null, null)));
 
         // 默认隐藏“返回主页”按钮，某些模式（如 LEARNING）中再打开
@@ -96,78 +88,98 @@ public class GameInfos {
         _resign = new Button("resign");
         _prev = new Button("<");
         _next = new Button(">");
-        _candidats = new Button("show candidats");
         _hint = new Button("hint");
+
+        // 设置最小高度和默认字体，避免字体=0 导致控件高度=0（跨平台稳健）
+        setButtonMinHeight(_prev, _next, _hint,
+                _resign, _undo, _export, backHomeButton);
 
         _prev.setPadding(Insets.EMPTY);
         _next.setPadding(Insets.EMPTY);
-        _prev.setPrefWidth(_size_x / 2 - (_size_x / 10));
+        // 若 size_x 非零，则给左右按钮合适的 prefWidth
+        if (_size_x > 0) {
+            _prev.setPrefWidth((double) _size_x / 2 - ((double) _size_x / 10));
+            _next.setPrefWidth((double) _size_x / 2 - ((double) _size_x / 10));
+        }
         _prev.setFont(Font.font("Arial", 20));
-
-        _next.setPrefWidth(_size_x / 2 - (_size_x / 10));
         _next.setFont(Font.font("Arial", 20));
 
-        // 结果区域，默认隐藏
+        // 结果区域默认隐藏
         _results.getChildren().addAll(_whiteResults, _blackResults);
         _results.setVisible(false);
         _results.setManaged(false);
 
+        HBox _button_prev_next = new HBox();
         _button_prev_next.getChildren().addAll(_prev, _next);
 
-        // 最终把所有控件装进 info 面板
+        // 将所有控件装进 info 面板
         _game_infos.getChildren().addAll(
-                _candidats,
                 _hint,
-                _forbidden,
                 _resign,
                 _undo,
                 _button_prev_next,
-                _pass,
                 _results,
                 _export
         );
+
+        // 延迟绑定字体（确保控件已加入 Scene 并有尺寸）
+        Platform.runLater(this::bindFonts);
     }
 
     /**
-     * 根据面板大小动态设定字体，初始化白/黑方 Label 与囚徒 Label。
+     * 延迟绑定字体大小，避免构造阶段 _game_infos 高度为 0 导致字体变 0。
+     * 同时设置字体下限（避免 min = 0）。
      */
+    private void bindFonts() {
+        // 字体下限设为 8px，避免 fontSize = 0
+        DoubleBinding fontSizeBinding = (DoubleBinding) Bindings.max(
+                8,
+                Bindings.min(
+                        _game_infos.widthProperty().multiply(0.1),
+                        _game_infos.heightProperty().multiply(0.1)
+                )
+        );
+
+        bindFont(playTurn, fontSizeBinding);
+        bindFont(playerTurn, fontSizeBinding);
+        bindFont(_white, fontSizeBinding);
+        bindFont(_black, fontSizeBinding);
+        bindFont(_white_label_prisonners, fontSizeBinding);
+        bindFont(_black_label_prisonners, fontSizeBinding);
+        bindFont(_whiteResults, fontSizeBinding);
+        bindFont(_blackResults, fontSizeBinding);
+    }
+
+    private void bindFont(Label label, DoubleBinding binding) {
+        label.fontProperty().bind(Bindings.createObjectBinding(
+                () -> new Font("Arial", binding.get()),
+                binding
+        ));
+    }
+
+    private void setButtonMinHeight(Button... buttons) {
+        for (Button b : buttons) {
+            if (b == null) continue;
+            b.setMinHeight(28);            // 跨平台稳定高度
+            b.setFont(Font.font("Arial", 14)); // 默认字体，避免测量异常
+        }
+    }
+
     private void addText() {
         _white = new Label("white");
         _black = new Label("black");
 
-        _white.setFont(new Font("Arial", 8));
-        _black.setFont(new Font("Arial", 8));
+        // 给初始字体，使得在极端情况下也不会为 0
+        _white.setFont(Font.font("Arial", 12));
+        _black.setFont(Font.font("Arial", 12));
 
-        DoubleBinding fontSizeBinding = (DoubleBinding) Bindings.min(
-                _game_infos.widthProperty().multiply(0.1),
-                _game_infos.heightProperty().multiply(0.1)
-        );
-
-        _white.fontProperty().bind(Bindings.createObjectBinding(
-                () -> new Font("Arial", fontSizeBinding.get()),
-                fontSizeBinding
-        ));
-
-        _black.fontProperty().bind(Bindings.createObjectBinding(
-                () -> new Font("Arial", fontSizeBinding.get()),
-                fontSizeBinding
-        ));
-
-        // 初始化囚徒数
-        _white_prisonners = "prisonners: 0";
-        _black_prisonners = "prisonners: 0";
+        String _white_prisonners = "prisonners: 0";
+        String _black_prisonners = "prisonners: 0";
 
         _white_label_prisonners.setText(_white_prisonners);
         _black_label_prisonners.setText(_black_prisonners);
 
-        _white_label_prisonners.fontProperty().bind(Bindings.createObjectBinding(
-                () -> new Font("Arial", fontSizeBinding.get()),
-                fontSizeBinding
-        ));
-        _black_label_prisonners.fontProperty().bind(Bindings.createObjectBinding(
-                () -> new Font("Arial", fontSizeBinding.get()),
-                fontSizeBinding
-        ));
+        // 其它字体绑定由 bindFonts() 延迟完成
     }
 
     // ================= 供外部调用的接口（Gomoku 等会用到） =================
@@ -180,10 +192,17 @@ public class GameInfos {
         _blackResults.setText(res);
     }
 
+    // ---------- Turn / Player ----------
+    // Gomoku 使用名为 setPLayTurn(int)（注意大小写），提供两个重载以兼容不同调用
     public void setPLayTurn(Integer turn) {
         playTurn.setText("Round : " + turn.toString());
     }
 
+    public void setPLayTurn(int turn) {
+        playTurn.setText("Round : " + Integer.toString(turn));
+    }
+
+    // 旧名：setPLayerTurn（若项目中使用此名也兼容）
     public void setPLayerTurn(int play) {
         if (play == 0)
             playerTurn.setText("Black turn");
@@ -195,6 +214,8 @@ public class GameInfos {
         return _results;
     }
 
+    // ---------- Prisonners ----------
+    // 注意方法名中带下划线，和 Gomoku 报错中一致
     public void set_white_prisonners(String str) {
         _white_label_prisonners.setText("prisonners : " + str);
     }
@@ -203,18 +224,16 @@ public class GameInfos {
         _black_label_prisonners.setText("prisonners : " + str);
     }
 
+    // ---------- Reset / Clear / Update ----------
     public void reset_infos(Home infos) {
         // 计时已删除，这里只重置回合与当前玩家显示
         playTurn.setText("Round : 0");
         playerTurn.setText("Black turn");
     }
 
+    // ---------- Getters for buttons / boxes ----------
     public Button getBackHomeButton() {
         return backHomeButton;
-    }
-
-    public Button getForbiddeButton() {
-        return _forbidden;
     }
 
     public VBox getGameInfos() {
@@ -227,10 +246,6 @@ public class GameInfos {
 
     public Button getNextButton() {
         return _next;
-    }
-
-    public Button getCandidatsButton() {
-        return _candidats;
     }
 
     public Button getResignButton() {
@@ -249,10 +264,6 @@ public class GameInfos {
         return _hint;
     }
 
-    public Button getPassButton() {
-        return _pass;
-    }
-
     public VBox getBlackBox() {
         return _blackBox;
     }
@@ -260,15 +271,4 @@ public class GameInfos {
     public VBox getWhiteBox() {
         return _whiteBox;
     }
-
-    public void updateGameInfo(int new_y, int new_x) {
-        _size_x = new_x;
-        _size_y = new_y;
-        _game_infos.setPrefSize(new_x, new_y);
-    }
-
-    public void clear() {
-        // 目前不用做什么，如果以后想重置信息可以在这里补
-    }
 }
-
