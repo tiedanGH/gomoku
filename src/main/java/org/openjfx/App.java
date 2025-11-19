@@ -118,21 +118,17 @@ public class App extends Application {
 
     private void set_board_event(Pane board_root) {
         gomoku.getBackHomeButton().setOnMouseClicked(event -> {
-            gomoku.killIa();
+            gomoku.endAI();
             setNewHome();
         });
-
         gomoku.get_home_button().setOnMouseClicked(event -> setNewHome());
-
-        gomoku.get_replay_button().setOnMouseClicked(event -> gomoku.reset_gomoku());
-
-        board.widthProperty().addListener((obs, oldV, newV) -> {
-            gomoku.updateGameDisplay((int) board.getHeight(), newV.intValue());
-        });
-
-        board.heightProperty().addListener((obs, oldV, newV) -> {
-            gomoku.updateGameDisplay(newV.intValue(), (int) board.getWidth());
-        });
+        gomoku.get_replay_button().setOnMouseClicked(event -> gomoku.resetGame());
+        board.widthProperty().addListener((obs, oldV, newV) ->
+                gomoku.updateGameDisplay((int) board.getHeight(), newV.intValue())
+        );
+        board.heightProperty().addListener((obs, oldV, newV) ->
+                gomoku.updateGameDisplay(newV.intValue(), (int) board.getWidth())
+        );
     }
 
     @Override

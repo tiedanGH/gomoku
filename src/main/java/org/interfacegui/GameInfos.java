@@ -15,20 +15,15 @@ public class GameInfos {
     private final VBox gameInfos;
     private final VBox whiteBox = new VBox();
     private final VBox blackBox = new VBox();
-
     private int sizeX;
     private int sizeY;
-
     private Label white;
     private Label black;
-
-    // 回合显示
     private final Label turn = new Label("Round : 0");
 
-    // 各种按钮（确保都有实例）
     private final Button resign;
     private final Button undo = new Button("undo");
-    private final Button prev;
+    private final Button previous;
     private final Button next;
     private final Button hint;
 
@@ -55,25 +50,25 @@ public class GameInfos {
 
         // 初始化按钮
         resign = new Button("resign");
-        prev = new Button("<");
+        previous = new Button("<");
         next = new Button(">");
         hint = new Button("hint");
 
         // 设置最小高度和默认字体，避免字体=0 导致控件高度=0（跨平台稳健）
-        setButtonMinHeight(prev, next, hint, undo, resign);
+        setButtonMinHeight(previous, next, hint, undo, resign);
 
-        prev.setPadding(Insets.EMPTY);
+        previous.setPadding(Insets.EMPTY);
         next.setPadding(Insets.EMPTY);
         // 若 size_x 非零，则给左右按钮合适的 prefWidth
         if (sizeX > 0) {
-            prev.setPrefWidth((double) sizeX / 2 - ((double) sizeX / 10));
+            previous.setPrefWidth((double) sizeX / 2 - ((double) sizeX / 10));
             next.setPrefWidth((double) sizeX / 2 - ((double) sizeX / 10));
         }
-        prev.setFont(Font.font("Arial", 20));
+        previous.setFont(Font.font("Arial", 20));
         next.setFont(Font.font("Arial", 20));
 
         HBox _button_prev_next = new HBox();
-        _button_prev_next.getChildren().addAll(prev, next);
+        _button_prev_next.getChildren().addAll(previous, next);
 
         // 将所有控件装进 info 面板
         gameInfos.getChildren().addAll(
@@ -146,8 +141,8 @@ public class GameInfos {
         return gameInfos;
     }
 
-    public Button getPrevButton() {
-        return prev;
+    public Button getPreviousButton() {
+        return previous;
     }
 
     public Button getNextButton() {

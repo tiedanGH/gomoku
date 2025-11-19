@@ -25,149 +25,97 @@ import javafx.util.Duration;
 
 public class Gomoku {
 
-    /** 记录最新落子，用于画红框 */
     private Point lastMove = null;
-
     private final Pane gameDisplay;
-    private ArrayList<Map> _map;
-    private Board board;
-    private GameInfos gameInfos;
-    private int _game_infos_size_x;
-    public int _game_infos_size_y;
-    private Pane _board_pane;
-    private VBox _game_infos_pane;
-    private int _nb_line;
-    private int map_index;
+    private final ArrayList<Map> maps;
+    private final Board board;
+    private final GameInfos gameInfos;
+    private int gameInfosSizeX;
+    public int gameInfosSizeY;
+    private final Pane boardPane;
+    private final int totalLines;
+    private int mapIndex;
     private Rules rule;
-    private VBox _end_popin = new VBox();
-    private Button _replay;
-    private Button _back_home;
-    private Home _game_infos = new Home(){};
+    private final VBox endPopup = new VBox();
+    private final Button replay;
+    private final Button backHome;
+    private final Home home;
 
-    private int player_turn = 0;
-    private boolean game_end = false;
+    private int playerTurn = 0;
+    private boolean gameEnd = false;
     private Timeline gameLoop;
-    private Label _end_text = new Label();
-    private int _winner = 0;
-    private Label game_name;
+    private final Label endText = new Label();
+    private Label gameName;
 
-    private ArrayList<Point> candidatsList;
+    private ArrayList<Point> candidatesList;
     private ArrayList<Point> hintList = null;
 
     private int round = 0;
     private Game game;
-    private ArrayList<Point> saved;
-    private boolean toggleCandidat = false;
     private boolean toggleHint = false;
     private boolean ia_playing = false;
 
     private ExecutorService executor = null;
     private Future<Point> future = null;
-
-    private ExecutorService executor2 = null;
+    private final ExecutorService executor2 = null;
     private Future<Boolean> future2 = null;
 
-    private Label commentLabel = new Label();
-    private Rules.GameMode playingMode = Rules.GameMode.PLAYING;
-    int _width = 0;
-
-    private ArrayList<Map> cpyMapLst(ArrayList<Map> m) {
-        ArrayList<Map> n = new ArrayList<>();
-        for (Map map : m) n.add(new Map(map));
-        return n;
-    }
+    private final Label commentLabel = new Label();
+    int width = 0;
 
     private void setEndGame() {
         int winner = rule.getWinner();
-        _end_popin.setVisible(true);
-        _end_popin.setManaged(true);
-        game_end = true;
+        endPopup.setVisible(true);
+        endPopup.setManaged(true);
+        gameEnd = true;
         ia_playing = false;
         if (gameLoop != null) gameLoop.stop();
 
-        if (winner == 0) _end_text.setText("Draw");
-        else if (winner == 1) _end_text.setText("Black Win");
-        else _end_text.setText("White Win");
-    }
-
-    private Boolean playIa() {
-        boolean end = false;
-        int mapSize = _map.size();
-        int mIndex;
-
-        if (!rule.hasIa()) return false;
-
-        for (mIndex = 0; mIndex < mapSize; mIndex++) {
-            Map m = _map.get(mIndex);
-            ArrayList<Point> lastMove = m.getLastMove();
-            ArrayList<Integer> lastMoveColor = m.getLastMoveColor();
-
-            // 重建 AI 内部棋盘
-            updateGameMap(mIndex);
-
-            for (int j = 0; j < lastMove.size(); j++) {
-                if (lastMoveColor.get(j) != 0) {
-                    game.move(lastMove.get(j), lastMoveColor.get(j));
-                    if (!end) end = rule.endGame(_map.get(mIndex), lastMove.get(j));
-                    if (end) return true;
-                }
-            }
-
-            if (mIndex < _map.size() - 1) {
-                game.bestMove((mIndex % 2 == 0 ? 1 : 2),
-                        (mIndex % 2 == 0 ? 1 : 2), true);
-                setCandidats(game.m.candidate.list, game.m.values, mIndex + 1);
-                updatePlayerTurn();
-            }
-        }
-        return false;
+        if (winner == 0) endText.setText("Draw");
+        else if (winner == 1) endText.setText("Black Win");
+        else endText.setText("White Win");
     }
 
     private void updateGameMap(int index) {
         for (int i = 0; i < rule.get_board_size(); i++) {
             for (int j = 0; j < rule.get_board_size(); j++) {
-                game.gameMap[i][j] = _map.get(index).get_map()[i][j];
+                game.gameMap[i][j] = maps.get(index).get_map()[i][j];
             }
         }
     }
 
-    /** 显示候选点 */
-    void changeCandidatVisibility(boolean visible) {
-        ArrayList<Point> currentCandidats = _map.get(map_index).getCandidatsList();
-        if (currentCandidats == null) return;
-
-        for (Point p : currentCandidats) {
+    void hideCandidates() {
+        ArrayList<Point> currentCandidates = maps.get(mapIndex).getCandidatsList();
+        if (currentCandidates == null) return;
+        for (Point p : currentCandidates) {
             String color = p.val < 0 ? "#FF0000" : "#00FF00";
-            board.setStoneStatus(visible, color, p, String.format("%.0f", p.val));
+            board.setStoneStatus(false, color, p, String.format("%.0f", p.val));
         }
-        if (!visible) board.updateFromMap(_map.get(map_index));
+        board.updateFromMap(maps.get(mapIndex));
     }
 
-    void setCandidats(ArrayList<Candidate.Coordinate> candidats, float[] values, int index) {
-        if (!rule.hasIa() || candidats == null || values == null) return;
-
-        candidatsList = new ArrayList<>();
-        changeCandidatVisibility(false);
-
+    void setCandidates(ArrayList<Candidate.Coordinate> candidates, float[] values, int index) {
+        if (!rule.hasAI() || candidates == null || values == null) return;
+        candidatesList = new ArrayList<>();
+        hideCandidates();
         for (int i = 0; i < values.length; i++) {
-            candidatsList.add(new Point(candidats.get(i).y, candidats.get(i).x));
-            candidatsList.get(i).set_val(values[i]);
+            candidatesList.add(new Point(candidates.get(i).y, candidates.get(i).x));
+            candidatesList.get(i).set_val(values[i]);
         }
-        _map.get(index).setCandidatsList(candidatsList);
+        maps.get(index).setCandidatsList(candidatesList);
     }
 
-    /** Hint */
     void changeHintVisibility(boolean visible) {
         if (hintList == null) return;
 
         for (Point p : hintList) {
             board.setStoneStatus(visible, "#00F0FF", p, String.valueOf((int)p.val));
         }
-        if (!visible) board.updateFromMap(_map.get(map_index));
+        if (!visible) board.updateFromMap(maps.get(mapIndex));
     }
 
     void setHint(ArrayList<Candidate.Coordinate> hint, float[] values) {
-        if (!rule.hasIa() || hint == null) return;
+        if (!rule.hasAI() || hint == null) return;
 
         hintList = new ArrayList<>();
         for (int i = 0; i < hint.size(); i++) {
@@ -179,40 +127,33 @@ public class Gomoku {
     }
 
     private void updatePlayerTurn() {
-        player_turn ^= 1;
+        playerTurn = 1 - playerTurn;
     }
 
-    // 五子棋落子主逻辑
+    // play a move
     private void playMove(Point point) {
-        if (map_index < (_map.size() - 1) || !rule.isValidMove(point, _map)) return;
+        if (mapIndex < (maps.size() - 1) || !rule.isValidMove(point, maps)) return;
 
-        // 隐藏候选点、hint
-        changeCandidatVisibility(false);
+        hideCandidates();
         changeHintVisibility(false);
-        toggleCandidat = false;
         toggleHint = false;
 
-        // 克隆上一个棋盘
-        _map.add(new Map(_map.get(_map.size() - 1)));
-        Map newMap = _map.get(_map.size() - 1);
+        maps.add(new Map(maps.get(maps.size() - 1)));
+        Map newMap = maps.get(maps.size() - 1);
 
-        // 添加落子
         newMap.clearMove();
-        newMap.addMove(point, _map.size() % 2 + 1);
-        map_index = _map.size() - 1;
+        newMap.addMove(point, maps.size() % 2 + 1);
+        mapIndex = maps.size() - 1;
 
-        // 记录最新落子
         lastMove = point;
 
-        // AI 部分
-        if (rule.hasIa()) {
-            updateGameMap(map_index);
-            game.move(point, player_turn + 1);
+        if (rule.hasAI()) {
+            updateGameMap(mapIndex);
+            game.move(point, playerTurn + 1);
         }
 
-        newMap.set_color(player_turn);
+        newMap.set_color(playerTurn);
 
-        // 更新棋盘并画红框
         board.updateFromMap(newMap);
         highlightLastMove();
 
@@ -220,7 +161,7 @@ public class Gomoku {
             setEndGame();
         }
 
-        if (player_turn == 0) {
+        if (playerTurn == 0) {
             round++;
             gameInfos.setTurn(round);
         }
@@ -230,25 +171,22 @@ public class Gomoku {
     }
 
     private void undoMove() {
-        if (_map.size() < 2 || map_index < _map.size() - 1) return;
+        if (maps.size() < 2 || mapIndex < maps.size() - 1) return;
 
-        changeCandidatVisibility(false);
+        hideCandidates();
         changeHintVisibility(false);
-        toggleCandidat = false;
         toggleHint = false;
 
-        map_index--;
-        _map.remove(_map.size() - 1);
+        mapIndex--;
+        maps.remove(maps.size() - 1);
 
-        if (rule.hasIa()) {
-            updateGameMap(map_index);
+        if (rule.hasAI()) {
+            updateGameMap(mapIndex);
         }
 
-        // 回退后更新棋盘
-        board.updateFromMap(_map.get(map_index));
+        board.updateFromMap(maps.get(mapIndex));
 
-        // 更新 lastMove 为当前局面的最后一步
-        ArrayList<Point> last = _map.get(map_index).getLastMove();
+        ArrayList<Point> last = maps.get(mapIndex).getLastMove();
         if (last != null && !last.isEmpty()) {
             lastMove = last.get(last.size() - 1);
             highlightLastMove();
@@ -256,162 +194,155 @@ public class Gomoku {
             lastMove = null;
         }
 
-        player_turn ^= 1;
+        updatePlayerTurn();
 
-        if (map_index % 2 == 0) round--;
+        if (mapIndex % 2 == 0) round--;
         gameInfos.setTurn(round);
     }
 
     private void setPlayerColor() {
-        if (player_turn == 0) {
+        if (playerTurn == 0) {
             gameInfos.getBlackBox().setBackground(
-                    new Background(new BackgroundFill(Color.DARKSLATEGRAY, null, null)));
+                    new Background(new BackgroundFill(Color.GOLDENROD, null, null)));
             gameInfos.getWhiteBox().setBackground(
                     new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
         } else {
             gameInfos.getBlackBox().setBackground(
                     new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
             gameInfos.getWhiteBox().setBackground(
-                    new Background(new BackgroundFill(Color.DARKSLATEGRAY, null, null)));
+                    new Background(new BackgroundFill(Color.GOLDENROD, null, null)));
         }
     }
 
-    private void init_rules(String rules_type, int size) {
+    private void initRules(int size) {
         rule = new GomokuRules();
         rule.setBoardSize(size);
     }
 
-    public void killIa() {
+    public void endAI() {
         if (gameLoop != null) gameLoop.stop();
         if (executor != null) executor.shutdown();
-        if (rule.hasIa() && game != null) game.resetMinMax();
+        if (rule.hasAI() && game != null) game.resetMinMax();
     }
 
-    private void handdleButtonPrevNext() {
-        gameInfos.getPrevButton().setVisible(map_index > 0);
-        gameInfos.getNextButton().setVisible(map_index < _map.size() - 1);
+    private void setStepButtonVisibility() {
+        gameInfos.getPreviousButton().setVisible(mapIndex > 0);
+        gameInfos.getNextButton().setVisible(mapIndex < maps.size() - 1);
     }
 
-    public Gomoku(int heigh, int width, Home game_infos) {
+    public Gomoku(int height, int width, Home game_infos) {
+        home = game_infos;
+        this.width = width;
 
-        _game_infos = game_infos;
-        _width = width;
-
-        if (_game_infos.getRuleInstance() != null)
-            rule = _game_infos.getRuleInstance();
+        if (home.getRuleInstance() != null)
+            rule = home.getRuleInstance();
         else
-            init_rules(_game_infos.getRules(), _game_infos.getBoardSize());
+            initRules(home.getBoardSize());
 
-        _nb_line = rule.get_board_size();
+        totalLines = rule.get_board_size();
 
-        _game_infos_size_x = width / 4;
-        _game_infos_size_y = heigh;
+        gameInfosSizeX = width / 4;
+        gameInfosSizeY = height;
 
-        gameInfos = new GameInfos(heigh, _game_infos_size_x);
-        playingMode = game_infos.getGameMode();
+        gameInfos = new GameInfos(height, gameInfosSizeX);
 
         game = new Game(game_infos.getRules(), rule.get_board_size());
-
         game.resetMinMax();
+        maps = new ArrayList<>();
+        board = new Board(height, width - gameInfosSizeX, rule.get_board_size());
 
-        _map = new ArrayList<>();
-        board = new Board(heigh, width - _game_infos_size_x, rule.get_board_size());
+        maps.add(new Map(totalLines));
 
-        _map.add(new Map(_nb_line));
-
-        saved = new ArrayList<>();
         gameDisplay = new Pane();
-        _replay = new Button("Replay");
-        _back_home = new Button("Back Home");
-        game_name = new Label(game_infos.getRules());
+        replay = new Button("Replay");
+        backHome = new Button("Back Home");
+        gameName = new Label(game_infos.getRules());
 
-        _end_popin.setVisible(false);
-        _end_popin.getChildren().addAll(_end_text, _replay, _back_home);
+        endPopup.setVisible(false);
+        endPopup.getChildren().addAll(endText, replay, backHome);
 
-        _board_pane = board.getBoard();
-        _game_infos_pane = gameInfos.getGameInfos();
-        _game_infos_pane.getChildren().add(0, game_name);
-        _game_infos_pane.getChildren().add(0, _end_popin);
+        boardPane = board.getBoard();
+        VBox gameInfosPane = gameInfos.getGameInfos();
+        gameInfosPane.getChildren().add(0, gameName);
+        gameInfosPane.getChildren().add(0, endPopup);
 
         setPlayerColor();
 
         DoubleBinding fontSizeBinding = (DoubleBinding) Bindings.min(
-                _game_infos_pane.widthProperty().multiply(0.1),
-                _game_infos_pane.heightProperty().multiply(0.1)
+                gameInfosPane.widthProperty().multiply(0.1),
+                gameInfosPane.heightProperty().multiply(0.1)
         );
 
-        game_name.fontProperty().bind(Bindings.createObjectBinding(
+        gameName.fontProperty().bind(Bindings.createObjectBinding(
                 () -> new Font("Arial", fontSizeBinding.get()),
                 fontSizeBinding
         ));
 
         VBox mainVBox = new VBox();
         HBox hbox = new HBox();
-        hbox.getChildren().addAll(_game_infos_pane, _board_pane);
+        hbox.getChildren().addAll(gameInfosPane, boardPane);
         mainVBox.getChildren().addAll(commentLabel, hbox);
         gameDisplay.getChildren().add(mainVBox);
 
-        // 撤销
+        // Undo Button
         gameInfos.getUndoButton().setOnAction(event -> {
             if (!rule.undo()) return;
             undoMove();
         });
 
-        // 提示 hint
+        // Hint Button
         gameInfos.getHintButton().setOnAction(event -> {
-            if (!rule.hasIa() || game_end) return;
+            if (!rule.hasAI() || gameEnd) return;
 
             toggleHint = !toggleHint;
 
-            game.bestMove(player_turn + 1, player_turn + 1, true);
+            game.bestMove(playerTurn + 1, playerTurn + 1, true);
             setHint(game.m.candidate.list, game.m.values);
             changeHintVisibility(toggleHint);
 
-            if (!toggleHint) board.updateFromMap(_map.get(map_index));
+            if (!toggleHint) board.updateFromMap(maps.get(mapIndex));
         });
 
-        // 投降
+        // Resign Button
         gameInfos.getResignButton().setOnAction(event -> {
             if (rule.getGameMode() == Rules.GameMode.ENDGAME)
                 return ;
             gameLoop.stop();
-            game_end = true;
+            gameEnd = true;
             ia_playing = false;
-            _end_text.setText("match resigned");
-            _end_popin.setVisible(true);
-            _end_popin.setManaged(true);
-            killIa();
+            endText.setText("match resigned");
+            endPopup.setVisible(true);
+            endPopup.setManaged(true);
+            endAI();
             if (future2 != null){
-                if (executor2 != null)
-                    executor2.shutdownNow();
                 future2 = null;
                 ia_playing = false;
             }
         });
 
-        // 上一步
-        gameInfos.getPrevButton().setOnAction(event -> {
-            if (map_index > 0) {
-                map_index--;
-                board.updateFromMap(_map.get(map_index));
-                handdleButtonPrevNext();
+        // Previous Button
+        gameInfos.getPreviousButton().setOnAction(event -> {
+            if (mapIndex > 0) {
+                mapIndex--;
+                board.updateFromMap(maps.get(mapIndex));
+                setStepButtonVisibility();
             }
         });
 
-        // 下一步
+        // Next Button
         gameInfos.getNextButton().setOnAction(event -> {
-            if (map_index < _map.size() - 1) {
-                map_index++;
-                board.updateFromMap(_map.get(map_index));
-                handdleButtonPrevNext();
+            if (mapIndex < maps.size() - 1) {
+                mapIndex++;
+                board.updateFromMap(maps.get(mapIndex));
+                setStepButtonVisibility();
             }
         });
 
-        // 点击鼠标游玩
+        // Board Click Event
         board.getBoard().setOnMouseClicked(event -> {
-            if (game_end) return;
-            if ((player_turn == 0 && _game_infos.getBlackPlayerType() == 1)
-                    || (player_turn == 1 && _game_infos.getWhitePlayerType() == 1))
+            if (gameEnd) return;
+            if ((playerTurn == 0 && home.getBlackPlayerType() == 1)
+                    || (playerTurn == 1 && home.getWhitePlayerType() == 1))
                 return;
 
             int margin_w = board.get_margin_width();
@@ -431,17 +362,15 @@ public class Gomoku {
             playMove(new Point((int) x, (int) y));
         });
 
-        // 建立 AI loop
-        createDelayedGameLoop();
+        createGameLoop();
     }
 
-    public void createDelayedGameLoop() {
+    public void createGameLoop() {
         gameLoop = new Timeline();
         KeyFrame keyFrame = new KeyFrame(Duration.millis(50), event -> {
-
-            if (rule.hasIa()) {
+            if (rule.hasAI()) {
                 try {
-                    if (player_turn == 0 && _game_infos.getBlackPlayerType() == 1) {
+                    if (playerTurn == 0 && home.getBlackPlayerType() == 1) {
                         if (!ia_playing) {
                             executor = Executors.newSingleThreadExecutor();
                             future = executor.submit(() -> game.bestMove(1, 1, true));
@@ -452,7 +381,7 @@ public class Gomoku {
                             executor = null;
                             ia_playing = false;
                         }
-                    } else if (player_turn == 1 && _game_infos.getWhitePlayerType() == 1) {
+                    } else if (playerTurn == 1 && home.getWhitePlayerType() == 1) {
                         if (!ia_playing) {
                             executor = Executors.newSingleThreadExecutor();
                             future = executor.submit(() -> game.bestMove(2, 2, true));
@@ -469,17 +398,15 @@ public class Gomoku {
                 }
             }
         });
-
         gameLoop.getKeyFrames().add(keyFrame);
         gameLoop.setCycleCount(Timeline.INDEFINITE);
         gameLoop.play();
     }
 
-    public void reset_gomoku() {
-
+    public void resetGame() {
         ia_playing = false;
-        game_end = false;
-        player_turn = 0;
+        gameEnd = false;
+        playerTurn = 0;
         lastMove = null;
 
         if (gameLoop != null) {
@@ -490,40 +417,35 @@ public class Gomoku {
             executor = null;
         }
 
-        // 清空棋盘历史
-        _map.clear();
-        _map.add(new Map(_nb_line));
+        // reset map and board
+        maps.clear();
+        maps.add(new Map(totalLines));
 
-        // 更新 UI
-        board.updateFromMap(_map.get(0));
-        map_index = 0;
-        handdleButtonPrevNext();
+        board.updateFromMap(maps.get(0));
+        mapIndex = 0;
+        setStepButtonVisibility();
 
-        // 重置 AI
-        if (rule.hasIa()) {
-            game = new Game(_game_infos.getRules(), rule.get_board_size());
+        if (rule.hasAI()) {
+            game = new Game(home.getRules(), rule.get_board_size());
             game.resetMinMax();
-            if (_game_infos.getBlackPlayerType() == 0 &&
-                    _game_infos.getWhitePlayerType() == 0)
+            if (home.getBlackPlayerType() == 0 &&
+                    home.getWhitePlayerType() == 0)
                 game.treeConfig(1);
             else
-                game.treeConfig(_game_infos.getLevel());
+                game.treeConfig(home.getLevel());
         }
 
-        // 清空提示
-        candidatsList = null;
+        // clear hint
+        candidatesList = null;
         hintList = null;
-        toggleCandidat = false;
         toggleHint = false;
-        changeCandidatVisibility(false);
+        hideCandidates();
         changeHintVisibility(false);
 
-        // 隐藏结束弹窗
-        _end_popin.setVisible(false);
-        _end_popin.setManaged(false);
+        endPopup.setVisible(false);
+        endPopup.setManaged(false);
 
-        // 重新启动 AI 循环
-        createDelayedGameLoop();
+        createGameLoop();
     }
 
     public Pane getGameDisplay() {
@@ -531,28 +453,28 @@ public class Gomoku {
     }
 
     public Button get_home_button() {
-        return _back_home;
+        return backHome;
     }
 
     public Button get_replay_button() {
-        return _replay;
+        return replay;
     }
 
-    public Button getBackHomeButton() { return _back_home; }
+    public Button getBackHomeButton() { return backHome; }
 
-    public void updateGameDisplay(int new_y, int new_x){
-        _width = new_x;
-        _game_infos_size_x = new_x / 4;
-        _game_infos_size_y = new_y;
-        gameInfos.updateGameInfo(new_y, _game_infos_size_x);
+    public void updateGameDisplay(int newY, int newX){
+        width = newX;
+        gameInfosSizeX = newX / 4;
+        gameInfosSizeY = newY;
+        gameInfos.updateGameInfo(newY, gameInfosSizeX);
         double labelHeight = commentLabel.prefHeight(commentLabel.getMaxWidth());
         if (!commentLabel.isVisible())
             labelHeight = 0;
-        board.updateBoard(new_y - (int)labelHeight, new_x - _game_infos_size_x);
-        _board_pane.setLayoutX(_game_infos_size_x);
+        board.updateBoard(newY - (int)labelHeight, newX - gameInfosSizeX);
+        boardPane.setLayoutX(gameInfosSizeX);
     }
 
-    /** 在最新落子位置画红框（调用 Board 的辅助方法） */
+    // highlight the last move
     private void highlightLastMove() {
         if (lastMove == null) return;
         board.drawLastMoveBox(lastMove);

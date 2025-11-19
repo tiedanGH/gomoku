@@ -16,7 +16,7 @@ public interface Rules {
     boolean isValidMove(Point point, ArrayList<Map> map);
     boolean endGame(Map map, Point point);
     int getWinner();
-    boolean hasIa();
+    boolean hasAI();
     int get_board_size();
     GameMode getGameMode();
     ArrayList<Point> verticalWin = new ArrayList<Point>();

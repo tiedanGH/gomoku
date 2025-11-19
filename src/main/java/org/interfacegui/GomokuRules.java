@@ -65,7 +65,7 @@ public class GomokuRules implements Rules {
     }
 
     @Override
-    public boolean hasIa(){
+    public boolean hasAI(){
         return true;
     }
     
