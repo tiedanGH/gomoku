@@ -10,20 +10,6 @@ import javafx.beans.binding.DoubleBinding;
 import javafx.scene.control.Button;
 import javafx.geometry.Insets;
 
-/**
- * GameInfos 精简版 —— 已完全删除计时功能
- * -----------------------------------------------------
- * 删除内容：
- *  - 白方/黑方倒计时
- *  - last move time / average move time
- *  - 所有与时间相关的字段、Label、方法
- * 保留内容：
- *  - 白/黑方名称
- *  - 囚徒数量显示
- *  - 回合数显示（Round）
- *  - 结果显示（for Go 计分结果）
- *  - 各种操作按钮（prev/next/undo/pass/hint/candidats/forbidden/export/resign/backHome）
- */
 public class GameInfos {
 
     private final VBox _game_infos;
@@ -36,7 +22,7 @@ public class GameInfos {
     private Label _white;
     private Label _black;
 
-    // 结果显示（主要用于 Go 计分模式）
+    // 结果显示（主要用于五子棋的计分模式）
     private final Label _whiteResults = new Label();
     private final Label _blackResults = new Label();
     private final VBox _results = new VBox();

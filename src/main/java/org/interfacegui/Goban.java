@@ -8,6 +8,9 @@ import javafx.scene.layout.BackgroundFill;
 import org.utils.Point;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
+
 
 public class Goban{
     private Pane _goban;
@@ -363,4 +366,43 @@ public class Goban{
             }
         }
     }
+    private Rectangle lastMoveRect = null;
+
+    public void drawLastMoveBox(Point p) {
+        // 移除旧红框
+        if (lastMoveRect != null) {
+            this.get_goban().getChildren().remove(lastMoveRect);
+            lastMoveRect = null;
+        }
+
+        int square = getSquareSize();
+        int margin_w = get_margin_width();
+        int margin_h = get_margin_height();
+
+        // 棋子实际中心点，必须和stones_responsivity 一样
+        double centerX = margin_w + (p.x * square);
+        double centerY = margin_h + (p.y * square);
+
+        // 红框大小比棋子稍大一点
+        double size = square * 1.1;
+
+        Rectangle rect = new Rectangle(
+                centerX - size / 2,
+                centerY - size / 2,
+                size,
+                size
+        );
+
+        rect.setFill(Color.TRANSPARENT);
+        rect.setStroke(Color.RED);
+        rect.setStrokeWidth(2);
+
+        lastMoveRect = rect;
+
+        this.get_goban().getChildren().add(rect);
+    }
+
+
+
+
 }

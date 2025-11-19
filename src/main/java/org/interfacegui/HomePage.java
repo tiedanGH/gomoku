@@ -1,231 +1,232 @@
 package org.interfacegui;
 
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.paint.Color;
 
-/**
- * Home Page（主菜单界面）
- * 只保留 Gomoku
- * 保留：SGF 加载、玩家类型选择、AI 难度、棋盘大小
- */
 public class HomePage {
 
-    private Pane page;
-    private Pane pageContainer;
+    private Pane page;                // 主页面 Pane
+    private Pane pageContainer;       // 外层容器（可在 App 中放入 Scene）
 
-    // 只剩一个规则：Gomoku
-    private Button gomoku;
+    // 玩家选择按钮
+    private Button blackPlayer;
+    private Button blackAI;
+    private Button whitePlayer;
+    private Button whiteAI;
 
-    // 玩家类型选择
-    private Button white_human;
-    private Button white_ia;
-    private Button black_human;
-    private Button black_ia;
+    // AI 难度（黑方 & 白方）
+    private Button blackEasy, blackMedium, blackHard;
+    private Button whiteEasy, whiteMedium, whiteHard;
 
-    private Pane black_player;
-    private Pane white_player;
+    // Board Size（只剩 19）
+    private Button nineteenButton;
 
-    // 围棋专属字段（现在全部不显示）
-    private TextField komi_field;
-    private TextField handicap_field;
+    // Start / Learn
+    private Button startButton;
+    private Button learnButton;
 
-    private Label boardSizeLabel = new Label("board size");
-    private Button nineSize = new Button("9");
-    private Button thirteenSize = new Button("13");
-    private Button nineteenSize = new Button("19");
-    private VBox boardSizeBox = new VBox(10);
-    private HBox boardSizeButtonBox = new HBox(10);
+    // 错误信息
+    private Label errorMessage = new Label();
 
-    private Label fileName = new Label("");
-    private HBox fileBox = new HBox(10);
-    private Label reset = new Label("reset");
-
-    private Button validation = new Button("Start");
-    private Button learnOrView = new Button("Learn");
-    private HBox LaunchButtons = new HBox();
-
-    private Label error_file = new Label();
-    private Label error_message = new Label();
-
-    private StringProperty rule_type = new SimpleStringProperty("gomoku");
-    private Rules rules_instance = null;
-
-    // AI 难度按钮
-    private HBox blackBox = new HBox();
-    private Button blackIaEasy = new Button("easy");
-    private Button blackIaMedium = new Button("medium");
-    private Button blackIaHard = new Button("hard");
-
-    private HBox whiteBox = new HBox();
-    private Button whiteIaEasy = new Button("easy");
-    private Button whiteIaMedium = new Button("medium");
-    private Button whiteIaHard = new Button("hard");
+    private StringProperty ruleType = new SimpleStringProperty("gomoku");
+    private Rules rulesInstance = null;
 
     public HomePage() {
 
-        // AI 难度区域（默认隐藏）
-        blackBox.getChildren().addAll(blackIaEasy, blackIaMedium, blackIaHard);
-        whiteBox.getChildren().addAll(whiteIaEasy, whiteIaMedium, whiteIaHard);
-        blackBox.setManaged(false);
-        blackBox.setVisible(false);
-        whiteBox.setManaged(false);
-        whiteBox.setVisible(false);
+        page = new Pane();
+        page.setPrefSize(800, 800);   // 你可以改成窗口大小
 
-        // BOARD SIZE 区域
-        boardSizeBox.getChildren().addAll(boardSizeLabel, boardSizeButtonBox);
-        boardSizeButtonBox.getChildren().addAll(nineSize, thirteenSize, nineteenSize);
-        boardSizeBox.setVisible(false);
-        boardSizeBox.setManaged(false);
-
-        // Start / Learn
-        LaunchButtons.getChildren().addAll(validation, learnOrView);
-
-        // SGF 文件显示区域
-        fileBox.getChildren().addAll(fileName, reset);
-        fileBox.setManaged(false);
-        fileBox.setVisible(false);
-
+        // ========== 颜色样式 ==========
         String selectedColor = "-fx-text-fill: #FFFFFF;";
         String deselectedColor = "-fx-text-fill: #000000;";
-        String selectedBackgroundColor = "-fx-background-color: #000000;";
-        String deselectedBackgroundColor = "-fx-background-color: #FFFFFF;";
+        String selectedBackground = "-fx-background-color: #000000;";
+        String deselectedBackground = "-fx-background-color: #FFFFFF;";
 
-        String deselectedStyle = deselectedBackgroundColor + deselectedColor;
-        String selectedStyle = selectedBackgroundColor + selectedColor;
+        String selectedStyle = selectedBackground + selectedColor;
+        String deselectedStyle = deselectedBackground + deselectedColor;
 
-        reset.setStyle(selectedColor);
-        fileName.setStyle(selectedColor);
+        // ========== Start 按钮 ==========
+        startButton = new Button("Start");
+        startButton.setStyle(selectedStyle);
+        startButton.setLayoutX(350);
+        startButton.setLayoutY(80);
+        startButton.setPrefWidth(100);
+        page.getChildren().add(startButton);
 
-        // 默认 board size = 19
-        nineteenSize.setStyle(selectedStyle);
-        thirteenSize.setStyle(deselectedStyle);
-        nineSize.setStyle(deselectedStyle);
+        // ========== Learn 按钮 ==========
+        learnButton = new Button("Learn");
+        learnButton.setStyle(deselectedStyle);
+        learnButton.setLayoutX(350);
+        learnButton.setLayoutY(140);
+        learnButton.setPrefWidth(100);
+        page.getChildren().add(learnButton);
 
-        // —— 保留唯一规则：GOMOKU ——
-        gomoku = new Button("Gomoku");
-        gomoku.setStyle(selectedStyle);
+        // ========== 黑方按钮 ==========
+        blackPlayer = new Button("Black Human");
+        blackAI = new Button("Black AI");
 
-        HBox game_button = new HBox(10, gomoku);
+        blackPlayer.setStyle(selectedStyle);
+        blackAI.setStyle(deselectedStyle);
 
-        // 玩家类型选择
-        white_player = new VBox(5);
-        black_player = new VBox(5);
+        blackPlayer.setLayoutX(300);
+        blackPlayer.setLayoutY(230);
 
-        black_human = new Button("black human");
-        black_ia = new Button("black ia");
-        black_human.setStyle(selectedStyle);
-        black_ia.setStyle(deselectedStyle);
+        blackAI.setLayoutX(420);
+        blackAI.setLayoutY(230);
 
-        VBox black_info = new VBox(5, new HBox(5, black_human, black_ia, blackBox));
-        black_player.getChildren().addAll(black_info);
+        page.getChildren().addAll(blackPlayer, blackAI);
 
-        white_human = new Button("white human");
-        white_ia = new Button("white ia");
-        white_human.setStyle(selectedStyle);
-        white_ia.setStyle(deselectedStyle);
+        // ========== 白方按钮 ==========
+        whitePlayer = new Button("White Human");
+        whiteAI = new Button("White AI");
 
-        VBox white_info = new VBox(5, new HBox(5, white_human, white_ia, whiteBox));
-        white_player.getChildren().addAll(white_info);
+        whitePlayer.setStyle(selectedStyle);
+        whiteAI.setStyle(deselectedStyle);
 
-        // Komi / Handicap（不显示）
-        komi_field = new TextField();
-        handicap_field = new TextField();
-        komi_field.setManaged(false);
-        komi_field.setVisible(false);
-        handicap_field.setManaged(false);
-        handicap_field.setVisible(false);
+        whitePlayer.setLayoutX(300);
+        whitePlayer.setLayoutY(290);
 
-        // 错误提示
-        error_file.setVisible(false);
-        error_file.setManaged(false);
-        error_message.setVisible(false);
-        error_message.setManaged(false);
-        error_file.setTextFill(Color.RED);
-        error_message.setTextFill(Color.RED);
+        whiteAI.setLayoutX(420);
+        whiteAI.setLayoutY(290);
 
-        // 主界面布局
-        page = new VBox(10);
-        ((VBox) page).getChildren().addAll(
-                error_message,
-                error_file,
-                fileBox,
-                game_button,
-                black_player,
-                white_player,
-                boardSizeBox,
-                LaunchButtons
-        );
+        page.getChildren().addAll(whitePlayer, whiteAI);
 
-        pageContainer = new StackPane();
-        pageContainer.getChildren().add(page);
+        // ========== AI 难度（黑方） ==========
+        blackEasy = new Button("Easy");
+        blackMedium = new Button("Medium");
+        blackHard  = new Button("Hard");
 
-        reset.setOnMouseClicked(e -> {
-            deleteFile();
-            learnOrView.setManaged(true);
-            learnOrView.setVisible(true);
-        });
+        blackEasy.setLayoutX(260);
+        blackMedium.setLayoutX(350);
+        blackHard.setLayoutX(450);
+
+        blackEasy.setLayoutY(350);
+        blackMedium.setLayoutY(350);
+        blackHard.setLayoutY(350);
+
+        blackEasy.setVisible(false);
+        blackMedium.setVisible(false);
+        blackHard.setVisible(false);
+
+        page.getChildren().addAll(blackEasy, blackMedium, blackHard);
+
+        // ========== AI 难度（白方） ==========
+        whiteEasy   = new Button("Easy");
+        whiteMedium = new Button("Medium");
+        whiteHard   = new Button("Hard");
+
+        whiteEasy.setPrefWidth(80);
+        whiteMedium.setPrefWidth(80);
+        whiteHard.setPrefWidth(80);
+
+        // 默认隐藏
+        whiteEasy.setVisible(false);
+        whiteMedium.setVisible(false);
+        whiteHard.setVisible(false);
+
+        // 绝对布局坐标（可自己微调）
+        whiteEasy.setLayoutX(520);
+        whiteEasy.setLayoutY(420);
+
+        whiteMedium.setLayoutX(610);
+        whiteMedium.setLayoutY(420);
+
+        whiteHard.setLayoutX(700);
+        whiteHard.setLayoutY(420);
+
+        page.getChildren().addAll(whiteEasy, whiteMedium, whiteHard);
+
+        // ========== Board Size（19） ==========
+        nineteenButton = new Button("19");
+        nineteenButton.setStyle(selectedStyle);
+        nineteenButton.setLayoutX(370);
+        nineteenButton.setLayoutY(460);
+        page.getChildren().add(nineteenButton);
+
+        // ========== 错误信息 ==========
+        errorMessage.setTextFill(Color.RED);
+        errorMessage.setLayoutX(300);
+        errorMessage.setLayoutY(520);
+        errorMessage.setVisible(false);
+
+        page.getChildren().add(errorMessage);
+
+        // 页面容器
+        pageContainer = new Pane(page);
     }
 
-    // ============= Getter 区域 ==============
+    // ========= Getter，用于 Home.java 调用 =========
 
-    Pane getHomePage() { return pageContainer; }
-    Button getGomokuButton() { return gomoku; }
+    public Pane getHomePage() {
+        return pageContainer;
+    }
 
-    Button getValidationButton() { return validation; }
-    Button getLearnOrViewButton() { return learnOrView; }
+    public Button getValidationButton() {
+        return startButton;
+    }
 
-    Button getWhiteIaTypeButton() { return white_ia; }
-    Button getWhiteHumanTypeButton() { return white_human; }
-    Button getBlackIaTypeButton() { return black_ia; }
-    Button getBlackHumanTypeButton() { return black_human; }
+    public Button getLearnOrViewButton() {
+        return learnButton;
+    }
 
-    public VBox getBoardSizeBox() { return boardSizeBox; }
-    public Button get9Button() { return nineSize; }
-    public Button get13Button() { return thirteenSize; }
-    public Button get19Button() { return nineteenSize; }
+    public Button getWhiteHumanTypeButton() {
+        return whitePlayer;
+    }
 
-    public void addFileBox(VBox scrollPane) {
-        ((Pane) pageContainer).getChildren().add(scrollPane);
-        scrollPane.toFront();
+    public Button getWhiteIaTypeButton() {
+        return whiteAI;
+    }
+
+    public Button getBlackHumanTypeButton() {
+        return blackPlayer;
+    }
+
+    public Button getBlackIaTypeButton() {
+        return blackAI;
+    }
+
+    public Button getWhiteEasyButton() {
+        return whiteEasy;
+    }
+
+    public Button getWhiteMediumButton() {
+        return whiteMedium;
+    }
+
+    public Button getWhiteHardButton() {
+        return whiteHard;
+    }
+
+    public Button getBlackEasyButton() {
+        return blackEasy;
+    }
+
+    public Button getBlackMediumButton() {
+        return blackMedium;
+    }
+
+    public Button getBlackHardButton() {
+        return blackHard;
+    }
+
+    public Button get19Button() {
+        return nineteenButton;
     }
 
     public void set_error(String msg) {
-        error_message.setText(msg);
-        error_message.setVisible(true);
-        error_message.setManaged(true);
+        errorMessage.setText(msg);
+        errorMessage.setVisible(true);
     }
 
-    private void deleteFile() {
-        fileName.setText("");
-        fileBox.setManaged(false);
-        fileBox.setVisible(false);
-        learnOrView.setText("learn");
-        rule_type.set("gomoku");
+    public Rules getRuleInstance() {
+        return rulesInstance;
     }
 
-    public StringProperty getStringRule() { return rule_type; }
-
-    public Rules getRuleInstance() { return rules_instance; }
-    public void setRulesInstance(Rules r) { rules_instance = r; }
-
-    // —— AI 区域 Getter ——
-    public HBox getBlackBox() { return blackBox; }
-    public HBox getWhiteBox() { return whiteBox; }
-
-    public Button getBlackEasyButton() { return blackIaEasy; }
-    public Button getBlackMediumButton() { return blackIaMedium; }
-    public Button getBlackHardButton() { return blackIaHard; }
-
-    public Button getWhiteEasyButton() { return whiteIaEasy; }
-    public Button getWhiteMediumButton() { return whiteIaMedium; }
-    public Button getWhiteHardButton() { return whiteIaHard; }
-
+    public void setRulesInstance(Rules r) {
+        rulesInstance = r;
+    }
 }

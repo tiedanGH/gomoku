@@ -8,18 +8,14 @@ import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.io.File;
-import java.util.ArrayList;
-import org.utils.Point;
 
 public class App extends Application {
 
     private Gomoku gomoku;
     private Stage stage;
-    private Pane root;
-    public Scene scene;
+
 
     private Scene goban, home;
-    private Pane home_body = new Pane();
     private Pane home_root = new Pane();
     private Home home_page = new Home();
 
