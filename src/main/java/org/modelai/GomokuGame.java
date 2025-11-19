@@ -1,20 +1,20 @@
 package org.modelai;
 
 /*
- * Moku
+ * GomokuGame
  *
  * 中文说明：
- * Moku 继承 MinMax，用于 Gomoku（五子棋）专用的节点实现。
+ * GomokuGame 继承 MinimaxEngine，用于 Gomoku（五子棋）专用的节点实现。
  */
 
-public class Moku extends MinMax {
+public class GomokuGame extends MinimaxEngine {
 
-    public Moku()
+    public GomokuGame()
     {
         // 初始化共享棋盘与评估器、候选管理器
         board = new int[19][19];
         this.move = new Candidate.Coordinate(-1, -1);
-        miniScoreSim = new MiniScore();
+        evaluator = new Evaluator();
         candidate = new Candidate(false);
         positionCounter = 0;
         moveCount = 0;
@@ -28,7 +28,7 @@ public class Moku extends MinMax {
         board[c.x][c.y] = player;
 
         candidate.save(c);
-        miniScoreSim.analyseMove(c.x, c.y, player);
+        evaluator.analyseMove(c.x, c.y, player);
 
         return false;
     }
@@ -38,7 +38,7 @@ public class Moku extends MinMax {
         super.undo(c, depth);
     }
 
-    public Moku(int len)
+    public GomokuGame(int len)
     {
         this.len = len + 1;
         this.move = new Candidate.Coordinate(-1, -1);
@@ -61,7 +61,7 @@ public class Moku extends MinMax {
 
         for (int i = 0 ; i < nb_candidates ; i++)
         {
-            Moku m = new Moku(this.len);
+            GomokuGame m = new GomokuGame(this.len);
             if (m.play(candidate.list.get(i), turn))
                 values[i] = victoryValue(player, turn, len);
             else
@@ -82,7 +82,7 @@ public class Moku extends MinMax {
         float cur_beta;
         float res;
 
-        miniScoreSim.curTurn = turn;
+        evaluator.curTurn = turn;
 
         nb_candidates = candidate.oldLoad(depth, turn);
         if (depth == 0)
@@ -102,7 +102,7 @@ public class Moku extends MinMax {
 
         for (int i = 0 ; i < nb_candidates ; i++)
         {
-            Moku m = new Moku(this.len);
+            GomokuGame m = new GomokuGame(this.len);
             Candidate.Coordinate cand = candidate.list.get(i);
             boolean isMaxLayer = (turn == player);
 

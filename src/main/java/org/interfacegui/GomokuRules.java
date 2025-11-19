@@ -7,13 +7,12 @@ public class GomokuRules implements Rules {
     int winner;
     Rules.GameMode gameStatus = Rules.GameMode.PLAYING;
     int boardSize = 19;
-    int nbMove = 0;
-
+    int totalMove = 0;
 
     @Override
     public boolean undo(){
-        if (nbMove > 0)
-            nbMove--;
+        if (totalMove > 0)
+            totalMove--;
         return true;
     }
 
@@ -23,7 +22,7 @@ public class GomokuRules implements Rules {
         {
             return false;
         }
-        nbMove++;
+        totalMove++;
         return true;
     }
 
@@ -42,7 +41,7 @@ public class GomokuRules implements Rules {
             winner = getColor(map, point);
             return true;
         }
-        if (nbMove == boardSize * boardSize)
+        if (totalMove == boardSize * boardSize)
         {
             winner = 0;
             return true;
@@ -54,7 +53,6 @@ public class GomokuRules implements Rules {
     public Rules.GameMode getGameMode(){
         return gameStatus;
     }
-    
 
     @Override
     public int  get_board_size(){

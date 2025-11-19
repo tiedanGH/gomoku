@@ -5,16 +5,13 @@ import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
 import org.modelai.Candidate;
 import org.modelai.Game;
 import org.utils.Point;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
-
 import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -31,13 +28,13 @@ public class Gomoku {
     /** 记录最新落子，用于画红框 */
     private Point lastMove = null;
 
-    private Pane game_display;
+    private final Pane gameDisplay;
     private ArrayList<Map> _map;
-    private Goban goban;
+    private Board board;
     private GameInfos gameInfos;
     private int _game_infos_size_x;
     public int _game_infos_size_y;
-    private Pane _goban_pane;
+    private Pane _board_pane;
     private VBox _game_infos_pane;
     private int _nb_line;
     private int map_index;
@@ -141,9 +138,9 @@ public class Gomoku {
 
         for (Point p : currentCandidats) {
             String color = p.val < 0 ? "#FF0000" : "#00FF00";
-            goban.set_stone_status(visible, color, p, String.format("%.0f", p.val));
+            board.setStoneStatus(visible, color, p, String.format("%.0f", p.val));
         }
-        if (!visible) goban.updateFromMap(_map.get(map_index));
+        if (!visible) board.updateFromMap(_map.get(map_index));
     }
 
     void setCandidats(ArrayList<Candidate.Coordinate> candidats, float[] values, int index) {
@@ -164,9 +161,9 @@ public class Gomoku {
         if (hintList == null) return;
 
         for (Point p : hintList) {
-            goban.set_stone_status(visible, "#00F0FF", p, String.valueOf((int)p.val));
+            board.setStoneStatus(visible, "#00F0FF", p, String.valueOf((int)p.val));
         }
-        if (!visible) goban.updateFromMap(_map.get(map_index));
+        if (!visible) board.updateFromMap(_map.get(map_index));
     }
 
     void setHint(ArrayList<Candidate.Coordinate> hint, float[] values) {
@@ -216,7 +213,7 @@ public class Gomoku {
         newMap.set_color(player_turn);
 
         // 更新棋盘并画红框
-        goban.updateFromMap(newMap);
+        board.updateFromMap(newMap);
         highlightLastMove();
 
         if (rule.endGame(newMap, point)) {
@@ -225,7 +222,7 @@ public class Gomoku {
 
         if (player_turn == 0) {
             round++;
-            gameInfos.setPLayTurn(round);
+            gameInfos.setTurn(round);
         }
 
         updatePlayerTurn();
@@ -248,7 +245,7 @@ public class Gomoku {
         }
 
         // 回退后更新棋盘
-        goban.updateFromMap(_map.get(map_index));
+        board.updateFromMap(_map.get(map_index));
 
         // 更新 lastMove 为当前局面的最后一步
         ArrayList<Point> last = _map.get(map_index).getLastMove();
@@ -262,7 +259,7 @@ public class Gomoku {
         player_turn ^= 1;
 
         if (map_index % 2 == 0) round--;
-        gameInfos.setPLayTurn(round);
+        gameInfos.setTurn(round);
     }
 
     private void setPlayerColor() {
@@ -310,7 +307,7 @@ public class Gomoku {
         _game_infos_size_x = width / 4;
         _game_infos_size_y = heigh;
 
-        gameInfos = new GameInfos(heigh, _game_infos_size_x, game_infos);
+        gameInfos = new GameInfos(heigh, _game_infos_size_x);
         playingMode = game_infos.getGameMode();
 
         game = new Game(game_infos.getRules(), rule.get_board_size());
@@ -318,12 +315,12 @@ public class Gomoku {
         game.resetMinMax();
 
         _map = new ArrayList<>();
-        goban = new Goban(heigh, width - _game_infos_size_x, rule.get_board_size());
+        board = new Board(heigh, width - _game_infos_size_x, rule.get_board_size());
 
         _map.add(new Map(_nb_line));
 
         saved = new ArrayList<>();
-        game_display = new Pane();
+        gameDisplay = new Pane();
         _replay = new Button("Replay");
         _back_home = new Button("Back Home");
         game_name = new Label(game_infos.getRules());
@@ -331,7 +328,7 @@ public class Gomoku {
         _end_popin.setVisible(false);
         _end_popin.getChildren().addAll(_end_text, _replay, _back_home);
 
-        _goban_pane = goban.get_goban();
+        _board_pane = board.getBoard();
         _game_infos_pane = gameInfos.getGameInfos();
         _game_infos_pane.getChildren().add(0, game_name);
         _game_infos_pane.getChildren().add(0, _end_popin);
@@ -350,9 +347,9 @@ public class Gomoku {
 
         VBox mainVBox = new VBox();
         HBox hbox = new HBox();
-        hbox.getChildren().addAll(_game_infos_pane, _goban_pane);
+        hbox.getChildren().addAll(_game_infos_pane, _board_pane);
         mainVBox.getChildren().addAll(commentLabel, hbox);
-        game_display.getChildren().add(mainVBox);
+        gameDisplay.getChildren().add(mainVBox);
 
         // 撤销
         gameInfos.getUndoButton().setOnAction(event -> {
@@ -370,7 +367,7 @@ public class Gomoku {
             setHint(game.m.candidate.list, game.m.values);
             changeHintVisibility(toggleHint);
 
-            if (!toggleHint) goban.updateFromMap(_map.get(map_index));
+            if (!toggleHint) board.updateFromMap(_map.get(map_index));
         });
 
         // 投降
@@ -396,7 +393,7 @@ public class Gomoku {
         gameInfos.getPrevButton().setOnAction(event -> {
             if (map_index > 0) {
                 map_index--;
-                goban.updateFromMap(_map.get(map_index));
+                board.updateFromMap(_map.get(map_index));
                 handdleButtonPrevNext();
             }
         });
@@ -405,21 +402,21 @@ public class Gomoku {
         gameInfos.getNextButton().setOnAction(event -> {
             if (map_index < _map.size() - 1) {
                 map_index++;
-                goban.updateFromMap(_map.get(map_index));
+                board.updateFromMap(_map.get(map_index));
                 handdleButtonPrevNext();
             }
         });
 
         // 点击鼠标游玩
-        goban.get_goban().setOnMouseClicked(event -> {
+        board.getBoard().setOnMouseClicked(event -> {
             if (game_end) return;
             if ((player_turn == 0 && _game_infos.getBlackPlayerType() == 1)
                     || (player_turn == 1 && _game_infos.getWhitePlayerType() == 1))
                 return;
 
-            int margin_w = goban.get_margin_width();
-            int margin_h = goban.get_margin_height();
-            int square = goban.getSquareSize();
+            int margin_w = board.get_margin_width();
+            int margin_h = board.get_margin_height();
+            int square = board.getSquareSize();
             double x = event.getX() - margin_w;
             double y = event.getY() - margin_h;
 
@@ -498,7 +495,7 @@ public class Gomoku {
         _map.add(new Map(_nb_line));
 
         // 更新 UI
-        goban.updateFromMap(_map.get(0));
+        board.updateFromMap(_map.get(0));
         map_index = 0;
         handdleButtonPrevNext();
 
@@ -530,7 +527,7 @@ public class Gomoku {
     }
 
     public Pane getGameDisplay() {
-        return game_display;
+        return gameDisplay;
     }
 
     public Button get_home_button() {
@@ -551,13 +548,13 @@ public class Gomoku {
         double labelHeight = commentLabel.prefHeight(commentLabel.getMaxWidth());
         if (!commentLabel.isVisible())
             labelHeight = 0;
-        goban.updateGoban(new_y - (int)labelHeight, new_x - _game_infos_size_x);
-        _goban_pane.setLayoutX(_game_infos_size_x);
+        board.updateBoard(new_y - (int)labelHeight, new_x - _game_infos_size_x);
+        _board_pane.setLayoutX(_game_infos_size_x);
     }
 
-    /** 在最新落子位置画红框（调用 Goban 的辅助方法） */
+    /** 在最新落子位置画红框（调用 Board 的辅助方法） */
     private void highlightLastMove() {
         if (lastMove == null) return;
-        goban.drawLastMoveBox(lastMove);
+        board.drawLastMoveBox(lastMove);
     }
 }

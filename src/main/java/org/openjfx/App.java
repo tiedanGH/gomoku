@@ -15,7 +15,7 @@ public class App extends Application {
     private Stage stage;
 
 
-    private Scene goban, home;
+    private Scene board, home;
     private Pane home_root = new Pane();
     private Home home_page = new Home();
 
@@ -56,12 +56,12 @@ public class App extends Application {
 
             // 只创建 Gomoku，不再加载 Go/Pente
             gomoku = new Gomoku((int) sceney, (int) scenex, home_page);
-            Pane goban_root = new Pane();
-            goban = new Scene(goban_root, scenex, sceney);
-            set_goban_event(goban_root);
-            goban_root.getChildren().add(gomoku.getGameDisplay());
+            Pane board_root = new Pane();
+            board = new Scene(board_root, scenex, sceney);
+            set_board_event(board_root);
+            board_root.getChildren().add(gomoku.getGameDisplay());
 
-            switchScene(goban);
+            switchScene(board);
             stage.setResizable(true);
         });
 
@@ -84,12 +84,12 @@ public class App extends Application {
             double sceney = stage.getHeight();
 
             gomoku = new Gomoku((int) sceney, (int) scenex, home_page);
-            Pane goban_root = new Pane();
-            goban = new Scene(goban_root, scenex, sceney);
-            set_goban_event(goban_root);
-            goban_root.getChildren().add(gomoku.getGameDisplay());
+            Pane board_root = new Pane();
+            board = new Scene(board_root, scenex, sceney);
+            set_board_event(board_root);
+            board_root.getChildren().add(gomoku.getGameDisplay());
 
-            switchScene(goban);
+            switchScene(board);
             stage.setResizable(true);
         });
     }
@@ -116,7 +116,7 @@ public class App extends Application {
         switchScene(home);
     }
 
-    private void set_goban_event(Pane goban_root) {
+    private void set_board_event(Pane board_root) {
         gomoku.getBackHomeButton().setOnMouseClicked(event -> {
             gomoku.killIa();
             setNewHome();
@@ -126,12 +126,12 @@ public class App extends Application {
 
         gomoku.get_replay_button().setOnMouseClicked(event -> gomoku.reset_gomoku());
 
-        goban.widthProperty().addListener((obs, oldV, newV) -> {
-            gomoku.updateGameDisplay((int) goban.getHeight(), newV.intValue());
+        board.widthProperty().addListener((obs, oldV, newV) -> {
+            gomoku.updateGameDisplay((int) board.getHeight(), newV.intValue());
         });
 
-        goban.heightProperty().addListener((obs, oldV, newV) -> {
-            gomoku.updateGameDisplay(newV.intValue(), (int) goban.getWidth());
+        board.heightProperty().addListener((obs, oldV, newV) -> {
+            gomoku.updateGameDisplay(newV.intValue(), (int) board.getWidth());
         });
     }
 

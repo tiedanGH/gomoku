@@ -66,14 +66,14 @@ public class Candidate
 
     private int innerAlignment(int i, int j)
     {
-        if (j+1 != 19 && j-1 != -1 && isSameNonZero(MinMax.board[i][j + 1], MinMax.board[i][j - 1]))
-            return MinMax.board[i][j + 1];
-        if (i+1 != 19 && i-1 != -1 && isSameNonZero(MinMax.board[i + 1][j], MinMax.board[i - 1][j]))
-            return MinMax.board[i + 1][j];
-        if (i + 1 != 19 && i-1 != -1 && j + 1 != 19 && j - 1 != -1 && isSameNonZero(MinMax.board[i+1][j-1], MinMax.board[i-1][j+1]))
-            return MinMax.board[i+1][j-1];
-        if (i + 1 != 19 && i-1 != -1 && j + 1 != 19 && j - 1 != -1 && isSameNonZero(MinMax.board[i-1][j-1], MinMax.board[i+1][j+1]))
-            return MinMax.board[i-1][j-1];
+        if (j+1 != 19 && j-1 != -1 && isSameNonZero(MinimaxEngine.board[i][j + 1], MinimaxEngine.board[i][j - 1]))
+            return MinimaxEngine.board[i][j + 1];
+        if (i+1 != 19 && i-1 != -1 && isSameNonZero(MinimaxEngine.board[i + 1][j], MinimaxEngine.board[i - 1][j]))
+            return MinimaxEngine.board[i + 1][j];
+        if (i + 1 != 19 && i-1 != -1 && j + 1 != 19 && j - 1 != -1 && isSameNonZero(MinimaxEngine.board[i+1][j-1], MinimaxEngine.board[i-1][j+1]))
+            return MinimaxEngine.board[i+1][j-1];
+        if (i + 1 != 19 && i-1 != -1 && j + 1 != 19 && j - 1 != -1 && isSameNonZero(MinimaxEngine.board[i-1][j-1], MinimaxEngine.board[i+1][j+1]))
+            return MinimaxEngine.board[i-1][j-1];
 
         return 0;
     }
@@ -81,21 +81,21 @@ public class Candidate
     private int nearCount(int i, int j)
     {
         int cmp = 0;
-        if (j+1 != 19 && isPlayer(MinMax.board[i][j + 1]))
+        if (j+1 != 19 && isPlayer(MinimaxEngine.board[i][j + 1]))
             cmp++;
-        if (j-1 != -1 && isPlayer(MinMax.board[i][j - 1]))
+        if (j-1 != -1 && isPlayer(MinimaxEngine.board[i][j - 1]))
             cmp++;
-        if (i+1 != 19 && isPlayer(MinMax.board[i + 1][j]))
+        if (i+1 != 19 && isPlayer(MinimaxEngine.board[i + 1][j]))
             cmp++;
-        if (i-1 != -1 && isPlayer(MinMax.board[i - 1][j]))
+        if (i-1 != -1 && isPlayer(MinimaxEngine.board[i - 1][j]))
             cmp++;
-        if (i+1 != 19 && j-1 != -1 && isPlayer(MinMax.board[i+1][j-1]))
+        if (i+1 != 19 && j-1 != -1 && isPlayer(MinimaxEngine.board[i+1][j-1]))
             cmp++;
-        if (i-1 != -1 && j-1 != -1 && isPlayer(MinMax.board[i-1][j-1]))
+        if (i-1 != -1 && j-1 != -1 && isPlayer(MinimaxEngine.board[i-1][j-1]))
             cmp++;
-        if (i+1 != 19 && j+1 != 19 && isPlayer(MinMax.board[i+1][j+1]))
+        if (i+1 != 19 && j+1 != 19 && isPlayer(MinimaxEngine.board[i+1][j+1]))
             cmp++;
-        if (i-1 != -1 && j+1 != 19 && isPlayer(MinMax.board[i-1][j+1]))
+        if (i-1 != -1 && j+1 != 19 && isPlayer(MinimaxEngine.board[i-1][j+1]))
             cmp++;
         return cmp;
     }
@@ -126,10 +126,10 @@ public class Candidate
         this.list.add(new Coordinate(x,y, val));
     }
 
-    // 内部：基于 MiniScore 仿真结果为位置 (x,y) 生成候选评分（已移除 Pente 分支）
+    // 内部：基于 Evaluator 仿真结果为位置 (x,y) 生成候选评分（已移除 Pente 分支）
     private void loadCase(int x, int y, int ignoredDepth)
     {
-        // 功能：基于 MiniScore（MinMax.miniScoreSim）中记录的模式强度为位置 (x,y) 生成候选评分
+        // 功能：基于 Evaluator（MinimaxEngine.miniScoreSim）中记录的模式强度为位置 (x,y) 生成候选评分
         // 说明：已移除与 Pente 捕子相关的特殊处理与分支，保留模式强度汇总与连子检测。
 
         double totCase1 = 0;
@@ -138,9 +138,9 @@ public class Candidate
 
         for (int i = 0 ; i < 4 ; i++)
         {
-            // 将 MiniScore 中四个方向的模式强度纳入评分汇总
-            totCase1 = Math.max(totCase1, MinMax.miniScoreSim.patternStr1[i][x][y]);
-            totCase2 = Math.max(totCase2, MinMax.miniScoreSim.patternStr2[i][x][y]);
+            // 将 Evaluator 中四个方向的模式强度纳入评分汇总
+            totCase1 = Math.max(totCase1, MinimaxEngine.evaluator.patternStr1[i][x][y]);
+            totCase2 = Math.max(totCase2, MinimaxEngine.evaluator.patternStr2[i][x][y]);
         }
 
         val = innerAlignment(x, y);
@@ -148,7 +148,7 @@ public class Candidate
         if (val == 0 && totCase1 == 0 && totCase2 == 0)
             return;
         // 保留 double-free-three 检查调用点（若需要可以由外部配置 capturePossible）
-        if (capturePossible && !doubleFreeThree.check_double_free(x, y, turn, MinMax.board))
+        if (capturePossible && !doubleFreeThree.check_double_free(x, y, turn, MinimaxEngine.board))
             return;
 
         if (val == 0)
@@ -166,7 +166,7 @@ public class Candidate
         {
            for (int j = limitMin.y - 1 ; j <= limitMax.y + 1 ; j++)
             {
-                if (MinMax.board[i][j] == 0)
+                if (MinimaxEngine.board[i][j] == 0)
                     loadCase(i, j, depth);
             }
         }
@@ -199,7 +199,7 @@ public class Candidate
                     continue;
 
                 res = nearCount(i, j);
-                if (MinMax.board[i][j] == 0 && res !=0 && (!capturePossible || doubleFreeThree.check_double_free(i, j, turn, MinMax.board)))
+                if (MinimaxEngine.board[i][j] == 0 && res !=0 && (!capturePossible || doubleFreeThree.check_double_free(i, j, turn, MinimaxEngine.board)))
                     this.list.add(new Coordinate(i, j, res));
             }
         }
@@ -241,7 +241,7 @@ public class Candidate
         {
            for (int j = limitMin.y - 1 ; j <= limitMax.y + 1 ; j++)
             {
-                if (MinMax.board[i][j] == 1)
+                if (MinimaxEngine.board[i][j] == 1)
                 {
                     if (i !=0 && j !=0 && i != 18 && j != 18)
                     {
@@ -277,11 +277,11 @@ public class Candidate
         {
            for (int j = limitMin.y - 1 ; j <= limitMax.y + 1 ; j++)
             {
-                if (MinMax.board[i][j] == 1)
+                if (MinimaxEngine.board[i][j] == 1)
                 {
                     b.x = i; b.y=j;
                 }
-                else if (MinMax.board[i][j] == 2)
+                else if (MinimaxEngine.board[i][j] == 2)
                 {
                     w.x = i; w.y = j;
                 }
@@ -308,9 +308,9 @@ public class Candidate
            for (int j = limitMin.y - 1 ; j <= limitMax.y + 1 ; j++)
             {
                 res = nearCount(i, j);
-                if (MinMax.board[i][j] == 1 || MinMax.board[i][j] == 2)
+                if (MinimaxEngine.board[i][j] == 1 || MinimaxEngine.board[i][j] == 2)
                     nb_mv++;
-                if (MinMax.board[i][j] == 0 && res !=0 && (!capturePossible || doubleFreeThree.check_double_free(i, j, turn, MinMax.board)))
+                if (MinimaxEngine.board[i][j] == 0 && res !=0 && (!capturePossible || doubleFreeThree.check_double_free(i, j, turn, MinimaxEngine.board)))
                     this.list.add(new Coordinate(i, j, res));
             }
         }
@@ -375,7 +375,7 @@ public class Candidate
 
         if (depth == Game.max_depth)
         {
-            loadLimits(MinMax.board);
+            loadLimits(MinimaxEngine.board);
         }
 
         ret = interestingCandidate(depth);
@@ -429,13 +429,13 @@ public class Candidate
         int [] [] mapc = new int [19][19];
         for (int i = 0 ; i < 19 ; i++)
         {
-            System.arraycopy(MinMax.board[i], 0, mapc[i], 0, 19);
+            System.arraycopy(MinimaxEngine.board[i], 0, mapc[i], 0, 19);
         }
         for (Coordinate coord : this.list) {
             mapc[coord.x][coord.y] = 3;
             System.out.printf("%d %d\n", coord.x, coord.y);
         }
-        MinMax.displayBoardStatic(mapc);
+        MinimaxEngine.displayBoardStatic(mapc);
     }
 
     //display function

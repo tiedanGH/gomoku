@@ -4,15 +4,15 @@ import org.utils.*;
 
 public class Game {
 
-    // 类说明：代表一盘游戏的状态和与 MinMax 搜索的交互封装，
-    // 包括棋盘数据、计时信息、规则类型以及对 MinMax 的调用接口。
+    // 类说明：代表一盘游戏的状态和与 MinimaxEngine 搜索的交互封装，
+    // 包括棋盘数据、计时信息、规则类型以及对 MinimaxEngine 的调用接口。
 
-    // 当前 MinMax 实例（搜索树）
-    public MinMax m;
+    // 当前 MinimaxEngine 实例（搜索树）
+    public MinimaxEngine m;
     // 游戏棋盘（方阵，0=空，1=黑，2=白）
     public int[][] gameMap;
-    // 当前棋局评分对象（MiniScore）
-    public MiniScore miniScore =  new MiniScore();
+    // 当前棋局评分对象（Evaluator）
+    public Evaluator miniScore =  new Evaluator();
     // 已落子数量
     public int nb_move;
     // 上次搜索得到的估值
@@ -35,16 +35,16 @@ public class Game {
         m.len = 0;
     }
 
-    private MinMax minmaxTree(String str)
+    private MinimaxEngine minmaxTree(String str)
     {
         str = Character.toUpperCase(str.charAt(0)) + str.substring(1);
         if (str.equals("Gomoku")) {
             this.rules = "Gomoku";
             max_depth = 10;
-            return new Moku();
+            return new GomokuGame();
         } else {
             this.rules = "None";
-            return new MinMax();
+            return new MinimaxEngine();
         }
     }
 
@@ -83,7 +83,7 @@ public class Game {
     public void move(Point point, int turn)
     {
         // 将落子写入共享静态棋盘（重命名为 board）
-        MinMax.board[point.y][point.x] = turn;
+        MinimaxEngine.board[point.y][point.x] = turn;
 
         // 更新评分结构
         miniScore.analyseMove(point.y, point.x, turn);
@@ -95,9 +95,9 @@ public class Game {
     {
         for (int i = 0 ; i < 19 ; i++)
             for (int j = 0 ; j < 19 ; j++)
-                MinMax.board[i][j] = 0;
-        MinMax.positionCounter =0;
-        MinMax.moveCount = 0;
+                MinimaxEngine.board[i][j] = 0;
+        MinimaxEngine.positionCounter =0;
+        MinimaxEngine.moveCount = 0;
         Game.fast_search = 0;
         miniScore.resetStr();
     }
@@ -105,7 +105,7 @@ public class Game {
     private void initializeMap()
     {
         for (int i = 0 ; i < 19 ; i++)
-            System.arraycopy(gameMap[i], 0, MinMax.board[i], 0, 19);
+            System.arraycopy(gameMap[i], 0, MinimaxEngine.board[i], 0, 19);
     }
 
     public Point bestMove(int turn, int player, boolean display)
@@ -147,15 +147,13 @@ public class Game {
     //display function
     private void displayAllBoardInfo()
     {
-        MinMax.displayBoardStatic();
-        miniScore.display(false);
-        // 已移除 Pente 特有的 prisoners 信息打印
+        MinimaxEngine.displayBoardStatic();
         System.out.println();
     }
 
     //display function
     private void bestMoveStamp()
     {
-        System.out.printf("AI move %d (Turn %d) at %d %d played in %f seconds (%d pos, %d depth, %d speed)\n", nb_move + 1,(nb_move + 1) / 2 + 1, m.best.y, m.best.x,(double)time / 1000, MinMax.positionCounter, max_depth, fast_search);
+        System.out.printf("AI move %d (Turn %d) at %d %d played in %f seconds (%d pos, %d depth, %d speed)\n", nb_move + 1,(nb_move + 1) / 2 + 1, m.best.y, m.best.x,(double)time / 1000, MinimaxEngine.positionCounter, max_depth, fast_search);
     }
 }

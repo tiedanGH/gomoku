@@ -2,9 +2,9 @@ package org.modelai;
 
 import java.util.ArrayList;
 
-public class MinMax
+public class MinimaxEngine
 {
-    // 类说明：MinMax 实现了用于五子棋的极大极小搜索逻辑，
+    // 类说明：MinimaxEngine 实现了用于五子棋的极大极小搜索逻辑，
     // 变量名重构后提高可读性：board, miniScoreSim, positionCounter, moveCount 等。
 
     // 全局棋盘表示（19x19），0=空,1=黑,2=白
@@ -19,44 +19,44 @@ public class MinMax
     public float [] values;
     // 当前搜索深度或步数计数（语义由调用方使用）
     public int len = 0;
-    // 用于仿真评分的共享对象（MiniScore）
-    static public MiniScore miniScoreSim;
+    // 用于仿真评分的共享对象（Evaluator）
+    static public Evaluator evaluator;
     // 统计已评估的局面数
     static public int positionCounter;
     // 已走步数计数（在 loadCurrentScore 中自增）
     static public int moveCount;
 
-    // 将传入的 MiniScore 复制到 miniScoreSim，并设置当前回合
-    public void loadCurrentScore(MiniScore score, int turn)
+    // 将传入的 Evaluator 复制到 miniScoreSim，并设置当前回合
+    public void loadCurrentScore(Evaluator score, int turn)
     {
-        miniScoreSim.curTurn = turn;
+        evaluator.curTurn = turn;
         for (int d = 0 ; d < 4 ; d++)
         {
             for(int i = 0 ; i < 19 ; i++)
             {
                 for (int j = 0 ; j < 19 ; j++)
                 {
-                    miniScoreSim.patternStr1[d][i][j] = score.patternStr1[d][i][j];
-                    miniScoreSim.patternStr2[d][i][j] = score.patternStr2[d][i][j];
+                    evaluator.patternStr1[d][i][j] = score.patternStr1[d][i][j];
+                    evaluator.patternStr2[d][i][j] = score.patternStr2[d][i][j];
                 }
             }
         }
-        miniScoreSim.score.one = score.score.one;
-        miniScoreSim.score.two = score.score.two;
+        evaluator.score.one = score.score.one;
+        evaluator.score.two = score.score.two;
 
         positionCounter = 0;
         moveCount += 1;
     }
 
-    public MinMax(){}
+    public MinimaxEngine(){}
 
-    public MinMax(int len)
+    public MinimaxEngine(int len)
     {
         this.len = len;
         this.move = new Candidate.Coordinate(-1, -1);
     }
 
-    public MinMax(MinMax m, int ignoredDepth)
+    public MinimaxEngine(MinimaxEngine m, int ignoredDepth)
     {
         this.len = m.len + 1;
         this.move = new Candidate.Coordinate(-1, -1);
@@ -64,14 +64,14 @@ public class MinMax
         candidate.reloadLimits();
     }
 
-    // 评估函数：返回当前仿真评分（封装在 MiniScore 中）
+    // 评估函数：返回当前仿真评分（封装在 Evaluator 中）
     public float eval(int player, int ignoredLen, int ignoredTurn)
     {
-        return miniScoreSim.score.evaluate(player);
+        return evaluator.score.evaluate(player);
     }
 
     // 判断坐标是否在棋盘内（保护方法）
-    static public boolean isInGoban(int x, int y)
+    static public boolean isInBoard(int x, int y)
     {
         return x >= 0 && x < 19 && y >= 0 && y < 19;
     }
@@ -81,10 +81,10 @@ public class MinMax
     {
         int count = 0;
 
-        for (int i=dx , j = dy; isInGoban(x+i, y+j) && board[x + i][y + j] == player ; i+=dx, j+=dy)
+        for (int i=dx , j = dy; isInBoard(x+i, y+j) && board[x + i][y + j] == player ; i+=dx, j+=dy)
             count +=1;
 
-        for (int i = -dx, j = -dy ; isInGoban(x + i, y + j) && board[x + i][y + j] == player ; i-=dx, j-=dy)
+        for (int i = -dx, j = -dy ; isInBoard(x + i, y + j) && board[x + i][y + j] == player ; i-=dx, j-=dy)
             count +=1;
 
         return count >= 4;
@@ -101,22 +101,22 @@ public class MinMax
         return checkDir(x, y, 1, -1, player);
     }
 
-    // 执行落子：设置棋盘、保存候选、并在 MiniScore 中进行分析；返回是否达成四连（胜利检测）
+    // 执行落子：设置棋盘、保存候选、并在 Evaluator 中进行分析；返回是否达成四连（胜利检测）
     public boolean play(Candidate.Coordinate c, int player)
     {
         this.move = c;
         board[c.x][c.y] = player;
         this.candidate.save(c);
-        miniScoreSim.analyseMove(c.x, c.y, player);
+        evaluator.analyseMove(c.x, c.y, player);
         return checkWin4Dir(c.x, c.y, player);
     }
 
-    // 撤销落子：在棋盘上清空位置，并在 MiniScore 中撤销分析
+    // 撤销落子：在棋盘上清空位置，并在 Evaluator 中撤销分析
     public void undo(Candidate.Coordinate c, int depth)
     {
         int val = board[c.x][c.y];
         board[c.x][c.y] = 0;
-        miniScoreSim.analyseUnmove(c.x, c.y, val);
+        evaluator.analyseUndo(c.x, c.y, val);
     }
 
     // 切换玩家（1<->2）
@@ -210,7 +210,7 @@ public class MinMax
 
         for (int i = 0 ; i < nb_candidates ; i++)
         {
-            MinMax m = new MinMax(this, depth);
+            MinimaxEngine m = new MinimaxEngine(this, depth);
             if (m.play(candidate.list.get(i), turn))
                 values[i] = victoryValue(player, turn, len);
             else
@@ -233,7 +233,7 @@ public class MinMax
         float cur_beta;
         float res;
 
-        miniScoreSim.curTurn = turn;
+        evaluator.curTurn = turn;
 
         nb_candidates = candidate.oldLoad(depth, turn);
         if (depth == 0)
@@ -253,7 +253,7 @@ public class MinMax
 
         for (int i = 0 ; i < nb_candidates ; i++)
         {
-            MinMax m = new MinMax(this.len);
+            MinimaxEngine m = new MinimaxEngine(this.len);
             Candidate.Coordinate cand = candidate.list.get(i);
             boolean isMaxLayer = (turn == player);
 
@@ -307,7 +307,7 @@ public class MinMax
         {
             for (int j = 0 ; j < 19 ; j++)
             {
-                System.out.printf("%2d", MinMax.board[i][j]);
+                System.out.printf("%2d", MinimaxEngine.board[i][j]);
             }
             System.out.println();
         }

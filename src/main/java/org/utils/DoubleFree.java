@@ -10,10 +10,10 @@ public class DoubleFree
         map[x][y] = val; 
     }
 
-    private boolean in_goban(int x, int y)
+    private boolean in_board(int x, int y)
     {
-        int goban_size = 19;
-        return x >= 0 && x < goban_size && y >= 0 && y < goban_size;
+        int board_size = 19;
+        return x >= 0 && x < board_size && y >= 0 && y < board_size;
     }
 
     private boolean check_win(int x, int y, int val, int i, int [][]map )
@@ -25,7 +25,7 @@ public class DoubleFree
     
         cur_x = x + dep * dir[i][0];
         cur_y = y + dep * dir[i][1];
-        while(in_goban(cur_x, cur_y) && map[cur_x][cur_y] == val)
+        while(in_board(cur_x, cur_y) && map[cur_x][cur_y] == val)
             {
                 res++;
                 dep++;
@@ -36,7 +36,7 @@ public class DoubleFree
         dep = -1;
         cur_x = x + dep * dir[i][0];
         cur_y = y + dep * dir[i][1];
-        while(in_goban(cur_x, cur_y) && map[cur_x][cur_y] == val)
+        while(in_board(cur_x, cur_y) && map[cur_x][cur_y] == val)
             {
                 res++;
                 dep--;
@@ -74,7 +74,7 @@ public class DoubleFree
 
             cur_x = x + dep * dir[i][0];
             cur_y = y + dep * dir[i][1];
-            while(in_goban(cur_x, cur_y) && nb_0 != 2 && map[cur_x][cur_y] != sep)
+            while(in_board(cur_x, cur_y) && nb_0 != 2 && map[cur_x][cur_y] != sep)
             {
                 if (map[cur_x][cur_y] == 0)
                     nb_0++;
@@ -86,15 +86,15 @@ public class DoubleFree
                 cur_y = y + dep * dir[i][1];
             }
 
-            if (in_goban(cur_x, cur_y) && map[cur_x][cur_y] == sep)
+            if (in_board(cur_x, cur_y) && map[cur_x][cur_y] == sep)
             {
-                if (!in_goban(cur_x -dir[i][0], cur_y - dir[i][1]) || map[cur_x - dir[i][0]][cur_y - dir[i][1]] !=0)
+                if (!in_board(cur_x -dir[i][0], cur_y - dir[i][1]) || map[cur_x - dir[i][0]][cur_y - dir[i][1]] !=0)
                     continue;
                 if (cur_x-dir[i][0] == x && cur_y - dir[i][1] == y)
                     continue;
             }
 
-            if (in_goban( cur_x - dir[i][0], cur_y - dir[i][1]) && in_goban(cur_x - 2 * dir[i][0], cur_y - 2 * dir[i][1]) &&
+            if (in_board( cur_x - dir[i][0], cur_y - dir[i][1]) && in_board(cur_x - 2 * dir[i][0], cur_y - 2 * dir[i][1]) &&
                  map[cur_x - 2 * dir[i][0]][cur_y - 2 * dir[i][1]] == 0 && map[cur_x - dir[i][0]][cur_y - dir[i][1]] == 0)
                 nb_0 = 0;
             else
@@ -103,7 +103,7 @@ public class DoubleFree
             cur_x = x - (dep * dir[i][0]);
             cur_y = y - (dep * dir[i][1]);
 
-            while( in_goban(cur_x, cur_y) && nb_0 != 2 && map[cur_x][cur_y] != sep)
+            while( in_board(cur_x, cur_y) && nb_0 != 2 && map[cur_x][cur_y] != sep)
             {
                 if (map[cur_x][cur_y] == 0)
                     nb_0++;
@@ -114,9 +114,9 @@ public class DoubleFree
                 cur_y = y - (dep * dir[i][1]);
             }
 
-            if (in_goban(cur_x, cur_y) && map[cur_x][cur_y] == sep)
+            if (in_board(cur_x, cur_y) && map[cur_x][cur_y] == sep)
             {
-                if (!in_goban( + dir[i][0], cur_y + dir[i][1]) ||
+                if (!in_board( + dir[i][0], cur_y + dir[i][1]) ||
                 map[cur_x + dir[i][0]][cur_y + dir[i][1]] !=0)
                     continue;
                 if (cur_x + dir[i][0] == x && cur_y + dir[i][1] == y)
@@ -159,7 +159,7 @@ public class DoubleFree
 
             cur_x = x + dep * dir[i][0];
             cur_y = y + dep * dir[i][1];
-            while(in_goban(cur_x, cur_y) && nb_0 != 2 && map[cur_x][cur_y] != sep)
+            while(in_board(cur_x, cur_y) && nb_0 != 2 && map[cur_x][cur_y] != sep)
             {
                 if (map[cur_x][cur_y] == 0)
                     nb_0++;
@@ -171,15 +171,15 @@ public class DoubleFree
                 cur_y = y + dep * dir[i][1];
             }
 
-            if (in_goban(cur_x, cur_y) && map[cur_x][cur_y] == sep)
+            if (in_board(cur_x, cur_y) && map[cur_x][cur_y] == sep)
             {
-                if (!in_goban(cur_x -dir[i][0], cur_y - dir[i][1]) || map[cur_x - dir[i][0]][cur_y - dir[i][1]] !=0)
+                if (!in_board(cur_x -dir[i][0], cur_y - dir[i][1]) || map[cur_x - dir[i][0]][cur_y - dir[i][1]] !=0)
                     continue;
                 if (cur_x-dir[i][0] == x && cur_y - dir[i][1] == y)
                     continue;
             }
 
-            if (in_goban( cur_x - dir[i][0], cur_y - dir[i][1]) && in_goban(cur_x - 2 * dir[i][0], cur_y - 2 * dir[i][1]) &&
+            if (in_board( cur_x - dir[i][0], cur_y - dir[i][1]) && in_board(cur_x - 2 * dir[i][0], cur_y - 2 * dir[i][1]) &&
                  map[cur_x - 2 * dir[i][0]][cur_y - 2 * dir[i][1]] == 0 && map[cur_x - dir[i][0]][cur_y - dir[i][1]] == 0)
                 nb_0 = 0;
             else
@@ -191,7 +191,7 @@ public class DoubleFree
             cur_x = x - (dep * dir[i][0]);
             cur_y = y - (dep * dir[i][1]);
 
-            while( in_goban(cur_x, cur_y) && nb_0 != 2 && map[cur_x][cur_y] != sep)
+            while( in_board(cur_x, cur_y) && nb_0 != 2 && map[cur_x][cur_y] != sep)
             {
                 if (map[cur_x][cur_y] == 0)
                     nb_0++;
@@ -202,16 +202,16 @@ public class DoubleFree
                 cur_y = y - (dep * dir[i][1]);
             }
 
-            if (in_goban(cur_x, cur_y) && map[cur_x][cur_y] == sep)
+            if (in_board(cur_x, cur_y) && map[cur_x][cur_y] == sep)
             {
-                if (!in_goban( + dir[i][0], cur_y + dir[i][1]) ||
+                if (!in_board( + dir[i][0], cur_y + dir[i][1]) ||
                 map[cur_x + dir[i][0]][cur_y + dir[i][1]] !=0)
                     continue;
                 if (cur_x + dir[i][0] == x && cur_y + dir[i][1] == y)
                     continue;
             }
 
-            if (in_goban( cur_x + dir[i][0], cur_y + dir[i][1]) && in_goban(cur_x + 2 * dir[i][0], cur_y + 2 * dir[i][1]) &&
+            if (in_board( cur_x + dir[i][0], cur_y + dir[i][1]) && in_board(cur_x + 2 * dir[i][0], cur_y + 2 * dir[i][1]) &&
                  (map[cur_x + 2 * dir[i][0]][cur_y + 2 * dir[i][1]] != 0 || map[cur_x + dir[i][0]][cur_y + dir[i][1]] != 0))
                 cut = 1;
             if (nb_val == 2)
@@ -238,7 +238,7 @@ public class DoubleFree
         {
             System.out.printf("Move %d %d possible\n", x, y);
             m_play(x, y, val, map);
-            MinMax.displayBoardStatic();
+            MinimaxEngine.displayBoardStatic();
         }
     }
 }

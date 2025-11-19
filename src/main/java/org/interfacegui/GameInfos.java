@@ -12,94 +12,75 @@ import javafx.geometry.Insets;
 
 public class GameInfos {
 
-    private final VBox _game_infos;
-    private final VBox _whiteBox = new VBox();
-    private final VBox _blackBox = new VBox();
+    private final VBox gameInfos;
+    private final VBox whiteBox = new VBox();
+    private final VBox blackBox = new VBox();
 
-    private int _size_x;
-    private int _size_y;
+    private int sizeX;
+    private int sizeY;
 
-    private Label _white;
-    private Label _black;
-
-    // 结果显示（主要用于五子棋的计分模式）
-    private final Label _whiteResults = new Label();
-    private final Label _blackResults = new Label();
-    private final VBox _results = new VBox();
+    private Label white;
+    private Label black;
 
     // 回合显示
-    private final Label playTurn = new Label("Round : 0");
-    private final Label playerTurn = new Label("Black turn");
+    private final Label turn = new Label("Round : 0");
 
     // 各种按钮（确保都有实例）
-    private final Button _resign;
-    private final Button _undo = new Button("undo");
-    private final Button _prev;
-    private final Button _next;
-    private final Button _hint;
-    private final Button backHomeButton = new Button("back Home");
+    private final Button resign;
+    private final Button undo = new Button("undo");
+    private final Button prev;
+    private final Button next;
+    private final Button hint;
 
-    public GameInfos(int y, int x, Home infos) {
-        _size_x = x;
-        _size_y = y;
+    public GameInfos(int y, int x) {
+        sizeX = x;
+        sizeY = y;
 
-        _game_infos = new VBox();
-        _game_infos.setPrefSize(x, y);
-        _game_infos.setMinWidth(Region.USE_PREF_SIZE);
-        _game_infos.setMinHeight(Region.USE_PREF_SIZE);
-        _game_infos.setBackground(new Background(new BackgroundFill(Color.web("#ADBAC0"), null, null)));
-
-        // 默认隐藏“返回主页”按钮，某些模式（如 LEARNING）中再打开
-        backHomeButton.setManaged(false);
-        backHomeButton.setVisible(false);
-        _game_infos.getChildren().add(backHomeButton);
+        gameInfos = new VBox();
+        gameInfos.setPrefSize(x, y);
+        gameInfos.setMinWidth(Region.USE_PREF_SIZE);
+        gameInfos.setMinHeight(Region.USE_PREF_SIZE);
+        gameInfos.setBackground(new Background(new BackgroundFill(Color.web("#ADBAC0"), null, null)));
 
         // 先加回合数显示
-        _game_infos.getChildren().add(playTurn);
+        gameInfos.getChildren().add(turn);
 
         // 填充白/黑方名称与囚徒数
         addText();
 
         // 添加白/黑方信息框（名字 + 囚徒数）
-        _whiteBox.getChildren().add(_white);
-        _blackBox.getChildren().add(_black);
-        _game_infos.getChildren().addAll(_blackBox, _whiteBox);
+        whiteBox.getChildren().add(white);
+        blackBox.getChildren().add(black);
+        gameInfos.getChildren().addAll(blackBox, whiteBox);
 
         // 初始化按钮
-        _resign = new Button("resign");
-        _prev = new Button("<");
-        _next = new Button(">");
-        _hint = new Button("hint");
+        resign = new Button("resign");
+        prev = new Button("<");
+        next = new Button(">");
+        hint = new Button("hint");
 
         // 设置最小高度和默认字体，避免字体=0 导致控件高度=0（跨平台稳健）
-        setButtonMinHeight(_prev, _next, _hint,
-                _resign, _undo, backHomeButton);
+        setButtonMinHeight(prev, next, hint, undo, resign);
 
-        _prev.setPadding(Insets.EMPTY);
-        _next.setPadding(Insets.EMPTY);
+        prev.setPadding(Insets.EMPTY);
+        next.setPadding(Insets.EMPTY);
         // 若 size_x 非零，则给左右按钮合适的 prefWidth
-        if (_size_x > 0) {
-            _prev.setPrefWidth((double) _size_x / 2 - ((double) _size_x / 10));
-            _next.setPrefWidth((double) _size_x / 2 - ((double) _size_x / 10));
+        if (sizeX > 0) {
+            prev.setPrefWidth((double) sizeX / 2 - ((double) sizeX / 10));
+            next.setPrefWidth((double) sizeX / 2 - ((double) sizeX / 10));
         }
-        _prev.setFont(Font.font("Arial", 20));
-        _next.setFont(Font.font("Arial", 20));
-
-        // 结果区域默认隐藏
-        _results.getChildren().addAll(_whiteResults, _blackResults);
-        _results.setVisible(false);
-        _results.setManaged(false);
+        prev.setFont(Font.font("Arial", 20));
+        next.setFont(Font.font("Arial", 20));
 
         HBox _button_prev_next = new HBox();
-        _button_prev_next.getChildren().addAll(_prev, _next);
+        _button_prev_next.getChildren().addAll(prev, next);
 
         // 将所有控件装进 info 面板
-        _game_infos.getChildren().addAll(
-                _hint,
-                _resign,
-                _undo,
+        gameInfos.getChildren().addAll(
+                hint,
+                undo,
                 _button_prev_next,
-                _results
+                resign
         );
 
         // 延迟绑定字体（确保控件已加入 Scene 并有尺寸）
@@ -107,9 +88,9 @@ public class GameInfos {
     }
 
     public void updateGameInfo(int new_y, int new_x){
-        _size_x = new_x;
-        _size_y = new_y;
-        _game_infos.setPrefSize(_size_x, _size_y);
+        sizeX = new_x;
+        sizeY = new_y;
+        gameInfos.setPrefSize(sizeX, sizeY);
     }
 
     /**
@@ -121,17 +102,14 @@ public class GameInfos {
         DoubleBinding fontSizeBinding = (DoubleBinding) Bindings.max(
                 8,
                 Bindings.min(
-                        _game_infos.widthProperty().multiply(0.1),
-                        _game_infos.heightProperty().multiply(0.1)
+                        gameInfos.widthProperty().multiply(0.1),
+                        gameInfos.heightProperty().multiply(0.1)
                 )
         );
 
-        bindFont(playTurn, fontSizeBinding);
-        bindFont(playerTurn, fontSizeBinding);
-        bindFont(_white, fontSizeBinding);
-        bindFont(_black, fontSizeBinding);
-        bindFont(_whiteResults, fontSizeBinding);
-        bindFont(_blackResults, fontSizeBinding);
+        bindFont(turn, fontSizeBinding);
+        bindFont(white, fontSizeBinding);
+        bindFont(black, fontSizeBinding);
     }
 
     private void bindFont(Label label, DoubleBinding binding) {
@@ -150,73 +128,49 @@ public class GameInfos {
     }
 
     private void addText() {
-        _white = new Label("white turn");
-        _black = new Label("black turn");
+        white = new Label("white turn");
+        black = new Label("black turn");
 
         // 给初始字体，使得在极端情况下也不会为 0
-        _white.setFont(Font.font("Arial", 12));
-        _black.setFont(Font.font("Arial", 12));
+        white.setFont(Font.font("Arial", 12));
+        black.setFont(Font.font("Arial", 12));
 
         // 其它字体绑定由 bindFonts() 延迟完成
     }
 
-    public void setPLayTurn(int turn) {
-        playTurn.setText("Round : " + turn);
-    }
-
-    // 旧名：setPLayerTurn（若项目中使用此名也兼容）
-    public void setPLayerTurn(int play) {
-        if (play == 0)
-            playerTurn.setText("Black turn");
-        else
-            playerTurn.setText("White turn");
-    }
-
-    public VBox getResultsBox() {
-        return _results;
-    }
-
-    // ---------- Reset / Clear / Update ----------
-    public void reset_infos(Home infos) {
-        // 计时已删除，这里只重置回合与当前玩家显示
-        playTurn.setText("Round : 0");
-        playerTurn.setText("Black turn");
-    }
-
-    // ---------- Getters for buttons / boxes ----------
-    public Button getBackHomeButton() {
-        return backHomeButton;
+    public void setTurn(int turn) {
+        this.turn.setText("Round : " + turn);
     }
 
     public VBox getGameInfos() {
-        return _game_infos;
+        return gameInfos;
     }
 
     public Button getPrevButton() {
-        return _prev;
+        return prev;
     }
 
     public Button getNextButton() {
-        return _next;
+        return next;
     }
 
     public Button getResignButton() {
-        return _resign;
+        return resign;
     }
 
     public Button getUndoButton() {
-        return _undo;
+        return undo;
     }
 
     public Button getHintButton() {
-        return _hint;
+        return hint;
     }
 
     public VBox getBlackBox() {
-        return _blackBox;
+        return blackBox;
     }
 
     public VBox getWhiteBox() {
-        return _whiteBox;
+        return whiteBox;
     }
 }
