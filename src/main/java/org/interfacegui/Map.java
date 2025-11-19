@@ -28,7 +28,7 @@ public class Map{
         return (player_color);
     }
 
-    public void set_color(int color){
+    public void setColor(int color){
         player_color = color;
     }
 
@@ -99,7 +99,7 @@ public class Map{
         _map[coordinates.y][coordinates.x] = color;
     }
 
-    public int[][] get_map(){
+    public int[][] getMap(){
         return _map;
     }
 

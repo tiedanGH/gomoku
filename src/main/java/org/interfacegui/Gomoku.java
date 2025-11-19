@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import javafx.scene.layout.*;
 import org.modelai.Candidate;
 import org.modelai.Game;
 import org.utils.Point;
@@ -15,11 +17,6 @@ import javafx.beans.binding.DoubleBinding;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
@@ -30,56 +27,42 @@ public class Gomoku {
     private final ArrayList<Map> maps;
     private final Board board;
     private final GameInfos gameInfos;
-    private int gameInfosSizeX;
-    public int gameInfosSizeY;
+    private final EndInfos endInfos;
+    private int infoSizeX;
+    public int infoSizeY;
     private final Pane boardPane;
     private final int totalLines;
     private int mapIndex;
     private Rules rule;
-    private final VBox endPopup = new VBox();
-    private final Button replay;
-    private final Button backHome;
     private final Home home;
 
     private int playerTurn = 0;
     private boolean gameEnd = false;
     private Timeline gameLoop;
-    private final Label endText = new Label();
-    private Label gameName;
 
-    private ArrayList<Point> candidatesList;
     private ArrayList<Point> hintList = null;
 
     private int round = 0;
     private Game game;
     private boolean toggleHint = false;
-    private boolean ia_playing = false;
+    private boolean iaPlaying = false;
 
     private ExecutorService executor = null;
     private Future<Point> future = null;
-    private final ExecutorService executor2 = null;
     private Future<Boolean> future2 = null;
-
-    private final Label commentLabel = new Label();
-    int width = 0;
 
     private void setEndGame() {
         int winner = rule.getWinner();
-        endPopup.setVisible(true);
-        endPopup.setManaged(true);
         gameEnd = true;
-        ia_playing = false;
+        iaPlaying = false;
         if (gameLoop != null) gameLoop.stop();
-
-        if (winner == 0) endText.setText("Draw");
-        else if (winner == 1) endText.setText("Black Win");
-        else endText.setText("White Win");
+        endInfos.showEnd(winner);
     }
 
     private void updateGameMap(int index) {
-        for (int i = 0; i < rule.get_board_size(); i++) {
-            for (int j = 0; j < rule.get_board_size(); j++) {
-                game.gameMap[i][j] = maps.get(index).get_map()[i][j];
+        for (int i = 0; i < rule.getBoardSize(); i++) {
+            for (int j = 0; j < rule.getBoardSize(); j++) {
+                game.gameMap[i][j] = maps.get(index).getMap()[i][j];
             }
         }
     }
@@ -92,17 +75,6 @@ public class Gomoku {
             board.setStoneStatus(false, color, p, String.format("%.0f", p.val));
         }
         board.updateFromMap(maps.get(mapIndex));
-    }
-
-    void setCandidates(ArrayList<Candidate.Coordinate> candidates, float[] values, int index) {
-        if (!rule.hasAI() || candidates == null || values == null) return;
-        candidatesList = new ArrayList<>();
-        hideCandidates();
-        for (int i = 0; i < values.length; i++) {
-            candidatesList.add(new Point(candidates.get(i).y, candidates.get(i).x));
-            candidatesList.get(i).set_val(values[i]);
-        }
-        maps.get(index).setCandidatsList(candidatesList);
     }
 
     void changeHintVisibility(boolean visible) {
@@ -120,10 +92,9 @@ public class Gomoku {
         hintList = new ArrayList<>();
         for (int i = 0; i < hint.size(); i++) {
             hintList.add(new Point(hint.get(i).y, hint.get(i).x));
-            hintList.get(i).set_val(values[i]);
+            hintList.get(i).setValue(values[i]);
         }
-
-        hintList.sort(Comparator.comparingDouble(Point::get_val));
+        hintList.sort(Comparator.comparingDouble(Point::getValue));
     }
 
     private void updatePlayerTurn() {
@@ -135,6 +106,7 @@ public class Gomoku {
         if (mapIndex < (maps.size() - 1) || !rule.isValidMove(point, maps)) return;
 
         hideCandidates();
+        setStepButtonVisibility();
         changeHintVisibility(false);
         toggleHint = false;
 
@@ -152,7 +124,7 @@ public class Gomoku {
             game.move(point, playerTurn + 1);
         }
 
-        newMap.set_color(playerTurn);
+        newMap.setColor(playerTurn);
 
         board.updateFromMap(newMap);
         highlightLastMove();
@@ -230,41 +202,39 @@ public class Gomoku {
         gameInfos.getNextButton().setVisible(mapIndex < maps.size() - 1);
     }
 
-    public Gomoku(int height, int width, Home game_infos) {
-        home = game_infos;
-        this.width = width;
+    public Gomoku(int height, int width, Home gameInfosRules) {
+        home = gameInfosRules;
 
         if (home.getRuleInstance() != null)
             rule = home.getRuleInstance();
         else
             initRules(home.getBoardSize());
 
-        totalLines = rule.get_board_size();
+        totalLines = rule.getBoardSize();
 
-        gameInfosSizeX = width / 4;
-        gameInfosSizeY = height;
+        infoSizeX = width / 5;
+        infoSizeY = height;
 
-        gameInfos = new GameInfos(height, gameInfosSizeX);
+        gameInfos = new GameInfos(height, infoSizeX);
+        endInfos = new EndInfos(height, infoSizeX);
 
-        game = new Game(game_infos.getRules(), rule.get_board_size());
+        game = new Game(gameInfosRules.getRules(), rule.getBoardSize());
         game.resetMinMax();
         maps = new ArrayList<>();
-        board = new Board(height, width - gameInfosSizeX, rule.get_board_size());
+        board = new Board(height, width - infoSizeX * 2, rule.getBoardSize());
 
         maps.add(new Map(totalLines));
 
         gameDisplay = new Pane();
-        replay = new Button("Replay");
-        backHome = new Button("Back Home");
-        gameName = new Label(game_infos.getRules());
+        Label gameName = new Label(gameInfosRules.getRules());
 
-        endPopup.setVisible(false);
-        endPopup.getChildren().addAll(endText, replay, backHome);
+        endInfos.hidePopup();
 
         boardPane = board.getBoard();
         VBox gameInfosPane = gameInfos.getGameInfos();
         gameInfosPane.getChildren().add(0, gameName);
-        gameInfosPane.getChildren().add(0, endPopup);
+        VBox endInfosPane = endInfos.getEndInfos();
+        endInfosPane.getChildren().add(0, gameName);
 
         setPlayerColor();
 
@@ -272,7 +242,6 @@ public class Gomoku {
                 gameInfosPane.widthProperty().multiply(0.1),
                 gameInfosPane.heightProperty().multiply(0.1)
         );
-
         gameName.fontProperty().bind(Bindings.createObjectBinding(
                 () -> new Font("Arial", fontSizeBinding.get()),
                 fontSizeBinding
@@ -280,8 +249,8 @@ public class Gomoku {
 
         VBox mainVBox = new VBox();
         HBox hbox = new HBox();
-        hbox.getChildren().addAll(gameInfosPane, boardPane);
-        mainVBox.getChildren().addAll(commentLabel, hbox);
+        hbox.getChildren().addAll(gameInfosPane, boardPane, endInfosPane);
+        mainVBox.getChildren().addAll(hbox);
         gameDisplay.getChildren().add(mainVBox);
 
         // Undo Button
@@ -309,14 +278,12 @@ public class Gomoku {
                 return ;
             gameLoop.stop();
             gameEnd = true;
-            ia_playing = false;
-            endText.setText("match resigned");
-            endPopup.setVisible(true);
-            endPopup.setManaged(true);
+            iaPlaying = false;
+            endInfos.showEnd("match resigned");
             endAI();
             if (future2 != null){
                 future2 = null;
-                ia_playing = false;
+                iaPlaying = false;
             }
         });
 
@@ -326,6 +293,7 @@ public class Gomoku {
                 mapIndex--;
                 board.updateFromMap(maps.get(mapIndex));
                 setStepButtonVisibility();
+                board.removeLastMoveRect();
             }
         });
 
@@ -335,6 +303,9 @@ public class Gomoku {
                 mapIndex++;
                 board.updateFromMap(maps.get(mapIndex));
                 setStepButtonVisibility();
+                if (mapIndex == maps.size() - 1) {
+                    highlightLastMove();
+                }
             }
         });
 
@@ -345,18 +316,18 @@ public class Gomoku {
                     || (playerTurn == 1 && home.getWhitePlayerType() == 1))
                 return;
 
-            int margin_w = board.get_margin_width();
-            int margin_h = board.get_margin_height();
+            int marginWidth = board.getMarginWidth();
+            int marginHeight = board.getMarginHeight();
             int square = board.getSquareSize();
-            double x = event.getX() - margin_w;
-            double y = event.getY() - margin_h;
+            double x = event.getX() - marginWidth;
+            double y = event.getY() - marginHeight;
 
             x /= square;
             y /= square;
             x = Math.round(x);
             y = Math.round(y);
 
-            if (x < 0 || x >= rule.get_board_size() || y < 0 || y >= rule.get_board_size())
+            if (x < 0 || x >= rule.getBoardSize() || y < 0 || y >= rule.getBoardSize())
                 return;
 
             playMove(new Point((int) x, (int) y));
@@ -371,26 +342,26 @@ public class Gomoku {
             if (rule.hasAI()) {
                 try {
                     if (playerTurn == 0 && home.getBlackPlayerType() == 1) {
-                        if (!ia_playing) {
+                        if (!iaPlaying) {
                             executor = Executors.newSingleThreadExecutor();
                             future = executor.submit(() -> game.bestMove(1, 1, true));
-                            ia_playing = true;
+                            iaPlaying = true;
                         } else if (future.isDone()) {
                             playMove(future.get());
                             executor.shutdown();
                             executor = null;
-                            ia_playing = false;
+                            iaPlaying = false;
                         }
                     } else if (playerTurn == 1 && home.getWhitePlayerType() == 1) {
-                        if (!ia_playing) {
+                        if (!iaPlaying) {
                             executor = Executors.newSingleThreadExecutor();
                             future = executor.submit(() -> game.bestMove(2, 2, true));
-                            ia_playing = true;
+                            iaPlaying = true;
                         } else if (future.isDone()) {
                             playMove(future.get());
                             executor.shutdown();
                             executor = null;
-                            ia_playing = false;
+                            iaPlaying = false;
                         }
                     }
                 } catch (Exception e) {
@@ -404,7 +375,7 @@ public class Gomoku {
     }
 
     public void resetGame() {
-        ia_playing = false;
+        iaPlaying = false;
         gameEnd = false;
         playerTurn = 0;
         lastMove = null;
@@ -426,7 +397,7 @@ public class Gomoku {
         setStepButtonVisibility();
 
         if (rule.hasAI()) {
-            game = new Game(home.getRules(), rule.get_board_size());
+            game = new Game(home.getRules(), rule.getBoardSize());
             game.resetMinMax();
             if (home.getBlackPlayerType() == 0 &&
                     home.getWhitePlayerType() == 0)
@@ -435,15 +406,13 @@ public class Gomoku {
                 game.treeConfig(home.getLevel());
         }
 
-        // clear hint
-        candidatesList = null;
         hintList = null;
         toggleHint = false;
+        lastMove = null;
+        board.removeLastMoveRect();
         hideCandidates();
         changeHintVisibility(false);
-
-        endPopup.setVisible(false);
-        endPopup.setManaged(false);
+        endInfos.hidePopup();
 
         createGameLoop();
     }
@@ -452,26 +421,21 @@ public class Gomoku {
         return gameDisplay;
     }
 
-    public Button get_home_button() {
-        return backHome;
+    public Button getReplayButton() {
+        return endInfos.getReplayButton();
     }
 
-    public Button get_replay_button() {
-        return replay;
+    public Button getBackHomeButton() {
+        return endInfos.getBackHomeButton();
     }
-
-    public Button getBackHomeButton() { return backHome; }
 
     public void updateGameDisplay(int newY, int newX){
-        width = newX;
-        gameInfosSizeX = newX / 4;
-        gameInfosSizeY = newY;
-        gameInfos.updateGameInfo(newY, gameInfosSizeX);
-        double labelHeight = commentLabel.prefHeight(commentLabel.getMaxWidth());
-        if (!commentLabel.isVisible())
-            labelHeight = 0;
-        board.updateBoard(newY - (int)labelHeight, newX - gameInfosSizeX);
-        boardPane.setLayoutX(gameInfosSizeX);
+        infoSizeX = newX / 5;
+        infoSizeY = newY;
+        gameInfos.updateGameInfo(newY, infoSizeX);
+        endInfos.updateEndInfo(newY, infoSizeX);
+        board.updateBoard(newY, newX - infoSizeX * 2);
+        boardPane.setLayoutX(infoSizeX);
     }
 
     // highlight the last move

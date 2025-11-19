@@ -55,7 +55,7 @@ public class GomokuRules implements Rules {
     }
 
     @Override
-    public int  get_board_size(){
+    public int getBoardSize(){
         return boardSize;
     }
 

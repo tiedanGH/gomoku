@@ -20,15 +20,15 @@ public class Board {
     private int size;
     private final int totalLines;
     private int squareSize;
-    private int heightMargin;
-    private int widthMargin;
+    private int marginHeight;
+    private int marginWidth;
     private final ArrayList<Text> txt = new ArrayList<>();
     private Rectangle lastMoveRect = null;
 
     private void initMargin(int height, int width) {
-        int board_size = squareSize * (totalLines - 1);
-        heightMargin = (height - board_size) / 2;
-        widthMargin = (width - board_size) / 2;
+        int size = squareSize * (totalLines - 1);
+        marginHeight = (height - size) / 2;
+        marginWidth = (width - size) / 2;
     }
 
     private void initSquareSize() {
@@ -39,8 +39,8 @@ public class Board {
         for (int i = 0; i < dotsCoordinate.size(); i++) {
             Circle dot = dots.get(i);
             dot.setRadius((double) squareSize / 7);
-            dot.setCenterX((squareSize * dotsCoordinate.get(i).x) + widthMargin);
-            dot.setCenterY((squareSize * dotsCoordinate.get(i).y) + heightMargin);
+            dot.setCenterX((squareSize * dotsCoordinate.get(i).x) + marginWidth);
+            dot.setCenterY((squareSize * dotsCoordinate.get(i).y) + marginHeight);
             dot.setStroke(Color.TRANSPARENT);
             dot.setFill(Color.BLACK);
             dot.setStrokeWidth(1);
@@ -51,8 +51,8 @@ public class Board {
         for (Point p : dotsCoordinate) {
             Circle dots = new Circle();
             dots.setRadius((double) squareSize / 7);
-            dots.setCenterX((squareSize * p.x) + widthMargin);
-            dots.setCenterY((squareSize * p.y) + heightMargin);
+            dots.setCenterX((squareSize * p.x) + marginWidth);
+            dots.setCenterY((squareSize * p.y) + marginHeight);
             dots.setStroke(Color.TRANSPARENT);
             dots.setFill(Color.BLACK);
             dots.setStrokeWidth(1);
@@ -87,19 +87,19 @@ public class Board {
     private void initLines() {
         for (int i = 0; i < totalLines; i++) {
             Line line = new Line(
-                widthMargin + (squareSize * i),
-                    heightMargin,
-                widthMargin + (squareSize * i),
-                heightMargin + (squareSize * (totalLines - 1))
+                marginWidth + (squareSize * i),
+                    marginHeight,
+                marginWidth + (squareSize * i),
+                marginHeight + (squareSize * (totalLines - 1))
             );
             lines.add(line);
         }
         for (int i = 0; i < totalLines; i++) {
             Line line = new Line(
-                    widthMargin,
-                heightMargin + (squareSize * i),
-                widthMargin + (squareSize * (totalLines - 1)),
-                heightMargin + (squareSize * i)
+                    marginWidth,
+                marginHeight + (squareSize * i),
+                marginWidth + (squareSize * (totalLines - 1)),
+                marginHeight + (squareSize * i)
             );
             lines.add(line);
         }
@@ -131,16 +131,16 @@ public class Board {
     public void updateLines() {
         for (int i = 0; i < lines.size(); i++) {
             if (i < totalLines) {
-                lines.get(i).setStartX(widthMargin + (squareSize * i));
-                lines.get(i).setStartY(heightMargin);
-                lines.get(i).setEndX(widthMargin + (squareSize * i));
-                lines.get(i).setEndY(heightMargin + (squareSize * (totalLines - 1)));
+                lines.get(i).setStartX(marginWidth + (squareSize * i));
+                lines.get(i).setStartY(marginHeight);
+                lines.get(i).setEndX(marginWidth + (squareSize * i));
+                lines.get(i).setEndY(marginHeight + (squareSize * (totalLines - 1)));
             } else {
                 int n = i - totalLines;
-                lines.get(i).setStartX(widthMargin);
-                lines.get(i).setStartY(heightMargin + (squareSize * n));
-                lines.get(i).setEndX(widthMargin + (squareSize * (totalLines - 1)));
-                lines.get(i).setEndY(heightMargin + (squareSize * n));
+                lines.get(i).setStartX(marginWidth);
+                lines.get(i).setStartY(marginHeight + (squareSize * n));
+                lines.get(i).setEndX(marginWidth + (squareSize * (totalLines - 1)));
+                lines.get(i).setEndY(marginHeight + (squareSize * n));
             }
         }
     }
@@ -160,8 +160,8 @@ public class Board {
         for (int i = 0; i < stones.length; i++) {
             for (int j = 0; j < stones[i].length; j++) {
                 stones[i][j].setRadius((double) squareSize / 2);
-                stones[i][j].setCenterX((squareSize * j) + widthMargin);
-                stones[i][j].setCenterY((squareSize * i) + heightMargin);
+                stones[i][j].setCenterX((squareSize * j) + marginWidth);
+                stones[i][j].setCenterY((squareSize * i) + marginHeight);
             }
         }
     }
@@ -179,8 +179,8 @@ public class Board {
     private void setScoreLayout(double size, int i, int j, Rectangle r) {
         r.setWidth(size);
         r.setHeight(size);
-        double centerX = (squareSize * j) + widthMargin;
-        double centerY = (squareSize * i) + heightMargin;
+        double centerX = (squareSize * j) + marginWidth;
+        double centerY = (squareSize * i) + marginHeight;
         r.setX(centerX - size / 2.0);
         r.setY(centerY - size / 2.0);
     }
@@ -190,8 +190,8 @@ public class Board {
             for (int j = 0; j < stones[i].length; j++) {
                 stones[i][j] = new Circle();
                 stones[i][j].setRadius((double) squareSize / 2);
-                stones[i][j].setCenterX((squareSize * j) + widthMargin);
-                stones[i][j].setCenterY((squareSize * i) + heightMargin);
+                stones[i][j].setCenterX((squareSize * j) + marginWidth);
+                stones[i][j].setCenterY((squareSize * i) + marginHeight);
                 stones[i][j].setStroke(Color.TRANSPARENT);
                 stones[i][j].setFill(Color.BLUE);
                 stones[i][j].setStrokeWidth(1);
@@ -266,12 +266,12 @@ public class Board {
         }
     }
 
-    public int get_margin_width() {
-        return widthMargin;
+    public int getMarginWidth() {
+        return marginWidth;
     }
 
-    public int get_margin_height(){ 
-        return heightMargin;
+    public int getMarginHeight(){
+        return marginHeight;
     }
 
     public int getSquareSize() {
@@ -279,7 +279,7 @@ public class Board {
     }
 
     public void updateFromMap(Map gameMap) {
-        int[][] board = gameMap.get_map();
+        int[][] board = gameMap.getMap();
         for (Text t : txt) {
             t.setManaged(false);
             t.setVisible(false);
@@ -306,16 +306,20 @@ public class Board {
             }
         }
     }
-    
-    public void drawLastMoveBox(Point p) {
-        // 移除旧红框
+
+    public void removeLastMoveRect() {
         if (lastMoveRect != null) {
             this.getBoard().getChildren().remove(lastMoveRect);
             lastMoveRect = null;
         }
+    }
+    
+    public void drawLastMoveBox(Point p) {
+        // 移除旧红框
+        removeLastMoveRect();
 
-        int marginWidth = get_margin_width();
-        int marginHeight = get_margin_height();
+        int marginWidth = getMarginWidth();
+        int marginHeight = getMarginHeight();
 
         // 棋子实际中心点，必须和stones 一样
         double centerX = marginWidth + (p.x * squareSize);
