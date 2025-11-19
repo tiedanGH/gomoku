@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.modelai.Candidat;
+import org.modelai.Candidate;
 import org.modelai.Game;
 import org.utils.Point;
 
@@ -14,6 +14,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
+
+import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
@@ -21,7 +23,6 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
@@ -116,9 +117,9 @@ public class Gomoku {
             }
 
             if (mIndex < _map.size() - 1) {
-                game.best_move((mIndex % 2 == 0 ? 1 : 2),
+                game.bestMove((mIndex % 2 == 0 ? 1 : 2),
                         (mIndex % 2 == 0 ? 1 : 2), true);
-                setCandidats(game.m.candidat.lst, game.m.values, mIndex + 1);
+                setCandidats(game.m.candidate.list, game.m.values, mIndex + 1);
                 updatePlayerTurn();
             }
         }
@@ -145,7 +146,7 @@ public class Gomoku {
         if (!visible) goban.updateFromMap(_map.get(map_index));
     }
 
-    void setCandidats(ArrayList<Candidat.coord> candidats, float[] values, int index) {
+    void setCandidats(ArrayList<Candidate.Coordinate> candidats, float[] values, int index) {
         if (!rule.hasIa() || candidats == null || values == null) return;
 
         candidatsList = new ArrayList<>();
@@ -168,7 +169,7 @@ public class Gomoku {
         if (!visible) goban.updateFromMap(_map.get(map_index));
     }
 
-    void setHint(ArrayList<Candidat.coord> hint, float[] values) {
+    void setHint(ArrayList<Candidate.Coordinate> hint, float[] values) {
         if (!rule.hasIa() || hint == null) return;
 
         hintList = new ArrayList<>();
@@ -286,7 +287,7 @@ public class Gomoku {
     public void killIa() {
         if (gameLoop != null) gameLoop.stop();
         if (executor != null) executor.shutdown();
-        if (rule.hasIa() && game != null) game.reset_minmax();
+        if (rule.hasIa() && game != null) game.resetMinMax();
     }
 
     private void handdleButtonPrevNext() {
@@ -313,7 +314,8 @@ public class Gomoku {
         playingMode = game_infos.getGameMode();
 
         game = new Game(game_infos.getRules(), rule.get_board_size());
-        game.reset_minmax();
+
+        game.resetMinMax();
 
         _map = new ArrayList<>();
         goban = new Goban(heigh, width - _game_infos_size_x, rule.get_board_size());
@@ -364,8 +366,8 @@ public class Gomoku {
 
             toggleHint = !toggleHint;
 
-            game.best_move(player_turn + 1, player_turn + 1, true);
-            setHint(game.m.candidat.lst, game.m.values);
+            game.bestMove(player_turn + 1, player_turn + 1, true);
+            setHint(game.m.candidate.list, game.m.values);
             changeHintVisibility(toggleHint);
 
             if (!toggleHint) goban.updateFromMap(_map.get(map_index));
@@ -445,7 +447,7 @@ public class Gomoku {
                     if (player_turn == 0 && _game_infos.getBlackPlayerType() == 1) {
                         if (!ia_playing) {
                             executor = Executors.newSingleThreadExecutor();
-                            future = executor.submit(() -> game.best_move(1, 1, true));
+                            future = executor.submit(() -> game.bestMove(1, 1, true));
                             ia_playing = true;
                         } else if (future.isDone()) {
                             playMove(future.get());
@@ -456,7 +458,7 @@ public class Gomoku {
                     } else if (player_turn == 1 && _game_infos.getWhitePlayerType() == 1) {
                         if (!ia_playing) {
                             executor = Executors.newSingleThreadExecutor();
-                            future = executor.submit(() -> game.best_move(2, 2, true));
+                            future = executor.submit(() -> game.bestMove(2, 2, true));
                             ia_playing = true;
                         } else if (future.isDone()) {
                             playMove(future.get());
@@ -503,12 +505,12 @@ public class Gomoku {
         // 重置 AI
         if (rule.hasIa()) {
             game = new Game(_game_infos.getRules(), rule.get_board_size());
-            game.reset_minmax();
+            game.resetMinMax();
             if (_game_infos.getBlackPlayerType() == 0 &&
                     _game_infos.getWhitePlayerType() == 0)
-                game.tree_config(1);
+                game.treeConfig(1);
             else
-                game.tree_config(_game_infos.getLevel());
+                game.treeConfig(_game_infos.getLevel());
         }
 
         // 清空提示

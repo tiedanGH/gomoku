@@ -3,8 +3,7 @@ import org.modelai.*;
 
 public class DoubleFree
 {
-    static private int [][] dir = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
-    private static int goban_size = 19;
+    static private final int [][] dir = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
 
     private void m_play(int x, int y, int val, int[][] map )
     {
@@ -13,9 +12,8 @@ public class DoubleFree
 
     private boolean in_goban(int x, int y)
     {
-        if (x >=0 && x < goban_size && y >=0 && y < goban_size)
-            return true;
-        return false;
+        int goban_size = 19;
+        return x >= 0 && x < goban_size && y >= 0 && y < goban_size;
     }
 
     private boolean check_win(int x, int y, int val, int i, int [][]map )
@@ -45,9 +43,7 @@ public class DoubleFree
                 cur_x = x + dep * dir[i][0];
                 cur_y = y + dep * dir[i][1];
             }
-        if (res>=4)
-            return true;
-        return false;
+        return res >= 4;
     }
 
     public boolean check_double_free(int x, int y, int val, int[][] map)
@@ -236,13 +232,13 @@ public class DoubleFree
             System.out.printf("Impossible move %d %d, case occuped by %d\n", x, y, map[x][y]);
             return;
         }
-        if (check_double_free(x, y, val, map) == false)
+        if (!check_double_free(x, y, val, map))
             System.out.printf("Double free detetect at %d %d\n", x, y);
         else
         {
             System.out.printf("Move %d %d possible\n", x, y);
             m_play(x, y, val, map);
-            MinMax.display_Map();
+            MinMax.displayBoardStatic();
         }
     }
 }

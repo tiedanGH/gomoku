@@ -1,55 +1,59 @@
 package org.modelai;
 
+/*
+ * Moku
+ *
+ * 中文说明：
+ * Moku 继承 MinMax，用于 Gomoku（五子棋）专用的节点实现。
+ */
+
 public class Moku extends MinMax {
 
     public Moku()
     {
-        map = new int[19][19];
-
-        this.move = new Candidat.coord(-1, -1);
-
-        scsimul = new Miniscore();
-        candidat = new Candidat(false);
-        pos_counter = 0;
-        nbmove = 0;
+        // 初始化共享棋盘与评估器、候选管理器
+        board = new int[19][19];
+        this.move = new Candidate.Coordinate(-1, -1);
+        miniScoreSim = new MiniScore();
+        candidate = new Candidate(false);
+        positionCounter = 0;
+        moveCount = 0;
     }
 
-    public boolean play(Candidat.coord c, int player)
+    public boolean play(Candidate.Coordinate c, int player)
     {
-        if (check_win_4_dir(c.x, c.y, player))
+        if (checkWin4Dir(c.x, c.y, player))
             return true;
         this.move = c;
-        map[c.x][c.y] = player;
+        board[c.x][c.y] = player;
 
-        candidat.save(c);
-        scsimul.analyse_move(c.x, c.y, player);
+        candidate.save(c);
+        miniScoreSim.analyseMove(c.x, c.y, player);
 
         return false;
     }
 
-    public void unplay(Candidat.coord c, int depth)
+    public void undo(Candidate.Coordinate c, int depth)
     {
-        int val = map[c.x][c.y];
-        map[c.x][c.y] = 0;
-        scsimul.analyse_unmove(c.x, c.y, val);
+        super.undo(c, depth);
     }
 
-    public Moku (int len)
+    public Moku(int len)
     {
         this.len = len + 1;
-        this.move = new Candidat.coord(-1, -1);
-        this.candidat = new Candidat(false);
+        this.move = new Candidate.Coordinate(-1, -1);
+        this.candidate = new Candidate(false);
     }
 
-    public float minmax(int depth, int turn, int player)
-    {   
+    public float minimax(int depth, int turn, int player)
+    {
         int nb_candidates;
 
-        nb_candidates = candidat.old_load(depth, player);
+        nb_candidates = candidate.oldLoad(depth, player);
 
         if (depth == 0)
         {
-            pos_counter++;
+            positionCounter++;
             return eval(player, len, turn);
         }
 
@@ -58,11 +62,11 @@ public class Moku extends MinMax {
         for (int i = 0 ; i < nb_candidates ; i++)
         {
             Moku m = new Moku(this.len);
-            if (m.play(candidat.lst.get(i), turn))
-                values[i] = value_victory(player, turn, len);
+            if (m.play(candidate.list.get(i), turn))
+                values[i] = victoryValue(player, turn, len);
             else
-                values[i] = m.minmax(depth - 1, change(turn), player);
-            m.unplay(m.move, depth);
+                values[i] = m.minimax(depth - 1, change(turn), player);
+            m.undo(m.move, depth);
         }
 
         if (turn == player)
@@ -71,20 +75,19 @@ public class Moku extends MinMax {
             return min(values);
     }
 
-    public float minmaxab(int depth, int turn, int player, float alpha, float beta)
-    {   
+    public float minimaxAB(int depth, int turn, int player, float alpha, float beta)
+    {
         int nb_candidates;
         float cur_alpha;
         float cur_beta;
         float res;
 
-        scsimul.cur_turn = turn;
+        miniScoreSim.curTurn = turn;
 
-
-        nb_candidates = candidat.old_load(depth, turn);
+        nb_candidates = candidate.oldLoad(depth, turn);
         if (depth == 0)
         {
-            pos_counter++;
+            positionCounter++;
             res = eval(player, len, turn);
             return res;
         }
@@ -94,45 +97,40 @@ public class Moku extends MinMax {
 
         values = new float[nb_candidates];
 
-    
         cur_alpha = Float.NEGATIVE_INFINITY;
         cur_beta = Float.POSITIVE_INFINITY;
 
         for (int i = 0 ; i < nb_candidates ; i++)
         {
             Moku m = new Moku(this.len);
+            Candidate.Coordinate cand = candidate.list.get(i);
+            boolean isMaxLayer = (turn == player);
 
-            if (turn == player)
+            // 统一计算递归窗口
+            float recAlpha = isMaxLayer ? Math.max(alpha, cur_alpha) : alpha;
+            float recBeta  = isMaxLayer ? beta : Math.min(beta, cur_beta);
+
+            if (m.play(cand, turn))
             {
-                if (m.play(candidat.lst.get(i), turn))
-                    res = value_victory_intermediate(player, turn, len);
-                else
-                {
-                    res = m.minmaxab(depth - 1, change(turn), player, Math.max(alpha, cur_alpha), beta);
-                    m.unplay(m.move, depth);
-                }
-
-                values[i] = res;
-                cur_alpha = Math.max(cur_alpha, res);
-
-
-                if (cur_alpha > beta) // beta cut
-                    return cur_alpha;
-
+                res = victoryIntermediateValue(player, turn, len);
             }
             else
             {
-                if (m.play(candidat.lst.get(i),turn))
-                    res = value_victory_intermediate(player, turn, len);
-                else
-                {
-                    res = m.minmaxab(depth - 1, change(turn), player, alpha, Math.min(beta, cur_beta));
-                    m.unplay(m.move, depth);
-                }
-                values[i] = res;
+                res = m.minimaxAB(depth - 1, change(turn), player, recAlpha, recBeta);
+                m.undo(m.move, depth);
+            }
+
+            values[i] = res;
+
+            if (isMaxLayer)
+            {
+                cur_alpha = Math.max(cur_alpha, res);
+                if (cur_alpha > beta) // beta cut
+                    return cur_alpha;
+            }
+            else
+            {
                 cur_beta = Math.min(cur_beta, res);
-
-
                 if (alpha > cur_beta) // alpha cut
                     return cur_beta;
             }
@@ -143,5 +141,4 @@ public class Moku extends MinMax {
         else
             return min(values);
     }
-
 }

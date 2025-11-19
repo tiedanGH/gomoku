@@ -51,7 +51,7 @@ public class Blocker {
         {
             if (!in_goban(bl1[0]+ddir[dir][0]*sig*i, bl1[1]+ddir[dir][1]*sig*i))
                 break;
-            if (MinMax.map[bl1[0]+ddir[dir][0]*sig*i][bl1[1]+ddir[dir][1]*sig*i] == 0)
+            if (MinMax.board[bl1[0]+ddir[dir][0]*sig*i][bl1[1]+ddir[dir][1]*sig*i] == 0)
             {
                 cases[rank][0] = bl1[0]+ddir[dir][0]*sig*i;
                 cases[rank][1] = bl1[1]+ddir[dir][1]*sig*i;

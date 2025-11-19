@@ -4,278 +4,122 @@ import java.util.ArrayList;
 
 public class MinMax
 {
-    static public int [] [] map;
-    public Candidat candidat;
-    public Candidat.coord best;
-    public Candidat.coord move;
+    // 类说明：MinMax 实现了用于五子棋的极大极小搜索逻辑，
+    // 变量名重构后提高可读性：board, miniScoreSim, positionCounter, moveCount 等。
+
+    // 全局棋盘表示（19x19），0=空,1=黑,2=白
+    static public int[][] board;
+    // 当前候选集合对象（在 Candidate 类中管理候选位置）
+    public Candidate candidate;
+    // 当前评估出的最佳坐标（搜索时使用）
+    public Candidate.Coordinate best;
+    // 当前走子坐标（用于回溯时 undo）
+    public Candidate.Coordinate move;
+    // 存储每个候选位置对应的评估值
     public float [] values;
+    // 当前搜索深度或步数计数（语义由调用方使用）
     public int len = 0;
-    static public Miniscore scsimul;
-    static int pos_counter;
-    static int nbmove;
-    static int [] [] ddir = {{1, 0}, {0, 1}, {1, 1}, {1, -1}};
-    static public ArrayList<Candidat.coord> forced_capture =  new ArrayList<Candidat.coord>();
-    static public ArrayList<Candidat.coord> capwin =  new ArrayList<Candidat.coord>();
-    static public boolean after_capwinsim = true;
+    // 用于仿真评分的共享对象（MiniScore）
+    static public MiniScore miniScoreSim;
+    // 统计已评估的局面数
+    static public int positionCounter;
+    // 已走步数计数（在 loadCurrentScore 中自增）
+    static public int moveCount;
 
-    public class coord
+    // 将传入的 MiniScore 复制到 miniScoreSim，并设置当前回合
+    public void loadCurrentScore(MiniScore score, int turn)
     {
-        int x;
-        int y;
-    }
-
-    public void load_cur_score(Miniscore score, int turn)
-    {
-        scsimul.cur_turn = turn;
+        miniScoreSim.curTurn = turn;
         for (int d = 0 ; d < 4 ; d++)
         {
             for(int i = 0 ; i < 19 ; i++)
             {
                 for (int j = 0 ; j < 19 ; j++)
                 {
-                    scsimul.str1[d][i][j] = score.str1[d][i][j];
-                    scsimul.str2[d][i][j] = score.str2[d][i][j];  
+                    miniScoreSim.patternStr1[d][i][j] = score.patternStr1[d][i][j];
+                    miniScoreSim.patternStr2[d][i][j] = score.patternStr2[d][i][j];
                 }
             }
         }
-        scsimul.sc.one = score.sc.one;
-        scsimul.sc.two = score.sc.two;
-        scsimul.capt[0] = score.capt[0];
-        scsimul.capt[1] = score.capt[1];
+        miniScoreSim.score.one = score.score.one;
+        miniScoreSim.score.two = score.score.two;
 
-        pos_counter=0;
-        nbmove += 1;
+        positionCounter = 0;
+        moveCount += 1;
     }
 
     public MinMax(){}
 
-    public MinMax(int [][]inimap, int len)
-    {
-        map = new int[19][19];
-        this.move = new Candidat.coord(-1, -1);
-        this.len = len;
-
-        for (int i = 0 ; i < 19 ; i++)
-        {
-            for (int j = 0 ; j < 19 ; j++)
-                map[i][j] = inimap[i][j];
-        }
-    }
-
-    public MinMax (int len)
+    public MinMax(int len)
     {
         this.len = len;
-        this.move = new Candidat.coord(-1, -1);
+        this.move = new Candidate.Coordinate(-1, -1);
     }
 
-    public MinMax (MinMax m, int depth)
+    public MinMax(MinMax m, int ignoredDepth)
     {
         this.len = m.len + 1;
-        this.move = new Candidat.coord(-1, -1);
-        this.candidat = new Candidat(false);
-        candidat.reload_lim();
+        this.move = new Candidate.Coordinate(-1, -1);
+        this.candidate = new Candidate(false);
+        candidate.reloadLimits();
     }
 
-    public float eval(int player, int len, int turn)
+    // 评估函数：返回当前仿真评分（封装在 MiniScore 中）
+    public float eval(int player, int ignoredLen, int ignoredTurn)
     {
-       return scsimul.sc.evaluate(player);
+        return miniScoreSim.score.evaluate(player);
     }
 
-    public int nb_forced_capture()
+    // 判断坐标是否在棋盘内（保护方法）
+    static public boolean isInGoban(int x, int y)
     {
-        return forced_capture.size();
+        return x >= 0 && x < 19 && y >= 0 && y < 19;
     }
 
-    protected boolean in_goban(int x, int y)
+    // 检查某方向上是否已连成4（用于判断是否为胜利向量的一部分）
+    protected boolean checkDir(int x, int y, int dx, int dy, int player)
     {
-        if (x >=0 && x < 19 && y >=0 && y < 19)
-            return true;
-        return false;
-    }
+        int count = 0;
 
-    static public boolean IN_goban(int x, int y)
-    {
-        if (x >=0 && x < 19 && y >=0 && y < 19)
-            return true;
-        return false;
-    }
-
-    protected boolean check_dir(int x, int y, int dx, int dy, int player)
-    {
-        int count;
-
-        count = 0;
-
-        for (int i=dx , j = dy; in_goban(x+i, y+j) && map[x + i][y + j] == player ; i+=dx, j+=dy)
+        for (int i=dx , j = dy; isInGoban(x+i, y+j) && board[x + i][y + j] == player ; i+=dx, j+=dy)
             count +=1;
 
-        for (int i = -dx, j = -dy ; in_goban(x + i, y + j) && map[x + i][y + j] == player ; i-=dx, j-=dy)
+        for (int i = -dx, j = -dy ; isInGoban(x + i, y + j) && board[x + i][y + j] == player ; i-=dx, j-=dy)
             count +=1;
 
-        if (count >= 4)
-            return true;
-        return false;
+        return count >= 4;
     }
 
-    private void adding_capwinsim(int x, int y, int val)
+    protected boolean checkWin4Dir(int x, int y, int player)
     {
-        Candidat.coord c;
-
-        for (int i = 0 ; i < capwin.size() ; i++)
-        {
-            c = capwin.get(i);
-
-            if (c.x == x && c.y == y)
-            {
-                MinMax.map[x][y] = val;
-                return ;
-            } 
-        }
-        capwin.add(new Candidat.coord(x, y, MinMax.map[x][y]));
-        MinMax.map[x][y] = val;
-    }
-
-    protected boolean capture_add_forced(int x, int y, int dx, int dy, int p, int o)
-    {
-        if (in_goban(x+2*dx, y+2*dy) && in_goban(x-2*dx, y-2*dy))
-        {
-            if (MinMax.map[x-dx][y-dy] == p)
-            {
-                if (MinMax.map[x-2*dx][y-2*dy] == o && MinMax.map[x + dx][y + dy] == 0)
-                {
-                    forced_capture.add(new Candidat.coord(x +dx, y+dy));
-                    if (after_capwinsim)
-                    {
-                        adding_capwinsim(x-dx, y-dy, 0);
-                        adding_capwinsim(x+dx, y+dy, o);
-                        return true;
-                    }
-                }
-                else if (MinMax.map[x-2*dx][y-2*dy] == 0 && MinMax.map[x + dx][y + dy] == o)
-                {
-                    forced_capture.add(new Candidat.coord(x-2*dx, y-2*dy));
-                    if (after_capwinsim)
-                    {
-                        adding_capwinsim(x-dx, y-dy, 0);
-                        adding_capwinsim(x-2*dx, y-2*dy, o);
-                        return true;
-                    }
-                }
-            }
-            else if (MinMax.map[x+dx][y+dy] == p)
-            {
-                if (MinMax.map[x+2*dx][y+2*dy] == o && MinMax.map[x - dx][y - dy] == 0)
-                {
-                    forced_capture.add(new Candidat.coord(x-dx, y-dy));
-                    if (after_capwinsim)
-                    {
-                        adding_capwinsim(x+dx, y+dy, 0);
-                        adding_capwinsim(x-dx, y-dy, o);
-                        return true;
-                    }
-                }
-                else if (MinMax.map[x+2*dx][y+2*dy] == 0 && MinMax.map[x - dx][y - dy] == o)
-                {
-                    forced_capture.add(new Candidat.coord(x+2*dx, y+2*dy));
-                    if (after_capwinsim)
-                    {
-                        adding_capwinsim(x+dx, y+dy, 0);
-                        adding_capwinsim(x+2*dx, y+2*dy, o);
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean complete_check_dir(int x, int y, int dx, int dy, int player)
-    {
-        int countmax = 0;
-        int countmin = 0;
-        int opponant = player == 1 ? 2 : 1;
-
-        if (forced_capture.size() !=0)
-            forced_capture.clear();
-
-        for (int i=dx , j = dy; in_goban(x+i, y+j) && map[x + i][y + j] == player ; i+=dx, j+=dy)
-            countmax +=1;
-
-        for (int i = -dx, j = -dy ; in_goban(x + i, y + j) && map[x + i][y + j] == player ; i-=dx, j-=dy)
-            countmin +=1;
-
-        if (countmax + countmin >= 4)
-        {
-            MinMax.map[x][y] = player;
-
-            for (int i = -countmin ; i <= countmax ; i++)
-            {
-                for (int k = 0 ; k < 4 ; k++)
-                {
-                    if (capture_add_forced(x + i*dx, y + i*dy, ddir[k][0], ddir[k][1], player, opponant))
-                    {
-                        k = 0; i = -countmin;
-                    }
-                }
-            }
-            MinMax.map[x][y] = 0;
-            restore_capwinsim();
+        if (checkDir(x,y, 0, 1, player))
             return true;
-        }
-        return false;
+        if (checkDir(x, y, 1, 0, player))
+            return true;
+        if (checkDir(x, y, 1, 1, player))
+            return true;
+        return checkDir(x, y, 1, -1, player);
     }
 
-    private void restore_capwinsim()
-    {
-        Candidat.coord c;
-        for (int i = 0 ; i < capwin.size() ; i++)
-        {
-            c = capwin.get(i);
-            MinMax.map[c.x][c.y] = (int)c.st;
-        }
-        capwin.clear();
-    }
-
-    protected boolean complete_check_win(int x, int y, int player)
-    {
-        for (int i = 0 ; i < 4 ; i++)
-        {
-            if (complete_check_dir(x, y, ddir[i][0],ddir[i][1], player))
-                return true;
-        }
-        return false;
-    }
-
-    protected boolean check_win_4_dir(int x, int y, int player)
-    {
-        if (check_dir(x,y, 0, 1, player))
-            return true;
-        if (check_dir(x, y, 1, 0, player))
-            return true;
-        if (check_dir(x, y, 1, 1, player))
-            return true;
-        if (check_dir(x, y, 1, -1, player))
-            return true;
-    
-        return false;
-    }
-
-    public boolean play(Candidat.coord c, int player)
+    // 执行落子：设置棋盘、保存候选、并在 MiniScore 中进行分析；返回是否达成四连（胜利检测）
+    public boolean play(Candidate.Coordinate c, int player)
     {
         this.move = c;
-        map[c.x][c.y] = player;
-        this.candidat.save(c);
-        scsimul.analyse_move(c.x, c.y, player);
-        return check_win_4_dir(c.x, c.y, player);
+        board[c.x][c.y] = player;
+        this.candidate.save(c);
+        miniScoreSim.analyseMove(c.x, c.y, player);
+        return checkWin4Dir(c.x, c.y, player);
     }
 
-    public void unplay(Candidat.coord c, int depth)
+    // 撤销落子：在棋盘上清空位置，并在 MiniScore 中撤销分析
+    public void undo(Candidate.Coordinate c, int depth)
     {
-        int val = map[c.x][c.y];
-        map[c.x][c.y] = 0;
-        scsimul.analyse_unmove(c.x, c.y, val);
+        int val = board[c.x][c.y];
+        board[c.x][c.y] = 0;
+        miniScoreSim.analyseUnmove(c.x, c.y, val);
     }
 
+    // 切换玩家（1<->2）
     protected int change(int player)
     {
         if (player == 1)
@@ -284,22 +128,24 @@ public class MinMax
             return 1;
     }
 
+    // 在一组评估值中取最大值，并设置 best 为对应坐标
     protected float max(float [] val)
     {
         float res = val[0];
-        best = candidat.lst.get(0);
+        best = candidate.list.get(0);
 
         for (int i = 0 ; i < val.length ; i++)
         {
             if (val[i] > res)
             {
                 res = val[i];
-                best = candidat.lst.get(i);
+                best = candidate.list.get(i);
             }
         }
         return res;
     }
 
+    // 在一组评估值中取最小值，并设置 best 为对应坐标
     protected float min(float [] val)
     {
         float res = val[0];
@@ -308,24 +154,26 @@ public class MinMax
             if (val[i] < res)
             {
                 res = val[i];
-                best = candidat.lst.get(i);
+                best = candidate.list.get(i);
             }
         }
         return res;
     }
 
-    protected float value_victory_intermediate(int player, int turn, int len)
+    // 胜利的中间值（用于 alpha-beta 剪枝时遇到立即胜利的估值）
+    protected float victoryIntermediateValue(int player, int turn, int len)
     {
-        pos_counter++;
+        positionCounter++;
         if (player == turn)
             return 10000 - len * 100;
         else
             return -10000 + len * 100;
     }
 
-    protected float value_victory(int player, int turn, int len)
+    // 胜利的最终估值（区分先手/后手以及 len==0 的情况）
+    protected float victoryValue(int player, int turn, int len)
     {
-        pos_counter++;
+        positionCounter++;
         if (player == turn)
         {
             if (len == 0)
@@ -340,36 +188,35 @@ public class MinMax
        return -10000;
     }
 
-    public float minmax(int depth, int turn, int player)
-    {   
+    // 经典的深度为 depth 的 minimax 递归
+    public float minimax(int depth, int turn, int player)
+    {
 
         int nb_candidates;
         float reteval;
 
-        nb_candidates = candidat.old_load(depth, turn);
-
+        nb_candidates = candidate.oldLoad(depth, turn);
 
         if (depth == 0)
         {
 
-            pos_counter++;
+            positionCounter++;
             reteval = eval(player, len, turn);
 
             return reteval;
         }
-
 
         values = new float[nb_candidates];
 
         for (int i = 0 ; i < nb_candidates ; i++)
         {
             MinMax m = new MinMax(this, depth);
-            if (m.play(candidat.lst.get(i), turn))
-                values[i] = value_victory(player, turn, len);
+            if (m.play(candidate.list.get(i), turn))
+                values[i] = victoryValue(player, turn, len);
             else
-                values[i] = m.minmax(depth - 1, change(turn), player);
-            
-            m.unplay(m.move, depth);
+                values[i] = m.minimax(depth - 1, change(turn), player);
+
+            m.undo(m.move, depth);
         }
     
         if (turn == player)
@@ -378,73 +225,68 @@ public class MinMax
             return min(values);
     }
 
-    public float minmaxab(int depth, int turn, int player, float alpha, float beta)
-    {   
+    // 带 alpha-beta 剪枝的 minimax 实现
+    public float minimaxAB(int depth, int turn, int player, float alpha, float beta)
+    {
         int nb_candidates;
         float cur_alpha;
         float cur_beta;
         float res;
 
-        scsimul.cur_turn = turn;
+        miniScoreSim.curTurn = turn;
 
-
-        nb_candidates = candidat.old_load(depth, turn);
-
+        nb_candidates = candidate.oldLoad(depth, turn);
         if (depth == 0)
         {
-            pos_counter++;
+            positionCounter++;
             res = eval(player, len, turn);
             return res;
         }
 
+        if (nb_candidates == 0)
+            return 0;
+
         values = new float[nb_candidates];
 
-    
         cur_alpha = Float.NEGATIVE_INFINITY;
         cur_beta = Float.POSITIVE_INFINITY;
 
         for (int i = 0 ; i < nb_candidates ; i++)
         {
             MinMax m = new MinMax(this.len);
+            Candidate.Coordinate cand = candidate.list.get(i);
+            boolean isMaxLayer = (turn == player);
 
-            if (turn == player)
+            // 根据当前层决定递归时传入的窗口（不改变外部 alpha/beta）
+            float recAlpha = isMaxLayer ? Math.max(alpha, cur_alpha) : alpha;
+            float recBeta  = isMaxLayer ? beta : Math.min(beta, cur_beta);
+
+            if (m.play(cand, turn))
             {
-                if (m.play(candidat.lst.get(i), turn))
-                {
-                    res = value_victory_intermediate(player, turn, len);
-                }
-                else
-                {
-                    res = m.minmaxab(depth - 1, change(turn), player, Math.max(alpha, cur_alpha), beta);
-                    m.unplay(m.move, depth);
-                }
+                // 立即胜利（终止节点）
+                res = victoryIntermediateValue(player, turn, len);
+            }
+            else
+            {
+                // 递归调用并撤销（保持原有顺序与深度参数）
+                res = m.minimaxAB(depth - 1, change(turn), player, recAlpha, recBeta);
+                m.undo(m.move, depth);
+            }
 
-                values[i] = res;
+            values[i] = res;
+
+            // 更新局部窗口并判断剪枝
+            if (isMaxLayer)
+            {
                 cur_alpha = Math.max(cur_alpha, res);
-
-
                 if (cur_alpha > beta) // beta cut
                 {
                     return cur_alpha;
                 }
-
             }
             else
             {
-                if (m.play(candidat.lst.get(i),turn))
-                {
-                    res = value_victory_intermediate(player, turn, len);
-                }
-
-                else
-                {
-                    res = m.minmaxab(depth - 1, change(turn), player, alpha, Math.min(beta, cur_beta));
-                    m.unplay(m.move, depth);
-                }
-                values[i] = res;
                 cur_beta = Math.min(cur_beta, res);
-
-
                 if (alpha > cur_beta) // alpha cut
                 {
                     return cur_beta;
@@ -458,36 +300,22 @@ public class MinMax
             return min(values);
     }
 
-    //display function
-    public void display_map()
+    // 输出静态棋盘到控制台（静态方法）
+    static public void displayBoardStatic()
     {
         for (int i = 0 ; i < 19 ; i ++)
         {
             for (int j = 0 ; j < 19 ; j++)
             {
-                System.out.printf("%2d", MinMax.map[i][j]);
+                System.out.printf("%2d", MinMax.board[i][j]);
             }
-            System.out.println("");
+            System.out.println();
         }
-        System.out.println("");
+        System.out.println();
     }
 
-    //display function
-    static public void display_Map()
-    {
-        for (int i = 0 ; i < 19 ; i ++)
-        {
-            for (int j = 0 ; j < 19 ; j++)
-            {
-                System.out.printf("%2d", MinMax.map[i][j]);
-            }
-            System.out.println("");
-        }
-        System.out.println("");
-    }
-
-    //display function
-    static public void display_Map(int [][] arg_map)
+    // 将指定棋盘输出到控制台（静态方法，带参数）
+    static public void displayBoardStatic(int [][] arg_map)
     {
         for (int i = 0 ; i < 19 ; i ++)
         {
@@ -495,15 +323,15 @@ public class MinMax
             {
                 System.out.printf("%2d", arg_map[i][j]);
             }
-            System.out.println("");
+            System.out.println();
         }
-        System.out.println("");
+        System.out.println();
     }
 
-    //display function
-    public void display_values(float [] val, ArrayList<Candidat.coord> lst)
+    // 打印候选位置对应的评估值（用于调试）
+    public void displayValues(float [] val, ArrayList<Candidate.Coordinate> lst)
     {
-        Candidat.coord c;
+        Candidate.Coordinate c;
         for(int i = 0 ; i < val.length ; i++)
         {
             c = lst.get(i);
