@@ -1,8 +1,12 @@
 package org.interfacegui;
 import javafx.scene.shape.*;
+
+import java.io.File;
 import java.util.ArrayList;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import org.utils.Point;
@@ -10,44 +14,39 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.shape.Rectangle;
 
-/**
- *Board（棋盘渲染类）
- *负责：
- *绘制棋盘线、dots
- *绘制棋子（Circle[][]）
- *绘制AI调试用评分点（Rectangle[][]）
- *动态更新棋盘布局（响应窗口变化）
- *标红最后落子位置（红框）
- */
-
 public class Board {
-    private final Pane board; // 主棋盘 Pane
-    private final Circle[][] stones; // 棋子数组：1=黑 2=白
-    private final Rectangle[][] score;// AI调试评分格子（默认隐藏）
-    private final ArrayList<Circle> dots; // 黑点
+    private final Pane board;
+    private final Circle[][] stones;
+    private final ImageView [][] pieceImages;
+    private final Rectangle[][] score;
+    private final ArrayList<Circle> dots;
     private final ArrayList<Point> dotsCoordinate = new ArrayList<>();
-    private final ArrayList<Line> lines; // 棋盘线
-    private int size; // 棋盘尺寸
-    private final int totalLines; // 棋盘线数（=19）
-    private int squareSize;  // 每格大小（像素）
-    private int marginHeight;  // 垂直居中偏移
-    private int marginWidth; // 水平居中偏移
-    private final ArrayList<Text> txt = new ArrayList<>(); // 棋子数字标签
-    private Rectangle lastMoveRect = null; // 标量的落子标记框
+    private final ArrayList<Line> lines;
+    private int size;
+    private final int totalLines;
+    private int squareSize;
+    private int marginHeight;
+    private int marginWidth;
+ 
+    private Image whitePiece =
+            new Image(new File("./img/whitepiece.png").toURI().toString());
 
-    // Board 构造函数
-    /** 初始化棋盘外边距，使棋盘居中显示 */
+    private Image blackPiece =
+            new Image(new File("./img/blackpiece.png").toURI().toString());
+    
+
+    private final ArrayList<Text> txt = new ArrayList<>();
+    private Rectangle lastMoveRect = null;
     private void initMargin(int height, int width) {
         int size = squareSize * (totalLines - 1);
         marginHeight = (height - size) / 2;
         marginWidth = (width - size) / 2;
     }
 
-    /** 初始化每格像素大小（squareSize） */
     private void initSquareSize() {
         squareSize = size / totalLines;
     }
-    /** 初始化棋盘外边距，使棋盘居中显示 */
+
     private void updateDots() {
         for (int i = 0; i < dotsCoordinate.size(); i++) {
             Circle dot = dots.get(i);
@@ -59,7 +58,7 @@ public class Board {
             dot.setStrokeWidth(1);
         }
     }
-    /** 根据 dotsCoordinate 创建dots */
+
     private void createDots() {
         for (Point p : dotsCoordinate) {
             Circle dots = new Circle();
@@ -73,7 +72,6 @@ public class Board {
         }
     }
 
-    /** 初始化棋盘的（dots） */
     private void initDots() {
         boolean corner = false;
         boolean line = false;
@@ -98,7 +96,6 @@ public class Board {
         createDots();
     }
 
-    /** 创建棋盘线（横线 + 竖线） */
     private void initLines() {
         for (int i = 0; i < totalLines; i++) {
             Line line = new Line(
@@ -127,6 +124,7 @@ public class Board {
         size = Math.min(width, height);
         totalLines = lineNum;
         stones = new Circle[totalLines][totalLines];
+        pieceImages = new ImageView[totalLines][totalLines];
         score = new Rectangle[totalLines][totalLines];
         dots = new ArrayList<>();
         lines = new ArrayList<>();
@@ -138,12 +136,11 @@ public class Board {
         initScore();
         buildBoard();
     }
-
-    /** 返回 Pane 供 Gomoku class 使用 */
+    
     public Pane getBoard() {
         return board;
     }
-    /** 更新棋盘线位置（窗口变化时调用） */
+
     public void updateLines() {
         for (int i = 0; i < lines.size(); i++) {
             if (i < totalLines) {
@@ -160,7 +157,7 @@ public class Board {
             }
         }
     }
-    /** 外部调用：更新棋盘在窗口改变时重新布局 */
+
     public void updateBoard(int newY, int newX) {
         board.setPrefSize(newX, newY);
         size = Math.min(newX, newY);
@@ -170,14 +167,16 @@ public class Board {
         updateStones();
         updateScore();
         updateDots();
+       
     }
-    /** 更新棋子位置与大小 */
+
     private void updateStones() {
         for (int i = 0; i < stones.length; i++) {
             for (int j = 0; j < stones[i].length; j++) {
                 stones[i][j].setRadius((double) squareSize / 2);
                 stones[i][j].setCenterX((squareSize * j) + marginWidth);
                 stones[i][j].setCenterY((squareSize * i) + marginHeight);
+                
             }
         }
     }
@@ -201,7 +200,6 @@ public class Board {
         r.setY(centerY - size / 2.0);
     }
 
-    /** 初始化棋子 Circle[][] （默认隐藏） */
     public void initStones() {
         for (int i = 0; i < stones.length; i++) {
             for (int j = 0; j < stones[i].length; j++) {
@@ -210,14 +208,18 @@ public class Board {
                 stones[i][j].setCenterX((squareSize * j) + marginWidth);
                 stones[i][j].setCenterY((squareSize * i) + marginHeight);
                 stones[i][j].setStroke(Color.TRANSPARENT);
-                stones[i][j].setFill(Color.BLUE);
+                stones[i][j].setFill(Color.TRANSPARENT);
                 stones[i][j].setStrokeWidth(1);
                 stones[i][j].setVisible(false);
+                
+
+                // 图片棋子
+                pieceImages[i][j] = new ImageView();
+                pieceImages[i][j].setVisible(false);
             }
         }
     }
 
-    /** 初始化评分显示，游戏中的矩形提示框（AI 调试） */
     public void initScore() {
         double size = squareSize / 5.0;
         for (int i = 0; i < score.length; i++) {
@@ -232,33 +234,37 @@ public class Board {
             }
         }
     }
-    /** 建造棋盘*/
+
     private void buildBoard() {
         board.getChildren().addAll(lines);
         board.getChildren().addAll(dots);
-        for (Circle[] stone : stones) {
-            for (Circle circle : stone) {
-                board.getChildren().add(circle);
-            }
-        }
         for (Rectangle[] rectangles : score) {
             for (Rectangle rectangle : rectangles) {
                 board.getChildren().add(rectangle);
             }
         }
+        for (Circle[] stone : stones) {
+            for (Circle circle : stone) {
+                board.getChildren().add(circle);
+            }
+        }
+        for (ImageView[] images : pieceImages) {
+            for (ImageView image : images) {
+                board.getChildren().add(image);
+            }
+        }
     }
 
-    /** 初始化棋子 Circle[][] （默认隐藏） */
     public void setStoneStatus(boolean visible, String color, Point point, String text) {
         Circle stone = stones[point.y][point.x];
         stone.setVisible(visible);
-
+    
         Pane parent = (Pane) stone.getParent();
-        parent.getChildren().removeIf(node ->
-            node instanceof Text &&
-            node.getUserData() != null &&
+        parent.getChildren().removeIf(node -> 
+            node instanceof Text && 
+            node.getUserData() != null && 
             node.getUserData().equals("label_" + point.x + "_" + point.y));
-
+        
         if (visible) {
             stone.setFill(javafx.scene.paint.Color.web(color));
 
@@ -296,7 +302,7 @@ public class Board {
     public int getSquareSize() {
         return squareSize;
     }
-    /** 从 Map 更新所有棋子显示 */
+
     public void updateFromMap(Map gameMap) {
         int[][] board = gameMap.getMap();
         for (Text t : txt) {
@@ -307,15 +313,28 @@ public class Board {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 Circle stone = stones[i][j];
-
+                ImageView img = pieceImages[i][j];
+                
+                double len = squareSize * 0.85;
+                
                 if (board[i][j] == 0) {
                     stone.setVisible(false);
                 } else {
                     stone.setVisible(true);
                     if (board[i][j] == 1) {
-                        stone.setFill(Color.BLACK);
+                    	img.setImage(blackPiece);
+                        img.setFitWidth(squareSize);
+                        img.setFitHeight(squareSize);
+                        img.setX(marginWidth + (j - 0.5) * squareSize);
+                        img.setY(marginHeight + (i - 0.5) * squareSize);
+                        img.setVisible(true);
                     } else if (board[i][j] == 2) {
-                        stone.setFill(Color.SNOW);
+                    	img.setImage(whitePiece);
+                        img.setFitWidth(squareSize);
+                        img.setFitHeight(squareSize);
+                        img.setX(marginWidth + (j - 0.5) * squareSize);
+                        img.setY(marginHeight + (i - 0.5) * squareSize);
+                        img.setVisible(true);
                     } else if (board[i][j] == 3) {
                         stone.setFill(Color.web("rgba(0,0,0,0.5)"));
                     } else{
@@ -325,15 +344,16 @@ public class Board {
             }
         }
     }
-    /** 删除上一个红框 */
+
     public void removeLastMoveBox() {
         if (lastMoveRect != null) {
             this.getBoard().getChildren().remove(lastMoveRect);
             lastMoveRect = null;
         }
     }
-    /** 在最后落子位置绘制红框 */
+    
     public void drawLastMoveBox(Point p) {
+        // 移除旧红框
         removeLastMoveBox();
 
         int marginWidth = getMarginWidth();
