@@ -47,20 +47,13 @@ public class App extends Application {
     public void set_home_event() {
 
         home_page.getValidationButton().setOnMouseClicked(event -> {
+            double sceneX = stage.getWidth();
+            double sceneY = stage.getHeight();
 
-            if (home_page.getErrorMsg() != null && !home_page.getErrorMsg().isEmpty()) {
-                home_page.displayErrorMsg();
-                return;
-            }
-
-            double scenex = stage.getWidth();
-            double sceney = stage.getHeight();
-
-            // 只创建 Gomoku，不再加载 Go/Pente
-            gomoku = new Gomoku((int) sceney, (int) scenex, home_page);
+            gomoku = new Gomoku((int) sceneY, (int) sceneX, home_page);
             Pane board_root = new Pane();
-            board = new Scene(board_root, scenex, sceney);
-            set_board_event(board_root);
+            board = new Scene(board_root, sceneX, sceneY);
+            set_board_event();
             board_root.getChildren().add(gomoku.getGameDisplay());
 
             switchScene(board);
@@ -90,7 +83,7 @@ public class App extends Application {
         switchScene(home);
     }
 
-    private void set_board_event(Pane board_root) {
+    private void set_board_event() {
         gomoku.getBackHomeButton().setOnMouseClicked(event -> {
             gomoku.endAI();
             setNewHome();

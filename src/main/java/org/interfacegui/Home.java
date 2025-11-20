@@ -15,7 +15,7 @@ public class Home {
     private int blackPlayerType = 0;
 
     // 当前规则（固定为 Gomoku）
-    private String rule = "Gomoku";
+    private final static String rule = "Gomoku";
 
     // AI难度：1=hard, 2=medium, 3=easy
     private int level = 3;
@@ -23,35 +23,8 @@ public class Home {
     // UI页面
     private final HomePage homePage = new HomePage();
     private int boardSize = 19;  // 棋盘是19格子
-    private String errorMsg;
 
     public Home() {
-    	 String selectedColor = "-fx-text-fill: #000000;";
-         String deselectedColor = "-fx-text-fill: #000000;";
-         String selectedBackgroundColor = "-fx-background-color: "
-         	    + "linear-gradient(#E3C799, #C49A6C, #8B5A2B);" 
-         	    + "-fx-background-radius: 10; "
-         	    + "-fx-border-color: #B19776; "          
-         	    + "-fx-border-width: 2; "
-         	    + "-fx-border-radius: 10; "
-         	    + "-fx-padding: 10 20 10 20; "
-         	    + "-fx-font-size: 22px; "               
-         	    + "-fx-font-weight: bold; ";
-         String deselectedBackgroundColor = "-fx-background-color: "
-         	    + "linear-gradient(#E3C799, #C49A6C, #8B5A2B);" 
-         	    + "-fx-background-radius: 10; "
-         	    + "-fx-border-color: #B19776; "          
-         	    + "-fx-border-width: 2; "
-         	    + "-fx-border-radius: 10; "
-         	    + "-fx-padding: 10 20 10 20; "
-         	    + "-fx-font-size: 22px; "               
-         	    + "-fx-font-weight: bold; ";
-
-        String selectedStyle = selectedBackgroundColor + selectedColor;
-        String deselectedStyle = deselectedBackgroundColor + deselectedColor;
-
-
-
         // ===========================================================
         //                   黑方玩家选择（AI / Player）
         // ===========================================================
@@ -179,8 +152,5 @@ public class Home {
     public Button getValidationButton() { return homePage.getValidationButton(); }
 
     public Rules getRuleInstance() { return homePage.getRuleInstance(); }
-
-    public String getErrorMsg() { return errorMsg; }
-    public void displayErrorMsg() { homePage.set_error(errorMsg); }
 }
 
