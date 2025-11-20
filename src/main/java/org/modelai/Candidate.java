@@ -29,21 +29,21 @@ public class Candidate
     {
         public int x;
         public int y;
-        public double st;
+        public double strength;//strength就是hint的强度值，数字越大，这一步棋走的越好，数字越小则反之
 
         public Coordinate(int x, int y) {
             this.x = x;
             this.y = y;
         }
 
-        public Coordinate(int x, int y, double st ) {
+        public Coordinate(int x, int y, double strength) {
             this.x = x;
             this.y = y;
-            this.st = st;
+            this.strength = strength;
         }
 
         public double st() {
-            return this.st;
+            return this.strength;
         }
     }
 
@@ -123,7 +123,7 @@ public class Candidate
         if (val >= 3)
             this.threshold+=1;
 
-        this.list.add(new Coordinate(x,y, val));
+        this.list.add(new Coordinate(x, y, val));
     }
 
     // 内部：基于 Evaluator 仿真结果为位置 (x,y) 生成候选评分（已移除 Pente 分支）
@@ -188,7 +188,7 @@ public class Candidate
 
         for (Coordinate coord : this.list) {
             if (dp == Game.max_depth)
-                coord.st = 5;
+                coord.strength = 5;
         }
 
         for (int i = limitMin.x - 1 ; i <= limitMax.x + 1 ; i++)
@@ -443,7 +443,7 @@ public class Candidate
     {
         System.out.println(msg);
         for (Coordinate coord : this.list) {
-            System.out.printf("%d %d %f\n", coord.x, coord.y, coord.st);
+            System.out.printf("%d %d %f\n", coord.x, coord.y, coord.strength);
         }
     }
 }

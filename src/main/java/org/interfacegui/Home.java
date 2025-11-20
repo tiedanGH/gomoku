@@ -24,7 +24,6 @@ public class Home {
     // UI页面
     private final HomePage homePage = new HomePage();
     private int boardSize = 19;  //棋盘是19格子
-    private Rules.GameMode gameMode = Rules.GameMode.PLAYING;
     private String errorMsg;
 
     public Home() {
@@ -130,8 +129,7 @@ public class Home {
             homePage.getWhiteEasyButton().setStyle(deselectedStyle);
             homePage.getBlackEasyButton().setStyle(deselectedStyle);
         });
-
-        // 黑方难度按钮触发白方的（同步）
+        // 黑方难度按钮触发白方按钮（同步）
         homePage.getBlackEasyButton().setOnAction(e -> homePage.getWhiteEasyButton().fire());
         homePage.getBlackMediumButton().setOnAction(e -> homePage.getWhiteMediumButton().fire());
         homePage.getBlackHardButton().setOnAction(e -> homePage.getWhiteHardButton().fire());
@@ -163,15 +161,10 @@ public class Home {
     public Pane getHomePage() { return homePage.getHomePage(); }
 
     public Button getValidationButton() { return homePage.getValidationButton(); }
-    public Button getLearnOrViewButton() { return homePage.getLearnOrViewButton(); }
 
     public Rules getRuleInstance() { return homePage.getRuleInstance(); }
-    public void setRulesInstance(Rules r) { homePage.setRulesInstance(r); }
 
     public String getErrorMsg() { return errorMsg; }
     public void displayErrorMsg() { homePage.set_error(errorMsg); }
-
-    public void setGameMode(Rules.GameMode gm) { gameMode = gm; }
-    public Rules.GameMode getGameMode() { return gameMode; }
 
 }
