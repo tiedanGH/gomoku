@@ -72,6 +72,22 @@ public class GameInfos {
         );
 
         Platform.runLater(this::bindFonts);
+     // === 图片替换按钮 ===
+     
+     ImageButtonUtil.applyImage(hint, "./img/hint.png", 30, 30);
+     ImageButtonUtil.applyImage(undo, "./img/undo.png", 30, 30);
+     ImageButtonUtil.applyImage(prev, "./img/prev.png", 30, 30);
+     ImageButtonUtil.applyImage(next, "./img/next.png", 40, 40);
+     ImageButtonUtil.applyImage(resign, "./img/resign.png", 30, 30);
+     
+     HBox bottomButtons = new HBox(20);
+     bottomButtons.setLayoutY(sizeY - 120);
+     bottomButtons.setLayoutX((sizeX - 400) / 2);
+     bottomButtons.getChildren().addAll(hint, undo, prev, next, resign);
+
+     gameInfos.getChildren().add(bottomButtons);
+
+
     }
 
     public void updateGameInfo(int newY, int newX) {
