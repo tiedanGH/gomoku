@@ -133,6 +133,14 @@ public class App extends Application {
         board.heightProperty().addListener((obs, oldV, newV) -> {
             gomoku.updateGameDisplay(newV.intValue(), (int) board.getWidth());
         });
+        Pane board = gomoku.getGameDisplay();
+        board.layoutXProperty().bind(
+            board.widthProperty().subtract(board.widthProperty()).divide(2)
+        );
+        board.layoutYProperty().bind(
+            board.heightProperty().subtract(board.heightProperty()).divide(2).subtract(80)
+        );
+
     }
 
     @Override
