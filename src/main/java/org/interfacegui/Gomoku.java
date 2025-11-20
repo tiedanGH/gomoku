@@ -24,8 +24,14 @@ public class Gomoku {
     private final Board board;
     private final LeftBox leftBox;
     private final RightBox rightBox;
-    private int infoSizeX;
-    public int infoSizeY;
+    private final TopBox topBox;
+    private final BottomBox bottomBox;
+    private int sideBoxSizeX;
+    private int sideBoxSizeY;
+    private int boardSizeX;
+    private int boardSizeY;
+    private int topBoxSizeY;
+    private int bottomSizeY;
     private final Pane boardPane;
     private final int totalLines;
     private int mapIndex;
@@ -52,7 +58,7 @@ public class Gomoku {
         gameEnd = true;
         iaPlaying = false;
         if (gameLoop != null) gameLoop.stop();
-        rightBox.showEnd(winner);
+        topBox.showEnd(winner);
     }
 
     private void updateGameMap(int index) {
@@ -182,8 +188,8 @@ public class Gomoku {
     }
 
     private void setStepButtonVisibility() {
-        leftBox.getPreviousButton().setVisible(mapIndex > 0);
-        leftBox.getNextButton().setVisible(mapIndex < maps.size() - 1);
+        bottomBox.getPreviousButton().setVisible(mapIndex > 0);
+        bottomBox.getNextButton().setVisible(mapIndex < maps.size() - 1);
     }
 
     public Gomoku(int height, int width, Home gameInfosRules) {
@@ -196,43 +202,53 @@ public class Gomoku {
 
         totalLines = rule.getBoardSize();
 
-        infoSizeX = width / 5;
-        infoSizeY = height;
+        sideBoxSizeX = width / 5;
+        sideBoxSizeY = height;
+        topBoxSizeY = height / 7;
+        bottomSizeY = height / 8;
+        boardSizeX = width - sideBoxSizeX * 2;
+        boardSizeY = height - topBoxSizeY - bottomSizeY;
 
-        leftBox = new LeftBox(height, infoSizeX);
-        rightBox = new RightBox(height, infoSizeX);
+        leftBox = new LeftBox(sideBoxSizeY, sideBoxSizeX);
+        rightBox = new RightBox(sideBoxSizeY, sideBoxSizeX);
+        topBox = new TopBox(topBoxSizeY, boardSizeX);
+        bottomBox = new BottomBox(bottomSizeY, boardSizeX);
 
         game = new Game(gameInfosRules.getRules(), rule.getBoardSize());
         game.resetMinMax();
         maps = new ArrayList<>();
-        board = new Board(height, width - infoSizeX * 2, rule.getBoardSize());
+        board = new Board(boardSizeY, boardSizeX, rule.getBoardSize());
 
         maps.add(new Map(totalLines));
 
         gameDisplay = new Pane();
 
-        rightBox.hidePopup();
+        topBox.hideEnd();
 
         boardPane = board.getBoard();
-        VBox gameInfosPane = leftBox.getGameInfos();
-        VBox endInfosPane = rightBox.getEndInfos();
+        VBox leftPane = leftBox.getLeftPane();
+        VBox rightPane = rightBox.getRightPane();
+        VBox topPane = topBox.getTopPane();
+        VBox bottomPane = bottomBox.getBottomPane();
 
         setPlayerColor();
 
-        VBox mainVBox = new VBox();
+        Pane mainPane = new Pane();
+        VBox middlePane = new VBox();
+        middlePane.getChildren().addAll(topPane, boardPane, bottomPane);
         HBox hbox = new HBox();
-        hbox.getChildren().addAll(gameInfosPane, boardPane, endInfosPane);
-        mainVBox.getChildren().addAll(hbox);
-        gameDisplay.getChildren().add(mainVBox);
+        hbox.getChildren().addAll(leftPane, middlePane, rightPane);
+        mainPane.getChildren().addAll(hbox);
+        gameDisplay.getChildren().add(mainPane);
 
         // Undo Button
-        leftBox.getUndoButton().setOnAction(event -> {
+        bottomBox.getUndoButton().setOnAction(event -> {
             if (!rule.undo()) return;
             undoMove();
         });
 
         // Hint Button
-        leftBox.getHintButton().setOnAction(event -> {
+        bottomBox.getHintButton().setOnAction(event -> {
             if (!rule.hasAI() || gameEnd) return;
 
             toggleHint = !toggleHint;
@@ -245,13 +261,13 @@ public class Gomoku {
         });
 
         // Resign Button
-        leftBox.getResignButton().setOnAction(event -> {
+        bottomBox.getResignButton().setOnAction(event -> {
             if (gameEnd) return;
 
             gameLoop.stop();
             gameEnd = true;
             iaPlaying = false;
-            rightBox.showEnd("match resigned");
+            topBox.showEnd(0);
             endAI();
             if (future2 != null){
                 future2 = null;
@@ -260,7 +276,7 @@ public class Gomoku {
         });
 
         // Previous Button
-        leftBox.getPreviousButton().setOnAction(event -> {
+        bottomBox.getPreviousButton().setOnAction(event -> {
             if (mapIndex > 0) {
                 mapIndex--;
                 board.updateFromMap(maps.get(mapIndex));
@@ -270,7 +286,7 @@ public class Gomoku {
         });
 
         // Next Button
-        leftBox.getNextButton().setOnAction(event -> {
+        bottomBox.getNextButton().setOnAction(event -> {
             if (mapIndex < maps.size() - 1) {
                 mapIndex++;
                 board.updateFromMap(maps.get(mapIndex));
@@ -383,7 +399,7 @@ public class Gomoku {
         lastMove = null;
         board.removeLastMoveBox();
         changeHintVisibility(false);
-        rightBox.hidePopup();
+        topBox.hideEnd();
 
         createGameLoop();
     }
@@ -393,20 +409,26 @@ public class Gomoku {
     }
 
     public Button getReplayButton() {
-        return rightBox.getReplayButton();
+        return topBox.getReplayButton();
     }
 
     public Button getBackHomeButton() {
-        return rightBox.getBackHomeButton();
+        return topBox.getBackHomeButton();
     }
 
     public void updateGameDisplay(int newY, int newX){
-        infoSizeX = newX / 5;
-        infoSizeY = newY;
-        leftBox.updateGameInfo(newY, infoSizeX);
-        rightBox.updateEndInfo(newY, infoSizeX);
-        board.updateBoard(newY, newX - infoSizeX * 2, lastMove);
-        boardPane.setLayoutX(infoSizeX);
+        sideBoxSizeX = newX / 5;
+        sideBoxSizeY = newY;
+        topBoxSizeY = newY / 7;
+        bottomSizeY = newY / 8;
+        boardSizeX = newX - sideBoxSizeX * 2;
+        boardSizeY = newY - topBoxSizeY - bottomSizeY;
+        leftBox.updateLeftSize(newY, sideBoxSizeX);
+        rightBox.updateRightSize(newY, sideBoxSizeX);
+        topBox.updateTopSize(topBoxSizeY, boardSizeX);
+        bottomBox.updateBottomSize(bottomSizeY, boardSizeX);
+        board.updateBoard(boardSizeY, boardSizeX, lastMove);
+        boardPane.setLayoutX(sideBoxSizeX);
     }
 
     // highlight the last move

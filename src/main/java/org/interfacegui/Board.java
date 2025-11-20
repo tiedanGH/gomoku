@@ -13,6 +13,11 @@ import org.utils.Point;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.Stop;
+import javafx.geometry.Insets;
+import javafx.scene.layout.CornerRadii;
 
 public class Board {
     private final Pane board;
@@ -29,10 +34,10 @@ public class Board {
     private int marginWidth;
  
     private final Image whitePiece =
-            new Image(new File("./img/whitepiece.png").toURI().toString());
+            new Image(new File("./img/white-piece.png").toURI().toString());
 
     private final Image blackPiece =
-            new Image(new File("./img/blackpiece.png").toURI().toString());
+            new Image(new File("./img/black-piece.png").toURI().toString());
     
 
     private final ArrayList<Text> txt = new ArrayList<>();
@@ -119,7 +124,13 @@ public class Board {
 
     public Board(int height, int width, int lineNum) {
         board = new Pane();
-        board.setBackground(new Background(new BackgroundFill(Color.web("#DEB887"), null, null)));
+        LinearGradient boardGradient = new LinearGradient(
+                0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0.0, Color.web("#f7edd9")),
+                new Stop(0.5, Color.web("#e6c99a")),
+                new Stop(1.0, Color.web("#b8865b"))
+        );
+        board.setBackground(new Background(new BackgroundFill(boardGradient, CornerRadii.EMPTY, Insets.EMPTY)));
         board.setPrefSize(width, height);
         size = Math.min(width, height);
         totalLines = lineNum;
@@ -335,11 +346,10 @@ public class Board {
             for (int j = 0; j < board[i].length; j++) {
                 Circle stone = stones[i][j];
                 ImageView img = pieceImages[i][j];
-                
-                double len = squareSize * 0.85;
-                
+
                 if (board[i][j] == 0) {
                     stone.setVisible(false);
+                    img.setVisible(false);
                 } else {
                     stone.setVisible(true);
                     if (board[i][j] == 1) {
@@ -403,3 +413,4 @@ public class Board {
         this.getBoard().getChildren().add(rect);
     }
 }
+

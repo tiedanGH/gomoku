@@ -47,8 +47,10 @@ public class App extends Application {
     public void set_home_event() {
 
         home_page.getValidationButton().setOnMouseClicked(event -> {
-            double sceneX = stage.getWidth();
-            double sceneY = stage.getHeight();
+//            double sceneX = stage.getWidth();
+//            double sceneY = stage.getHeight();
+            double sceneX = 880;
+            double sceneY = 700;
 
             gomoku = new Gomoku((int) sceneY, (int) sceneX, home_page);
             Pane board_root = new Pane();

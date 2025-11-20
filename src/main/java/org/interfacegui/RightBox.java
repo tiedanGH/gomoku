@@ -1,11 +1,7 @@
 package org.interfacegui;
 
-import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.text.Font;
 
 /**
  * RightBox
@@ -15,103 +11,30 @@ import javafx.scene.text.Font;
  */
 public class RightBox {
 
-    private final VBox endInfos;
+    private final VBox rightBox;
     private int sizeX;
     private int sizeY;
-    private final Label endText;
-    private final VBox popupBox;
-    private final Button replay;
-    private final Button backHome;
 
     public RightBox(int y, int x) {
         sizeX = x;
         sizeY = y;
 
-        endInfos = new VBox();
-        endInfos.setPrefSize(x, y);
-        endInfos.setMinWidth(Region.USE_PREF_SIZE);
-        endInfos.setMinHeight(Region.USE_PREF_SIZE);
-        endInfos.setBackground(new Background(new BackgroundFill(Color.web("#DEB887"), null, null)));
+        rightBox = new VBox();
+        rightBox.setPrefSize(x, y);
+        rightBox.setMinWidth(Region.USE_PREF_SIZE);
+        rightBox.setMinHeight(Region.USE_PREF_SIZE);
+        rightBox.setBackground(new Background(new BackgroundFill(Color.web("#DEB887"), null, null)));
 
-        endText = new Label("");
-        endText.setFont(Font.font("Arial", 16));
-        // popup 只包含按钮（避免节点重复父节点问题）
-        popupBox = new VBox();
-        replay = new Button("Replay");
-        backHome = new Button("Back Home");
-
-        ImageButtonUtil.applyImage(replay, "./img/replay.png", 50, 50);
-        ImageButtonUtil.applyImage(backHome, "./img/home.png", 50, 50);
-
-        HBox row1 = new HBox(replay);
-        row1.setAlignment(Pos.CENTER);
-        HBox row2 = new HBox(backHome);
-        row2.setAlignment(Pos.CENTER);
-        VBox buttons = new VBox(22, row1, row2);
-        buttons.setAlignment(Pos.CENTER);
-
-        popupBox.getChildren().addAll(buttons);
-        popupBox.setVisible(false);
-        popupBox.setManaged(false);
-
-        endInfos.getChildren().addAll(endText, popupBox);
+//        rightBox.getChildren().addAll();
     }
 
-    /**
-     * 显示胜利信息并显示弹窗（同时放大文字）
-     */
-    public void showEnd(int winner) {
-        if (winner == 0) endText.setText("Draw");
-        else if (winner == 1) endText.setText("Black Win");
-        else endText.setText("White Win");
-        endText.setFont(Font.font("Arial", 28));
-        // ensure right-side pane is visible and contributes layout
-        endInfos.setVisible(true);
-        endInfos.setManaged(true);
-        showPopup();
-    }
-
-    public void showEnd(String message) {
-        endText.setText(message);
-        endText.setFont(Font.font("Arial", 28));
-        showPopup();
-    }
-
-    public void showPopup() {
-        popupBox.setVisible(true);
-        popupBox.setManaged(true);
-    }
-
-    public void hidePopup() {
-        popupBox.setVisible(false);
-        popupBox.setManaged(false);
-        endText.setFont(Font.font("Arial", 16));
-        endText.setText("");
-    }
-
-    public void updateEndInfo(int newY, int newX) {
+    public void updateRightSize(int newY, int newX) {
         sizeX = newX;
         sizeY = newY;
-        endInfos.setPrefSize(sizeX, sizeY);
+        rightBox.setPrefSize(sizeX, sizeY);
     }
 
-    private void setButtonMinHeight(Button... buttons) {
-        for (Button b : buttons) {
-            if (b == null) continue;
-            b.setMinHeight(28);
-            b.setFont(Font.font("Arial", 14));
-        }
-    }
-
-    public VBox getEndInfos() {
-        return endInfos;
-    }
-
-    public Button getReplayButton() {
-        return replay;
-    }
-
-    public Button getBackHomeButton() {
-        return backHome;
+    public VBox getRightPane() {
+        return rightBox;
     }
 }
