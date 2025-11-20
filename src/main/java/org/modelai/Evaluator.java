@@ -470,7 +470,7 @@ public class Evaluator {
         else
             res.bl2(x + 5 * dirOffsets[dir][0] * sign, y + 5 * dirOffsets[dir][1] * sign);
 
-        res.update_block_info();
+        res.updateBlockInfo();
         this.blockerList.add(res);
     }
 
@@ -486,7 +486,7 @@ public class Evaluator {
         {
             b = this.blockerList.get(i);
 
-            b.update_block_info();
+            b.updateBlockInfo();
             if (MinimaxEngine.board[b.bl1[0]] [b.bl1[1]] != b.blockcolor || ( b.bl2[0] != -1 &&
                 MinimaxEngine.board[b.bl2[0]] [b.bl2[1]] != b.blockcolor))
             {

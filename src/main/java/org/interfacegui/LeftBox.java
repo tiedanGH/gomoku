@@ -11,7 +11,7 @@ import javafx.scene.control.Button;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
-public class GameInfos {
+public class LeftBox {
 
     private final VBox gameInfos;
     private final VBox whiteBox = new VBox();
@@ -28,7 +28,7 @@ public class GameInfos {
     private final Button next;
     private final Button hint;
 
-    public GameInfos(int y, int x) {
+    public LeftBox(int y, int x) {
         sizeX = x;
         sizeY = y;
 
@@ -65,20 +65,22 @@ public class GameInfos {
         // 按钮排版：三行（每行水平居中）
         Platform.runLater(this::bindFonts);
 
-        ImageButtonUtil.applyImage(hint, "./img/hint.png", 30, 30);
-        ImageButtonUtil.applyImage(undo, "./img/undo.png", 30, 30);
-        ImageButtonUtil.applyImage(previous, "./img/prev.png", 30, 30);
-        ImageButtonUtil.applyImage(next, "./img/next.png", 40, 40);
-        ImageButtonUtil.applyImage(resign, "./img/resign.png", 30, 30);
+        ImageButtonUtil.applyImage(hint, "./img/hint.png", 50, 50);
+        ImageButtonUtil.applyImage(undo, "./img/undo.png", 50, 50);
+        ImageButtonUtil.applyImage(previous, "./img/prev.png", 50, 50);
+        ImageButtonUtil.applyImage(next, "./img/next.png", 50, 50);
+        ImageButtonUtil.applyImage(resign, "./img/resign.png", 50, 50);
 
-        HBox row1 = new HBox(12, hint, undo);
+        HBox row1 = new HBox(hint);
         row1.setAlignment(Pos.CENTER);
-        HBox row2 = new HBox(12, previous, next);
+        HBox row2 = new HBox(undo);
         row2.setAlignment(Pos.CENTER);
-        HBox row3 = new HBox(resign);
+        HBox row3 = new HBox(-15, previous, next);
         row3.setAlignment(Pos.CENTER);
+        HBox row4 = new HBox(resign);
+        row4.setAlignment(Pos.CENTER);
 
-        VBox bottomButtons = new VBox(12, row1, row2, row3);
+        VBox bottomButtons = new VBox(22, row1, row2, row3, row4);
         bottomButtons.setAlignment(Pos.CENTER);
         // 若需靠底部放置，可在外部调整 gameInfos 的布局；此处确保居中对齐
         gameInfos.getChildren().add(bottomButtons);

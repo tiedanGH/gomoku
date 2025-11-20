@@ -28,10 +28,10 @@ public class Board {
     private int marginHeight;
     private int marginWidth;
  
-    private Image whitePiece =
+    private final Image whitePiece =
             new Image(new File("./img/whitepiece.png").toURI().toString());
 
-    private Image blackPiece =
+    private final Image blackPiece =
             new Image(new File("./img/blackpiece.png").toURI().toString());
     
 
@@ -158,7 +158,7 @@ public class Board {
         }
     }
 
-    public void updateBoard(int newY, int newX) {
+    public void updateBoard(int newY, int newX, Point lastMove) {
         board.setPrefSize(newX, newY);
         size = Math.min(newX, newY);
         initSquareSize();
@@ -166,17 +166,17 @@ public class Board {
         updateLines();
         updateStones();
         updateScore();
+        updateLastMoveBox(lastMove);
+        updatePieceImages();
         updateDots();
-       
     }
-
+    /** 更新棋子位置与大小 */
     private void updateStones() {
         for (int i = 0; i < stones.length; i++) {
             for (int j = 0; j < stones[i].length; j++) {
                 stones[i][j].setRadius((double) squareSize / 2);
                 stones[i][j].setCenterX((squareSize * j) + marginWidth);
                 stones[i][j].setCenterY((squareSize * i) + marginHeight);
-                
             }
         }
     }
@@ -187,6 +187,27 @@ public class Board {
             for (int j = 0; j < score[i].length; j++) {
                 Rectangle r = score[i][j];
                 setScoreLayout(size, i, j, r);
+            }
+        }
+    }
+
+    private void updateLastMoveBox(Point p) {
+        if (p == null) return;
+        double size = squareSize * 1.1;
+        lastMoveRect.setX(marginWidth + p.x * squareSize - size / 2);
+        lastMoveRect.setY(marginHeight + p.y * squareSize - size / 2);
+        lastMoveRect.setWidth(size);
+        lastMoveRect.setHeight(size);
+    }
+
+    private void updatePieceImages() {
+        for (int i = 0; i < pieceImages.length; i++) {
+            for (int j = 0; j < pieceImages[i].length; j++) {
+                ImageView img = pieceImages[i][j];
+                img.setFitWidth(squareSize);
+                img.setFitHeight(squareSize);
+                img.setX(marginWidth + (j - 0.5) * squareSize);
+                img.setY(marginHeight + (i - 0.5) * squareSize);
             }
         }
     }

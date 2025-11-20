@@ -22,8 +22,8 @@ public class Gomoku {
     private final Pane gameDisplay;
     private final ArrayList<Map> maps;
     private final Board board;
-    private final GameInfos gameInfos;
-    private final EndInfos endInfos;
+    private final LeftBox leftBox;
+    private final RightBox rightBox;
     private int infoSizeX;
     public int infoSizeY;
     private final Pane boardPane;
@@ -52,7 +52,7 @@ public class Gomoku {
         gameEnd = true;
         iaPlaying = false;
         if (gameLoop != null) gameLoop.stop();
-        endInfos.showEnd(winner);
+        rightBox.showEnd(winner);
     }
 
     private void updateGameMap(int index) {
@@ -120,7 +120,7 @@ public class Gomoku {
 
         if (playerTurn == 0) {
             round++;
-            gameInfos.setTurn(round);
+            leftBox.setTurn(round);
         }
 
         updatePlayerTurn();
@@ -153,19 +153,19 @@ public class Gomoku {
         updatePlayerTurn();
 
         if (mapIndex % 2 == 0) round--;
-        gameInfos.setTurn(round);
+        leftBox.setTurn(round);
     }
 
     private void setPlayerColor() {
         if (playerTurn == 0) {
-            gameInfos.getBlackBox().setBackground(
+            leftBox.getBlackBox().setBackground(
                     new Background(new BackgroundFill(Color.GOLDENROD, null, null)));
-            gameInfos.getWhiteBox().setBackground(
+            leftBox.getWhiteBox().setBackground(
                     new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
         } else {
-            gameInfos.getBlackBox().setBackground(
+            leftBox.getBlackBox().setBackground(
                     new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
-            gameInfos.getWhiteBox().setBackground(
+            leftBox.getWhiteBox().setBackground(
                     new Background(new BackgroundFill(Color.GOLDENROD, null, null)));
         }
     }
@@ -182,8 +182,8 @@ public class Gomoku {
     }
 
     private void setStepButtonVisibility() {
-        gameInfos.getPreviousButton().setVisible(mapIndex > 0);
-        gameInfos.getNextButton().setVisible(mapIndex < maps.size() - 1);
+        leftBox.getPreviousButton().setVisible(mapIndex > 0);
+        leftBox.getNextButton().setVisible(mapIndex < maps.size() - 1);
     }
 
     public Gomoku(int height, int width, Home gameInfosRules) {
@@ -199,8 +199,8 @@ public class Gomoku {
         infoSizeX = width / 5;
         infoSizeY = height;
 
-        gameInfos = new GameInfos(height, infoSizeX);
-        endInfos = new EndInfos(height, infoSizeX);
+        leftBox = new LeftBox(height, infoSizeX);
+        rightBox = new RightBox(height, infoSizeX);
 
         game = new Game(gameInfosRules.getRules(), rule.getBoardSize());
         game.resetMinMax();
@@ -211,11 +211,11 @@ public class Gomoku {
 
         gameDisplay = new Pane();
 
-        endInfos.hidePopup();
+        rightBox.hidePopup();
 
         boardPane = board.getBoard();
-        VBox gameInfosPane = gameInfos.getGameInfos();
-        VBox endInfosPane = endInfos.getEndInfos();
+        VBox gameInfosPane = leftBox.getGameInfos();
+        VBox endInfosPane = rightBox.getEndInfos();
 
         setPlayerColor();
 
@@ -226,13 +226,13 @@ public class Gomoku {
         gameDisplay.getChildren().add(mainVBox);
 
         // Undo Button
-        gameInfos.getUndoButton().setOnAction(event -> {
+        leftBox.getUndoButton().setOnAction(event -> {
             if (!rule.undo()) return;
             undoMove();
         });
 
         // Hint Button
-        gameInfos.getHintButton().setOnAction(event -> {
+        leftBox.getHintButton().setOnAction(event -> {
             if (!rule.hasAI() || gameEnd) return;
 
             toggleHint = !toggleHint;
@@ -245,13 +245,13 @@ public class Gomoku {
         });
 
         // Resign Button
-        gameInfos.getResignButton().setOnAction(event -> {
+        leftBox.getResignButton().setOnAction(event -> {
             if (gameEnd) return;
 
             gameLoop.stop();
             gameEnd = true;
             iaPlaying = false;
-            endInfos.showEnd("match resigned");
+            rightBox.showEnd("match resigned");
             endAI();
             if (future2 != null){
                 future2 = null;
@@ -260,7 +260,7 @@ public class Gomoku {
         });
 
         // Previous Button
-        gameInfos.getPreviousButton().setOnAction(event -> {
+        leftBox.getPreviousButton().setOnAction(event -> {
             if (mapIndex > 0) {
                 mapIndex--;
                 board.updateFromMap(maps.get(mapIndex));
@@ -270,7 +270,7 @@ public class Gomoku {
         });
 
         // Next Button
-        gameInfos.getNextButton().setOnAction(event -> {
+        leftBox.getNextButton().setOnAction(event -> {
             if (mapIndex < maps.size() - 1) {
                 mapIndex++;
                 board.updateFromMap(maps.get(mapIndex));
@@ -383,7 +383,7 @@ public class Gomoku {
         lastMove = null;
         board.removeLastMoveBox();
         changeHintVisibility(false);
-        endInfos.hidePopup();
+        rightBox.hidePopup();
 
         createGameLoop();
     }
@@ -393,19 +393,19 @@ public class Gomoku {
     }
 
     public Button getReplayButton() {
-        return endInfos.getReplayButton();
+        return rightBox.getReplayButton();
     }
 
     public Button getBackHomeButton() {
-        return endInfos.getBackHomeButton();
+        return rightBox.getBackHomeButton();
     }
 
     public void updateGameDisplay(int newY, int newX){
         infoSizeX = newX / 5;
         infoSizeY = newY;
-        gameInfos.updateGameInfo(newY, infoSizeX);
-        endInfos.updateEndInfo(newY, infoSizeX);
-        board.updateBoard(newY, newX - infoSizeX * 2);
+        leftBox.updateGameInfo(newY, infoSizeX);
+        rightBox.updateEndInfo(newY, infoSizeX);
+        board.updateBoard(newY, newX - infoSizeX * 2, lastMove);
         boardPane.setLayoutX(infoSizeX);
     }
 

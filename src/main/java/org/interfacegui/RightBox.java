@@ -1,5 +1,6 @@
 package org.interfacegui;
 
+import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
@@ -7,12 +8,12 @@ import javafx.scene.control.Label;
 import javafx.scene.text.Font;
 
 /**
- * EndInfos
+ * RightBox
  * 右侧结束信息面板：展示胜负文本与结束弹窗（包含 replay / backHome 两个按钮）。
  * - 负责展示/隐藏弹窗与放大/恢复胜利文本字号
  * - 负责自身尺寸更新（由 Gomoku.updateGameDisplay 调用）
  */
-public class EndInfos {
+public class RightBox {
 
     private final VBox endInfos;
     private int sizeX;
@@ -22,7 +23,7 @@ public class EndInfos {
     private final Button replay;
     private final Button backHome;
 
-    public EndInfos(int y, int x) {
+    public RightBox(int y, int x) {
         sizeX = x;
         sizeY = y;
 
@@ -39,12 +40,17 @@ public class EndInfos {
         replay = new Button("Replay");
         backHome = new Button("Back Home");
 
-        ImageButtonUtil.applyImage(replay, "./img/replay.png", 30, 30);
-        ImageButtonUtil.applyImage(backHome, "./img/home.png", 30, 30);
+        ImageButtonUtil.applyImage(replay, "./img/replay.png", 50, 50);
+        ImageButtonUtil.applyImage(backHome, "./img/home.png", 50, 50);
 
-        setButtonMinHeight(replay, backHome);
+        HBox row1 = new HBox(replay);
+        row1.setAlignment(Pos.CENTER);
+        HBox row2 = new HBox(backHome);
+        row2.setAlignment(Pos.CENTER);
+        VBox buttons = new VBox(22, row1, row2);
+        buttons.setAlignment(Pos.CENTER);
 
-        popupBox.getChildren().addAll(replay, backHome);
+        popupBox.getChildren().addAll(buttons);
         popupBox.setVisible(false);
         popupBox.setManaged(false);
 
