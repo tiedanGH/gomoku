@@ -31,7 +31,7 @@ public class HomePage {
     // 错误信息
     private final Label errorMessage = new Label();
 
-    private StringProperty ruleType = new SimpleStringProperty("gomoku");
+    private StringProperty cruleType = new SimpleStringProperty("gomoku");
     private Rules rulesInstance = null;
 
     public HomePage() {
