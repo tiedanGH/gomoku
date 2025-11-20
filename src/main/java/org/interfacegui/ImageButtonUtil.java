@@ -18,8 +18,7 @@ public class ImageButtonUtil {
         view.setPreserveRatio(true);
 
         btn.setGraphic(view);
-        btn.setText(""); // 不要文字
-        btn.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+        btn.setText("");
         btn.setBackground(Background.EMPTY);
     }
 }

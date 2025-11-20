@@ -63,16 +63,6 @@ public class Gomoku {
         }
     }
 
-    void hideCandidates() {
-        ArrayList<Point> currentCandidates = maps.get(mapIndex).getCandidatsList();
-        if (currentCandidates == null) return;
-        for (Point p : currentCandidates) {
-            String color = p.val < 0 ? "#FF0000" : "#00FF00";
-            board.setStoneStatus(false, color, p, String.format("%.0f", p.val));
-        }
-        board.updateFromMap(maps.get(mapIndex));
-    }
-
     void changeHintVisibility(boolean visible) {
         if (hintList == null) return;
 
@@ -101,7 +91,6 @@ public class Gomoku {
     private void playMove(Point point) {
         if (mapIndex < (maps.size() - 1) || !rule.isValidMove(point, maps)) return;
 
-        hideCandidates();
         setStepButtonVisibility();
         changeHintVisibility(false);
         toggleHint = false;
@@ -141,7 +130,6 @@ public class Gomoku {
     private void undoMove() {
         if (maps.size() < 2 || mapIndex < maps.size() - 1) return;
 
-        hideCandidates();
         changeHintVisibility(false);
         toggleHint = false;
 
@@ -258,8 +246,8 @@ public class Gomoku {
 
         // Resign Button
         gameInfos.getResignButton().setOnAction(event -> {
-            if (rule.getGameMode() == Rules.GameMode.ENDGAME)
-                return ;
+            if (gameEnd) return;
+
             gameLoop.stop();
             gameEnd = true;
             iaPlaying = false;
@@ -277,7 +265,7 @@ public class Gomoku {
                 mapIndex--;
                 board.updateFromMap(maps.get(mapIndex));
                 setStepButtonVisibility();
-                board.removeLastMoveRect();
+                board.removeLastMoveBox();
             }
         });
 
@@ -393,8 +381,7 @@ public class Gomoku {
         hintList = null;
         toggleHint = false;
         lastMove = null;
-        board.removeLastMoveRect();
-        hideCandidates();
+        board.removeLastMoveBox();
         changeHintVisibility(false);
         endInfos.hidePopup();
 
