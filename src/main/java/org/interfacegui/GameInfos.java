@@ -9,6 +9,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.scene.control.Button;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 
 public class GameInfos {
 
@@ -35,7 +36,7 @@ public class GameInfos {
         gameInfos.setPrefSize(x, y);
         gameInfos.setMinWidth(Region.USE_PREF_SIZE);
         gameInfos.setMinHeight(Region.USE_PREF_SIZE);
-        gameInfos.setBackground(new Background(new BackgroundFill(Color.web("#ADBAC0"), null, null)));
+        gameInfos.setBackground(new Background(new BackgroundFill(Color.web("#DEB887"), null, null)));
         gameInfos.getChildren().add(turn);
 
         addText();
@@ -61,16 +62,7 @@ public class GameInfos {
         previous.setFont(Font.font("Arial", 20));
         next.setFont(Font.font("Arial", 20));
 
-        HBox buttonStep = new HBox();
-        buttonStep.getChildren().addAll(previous, next);
-
-        gameInfos.getChildren().addAll(
-                hint,
-                undo,
-                buttonStep,
-                resign
-        );
-
+        // 按钮排版：三行（每行水平居中）
         Platform.runLater(this::bindFonts);
 
         ImageButtonUtil.applyImage(hint, "./img/hint.png", 30, 30);
@@ -79,11 +71,16 @@ public class GameInfos {
         ImageButtonUtil.applyImage(next, "./img/next.png", 40, 40);
         ImageButtonUtil.applyImage(resign, "./img/resign.png", 30, 30);
 
-        VBox bottomButtons = new VBox(20);
-        bottomButtons.setLayoutY(sizeY - 120);
-        bottomButtons.setLayoutX((double) (sizeX - 400) / 2);
-        bottomButtons.getChildren().addAll(hint, undo, previous, next, resign);
+        HBox row1 = new HBox(12, hint, undo);
+        row1.setAlignment(Pos.CENTER);
+        HBox row2 = new HBox(12, previous, next);
+        row2.setAlignment(Pos.CENTER);
+        HBox row3 = new HBox(resign);
+        row3.setAlignment(Pos.CENTER);
 
+        VBox bottomButtons = new VBox(12, row1, row2, row3);
+        bottomButtons.setAlignment(Pos.CENTER);
+        // 若需靠底部放置，可在外部调整 gameInfos 的布局；此处确保居中对齐
         gameInfos.getChildren().add(bottomButtons);
     }
 

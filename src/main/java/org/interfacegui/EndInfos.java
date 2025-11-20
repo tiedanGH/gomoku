@@ -30,7 +30,7 @@ public class EndInfos {
         endInfos.setPrefSize(x, y);
         endInfos.setMinWidth(Region.USE_PREF_SIZE);
         endInfos.setMinHeight(Region.USE_PREF_SIZE);
-        endInfos.setBackground(new Background(new BackgroundFill(Color.web("#ADBAC0"), null, null)));
+        endInfos.setBackground(new Background(new BackgroundFill(Color.web("#DEB887"), null, null)));
 
         endText = new Label("");
         endText.setFont(Font.font("Arial", 16));

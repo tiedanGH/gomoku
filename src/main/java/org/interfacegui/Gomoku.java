@@ -12,12 +12,8 @@ import org.modelai.Game;
 import org.utils.Point;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 public class Gomoku {
@@ -226,26 +222,14 @@ public class Gomoku {
         maps.add(new Map(totalLines));
 
         gameDisplay = new Pane();
-        Label gameName = new Label(gameInfosRules.getRules());
 
         endInfos.hidePopup();
 
         boardPane = board.getBoard();
         VBox gameInfosPane = gameInfos.getGameInfos();
-        gameInfosPane.getChildren().add(0, gameName);
         VBox endInfosPane = endInfos.getEndInfos();
-        endInfosPane.getChildren().add(0, gameName);
 
         setPlayerColor();
-
-        DoubleBinding fontSizeBinding = (DoubleBinding) Bindings.min(
-                gameInfosPane.widthProperty().multiply(0.1),
-                gameInfosPane.heightProperty().multiply(0.1)
-        );
-        gameName.fontProperty().bind(Bindings.createObjectBinding(
-                () -> new Font("Arial", fontSizeBinding.get()),
-                fontSizeBinding
-        ));
 
         VBox mainVBox = new VBox();
         HBox hbox = new HBox();
