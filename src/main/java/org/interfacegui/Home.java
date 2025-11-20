@@ -26,8 +26,35 @@ public class Home {
     private String errorMsg;
 
     public Home() {
+    	 String selectedColor = "-fx-text-fill: #000000;";
+         String deselectedColor = "-fx-text-fill: #000000;";
+         String selectedBackgroundColor = "-fx-background-color: "
+         	    + "linear-gradient(#E3C799, #C49A6C, #8B5A2B);" 
+         	    + "-fx-background-radius: 10; "
+         	    + "-fx-border-color: #B19776; "          
+         	    + "-fx-border-width: 2; "
+         	    + "-fx-border-radius: 10; "
+         	    + "-fx-padding: 10 20 10 20; "
+         	    + "-fx-font-size: 22px; "               
+         	    + "-fx-font-weight: bold; ";
+         String deselectedBackgroundColor = "-fx-background-color: "
+         	    + "linear-gradient(#E3C799, #C49A6C, #8B5A2B);" 
+         	    + "-fx-background-radius: 10; "
+         	    + "-fx-border-color: #B19776; "          
+         	    + "-fx-border-width: 2; "
+         	    + "-fx-border-radius: 10; "
+         	    + "-fx-padding: 10 20 10 20; "
+         	    + "-fx-font-size: 22px; "               
+         	    + "-fx-font-weight: bold; ";
 
-        // ======== 黑方玩家选择（AI / Player） ========
+        String selectedStyle = selectedBackgroundColor + selectedColor;
+        String deselectedStyle = deselectedBackgroundColor + deselectedColor;
+
+
+
+        // ===========================================================
+        //                   黑方玩家选择（AI / Player）
+        // ===========================================================
 
         homePage.getBlackIaTypeButton().setOnAction(e -> {
             blackPlayerType = 1;

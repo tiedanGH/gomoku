@@ -126,7 +126,7 @@ public class HomePage {
         //黑子难度位置显示
         blackEasy.setLayoutX(520);
         blackMedium.setLayoutX(630);
-        blackHard.setLayoutX(740);
+        blackHard.setLayoutX(780);
 
         blackEasy.setLayoutY(300);
         blackMedium.setLayoutY(300);
@@ -159,7 +159,7 @@ public class HomePage {
         // 白子难度位置
         whiteEasy.setLayoutX(520);
         whiteMedium.setLayoutX(630);
-        whiteHard.setLayoutX(740);
+        whiteHard.setLayoutX(780);
 
         whiteEasy.setLayoutY(300);
         whiteMedium.setLayoutY(300);
@@ -249,7 +249,22 @@ public class HomePage {
         return rulesInstance;
     }
 
-    public void setRulesInstance(Rules r) {
-        rulesInstance = r;
+    // 选中样式（浅红/金色）
+    public void applySelected(Button btn) {
+        btn.setStyle("-fx-background-color: #DC143C; -fx-text-fill: #000000; "
+                + "-fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold;");
+    }
+
+    // 默认样式（原金色背景）
+    public void applyDefault(Button btn) {
+        btn.setStyle("-fx-background-color: linear-gradient(#E3C799, #C49A6C, #8B5A2B); "
+                + "-fx-text-fill: #000000; "
+                + "-fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold;");
+    }
+    // 将某个按钮组全部恢复默认样式
+    public void resetGroup(Button... buttons) {
+        for (Button b : buttons) {
+            applyDefault(b);
+        }
     }
 }

@@ -1,13 +1,10 @@
 package org.modelai;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import org.utils.DoubleFree;
 
-public class Candidate
-{
+public class Candidate {
     // 类说明（中文）：
     // 该类负责在搜索树中为当前局面生成“候选落子”列表，
     // 包括候选的收集、评分、排序与截断。
@@ -204,9 +201,9 @@ public class Candidate
             }
         }
 
-        // TODO sort need replace
-        Collections.sort(this.list, Comparator.comparing(item ->
-        this.order.indexOf(item.st())));
+        // sorting
+        sortListByOrder(this.list, this.order);
+
         if (dp == Game.max_depth && display)
                 displayCandidates("before Select");
         if (this.list.size() >= Game.min_can  + 1)
@@ -321,11 +318,8 @@ public class Candidate
             if (nb_mv == 2 && twoMoveCandidate() != 0)
                 return this.list.size();
 
-        // TODO sort need replace
-        Collections.sort(this.list, Comparator.comparing(item ->
-        this.order.indexOf(item.st())));
-
-
+        // sorting
+        sortListByOrder(this.list, this.order);
 
         if (this.list.size() >= Game.min_can + 1)
         {
@@ -385,9 +379,8 @@ public class Candidate
             if (display && depth == Game.max_depth)
                 displayCandidates("Candidate before sort");
 
-            // TODO sort need replace
-            Collections.sort(this.list, Comparator.comparing(item ->
-            this.order.indexOf(item.st())));
+            // sorting
+            sortListByOrder(this.list, this.order);
 
             if (display && depth == Game.max_depth)
                 displayCandidates("Candidate after sort");
@@ -444,6 +437,31 @@ public class Candidate
         System.out.println(msg);
         for (Coordinate coord : this.list) {
             System.out.printf("%d %d %f\n", coord.x, coord.y, coord.strength);
+        }
+    }
+
+    private void sortListByOrder(List<Coordinate> list, List<Double> order) {
+        int n = list.size();
+        int gap = n / 2;
+
+        while (gap > 0) {
+            for (int i = gap; i < n; i++) {
+                Coordinate temp = list.get(i);
+                int tempIdx = order.indexOf(temp.st());
+
+                int j = i;
+                while (j >= gap) {
+                    int prevIdx = order.indexOf(list.get(j - gap).st());
+                    if (prevIdx <= tempIdx) {
+                        break;
+                    }
+                    list.set(j, list.get(j - gap));
+                    j -= gap;
+                }
+
+                list.set(j, temp);
+            }
+            gap /= 2;
         }
     }
 }
