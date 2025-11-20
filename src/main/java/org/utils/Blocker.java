@@ -37,20 +37,20 @@ public class Blocker {
             this.color = 1;
     }
 
-    private boolean in_board(int x, int y)
+    private boolean inBoard(int x, int y)
     {
         if (x >=0 && x < 19 && y >=0 && y < 19)
             return true;
         return false;
     }
 
-    public void update_block_info()
+    public void updateBlockInfo()
     {
         rank = 0;
         
         for (int i = 1 ; i < 5 ; i++)
         {
-            if (!in_board(bl1[0]+ddir[dir][0]*sig*i, bl1[1]+ddir[dir][1]*sig*i))
+            if (!inBoard(bl1[0]+ddir[dir][0]*sig*i, bl1[1]+ddir[dir][1]*sig*i))
                 break;
             if (MinimaxEngine.board[bl1[0]+ddir[dir][0]*sig*i][bl1[1]+ddir[dir][1]*sig*i] == 0)
             {
