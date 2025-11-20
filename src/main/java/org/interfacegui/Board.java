@@ -10,31 +10,44 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.shape.Rectangle;
 
-public class Board {
-    private final Pane board;
-    private final Circle[][] stones;
-    private final Rectangle[][] score;
-    private final ArrayList<Circle> dots;
-    private final ArrayList<Point> dotsCoordinate = new ArrayList<>();
-    private final ArrayList<Line> lines;
-    private int size;
-    private final int totalLines;
-    private int squareSize;
-    private int marginHeight;
-    private int marginWidth;
-    private final ArrayList<Text> txt = new ArrayList<>();
-    private Rectangle lastMoveRect = null;
+/**
+ *Board（棋盘渲染类）
+ *负责：
+ *绘制棋盘线、dots
+ *绘制棋子（Circle[][]）
+ *绘制AI调试用评分点（Rectangle[][]）
+ *动态更新棋盘布局（响应窗口变化）
+ *标红最后落子位置（红框）
+ */
 
+public class Board {
+    private final Pane board; // 主棋盘 Pane
+    private final Circle[][] stones; // 棋子数组：1=黑 2=白
+    private final Rectangle[][] score;// AI调试评分格子（默认隐藏）
+    private final ArrayList<Circle> dots; // 黑点
+    private final ArrayList<Point> dotsCoordinate = new ArrayList<>();
+    private final ArrayList<Line> lines; // 棋盘线
+    private int size; // 棋盘尺寸
+    private final int totalLines; // 棋盘线数（=19）
+    private int squareSize;  // 每格大小（像素）
+    private int marginHeight;  // 垂直居中偏移
+    private int marginWidth; // 水平居中偏移
+    private final ArrayList<Text> txt = new ArrayList<>(); // 棋子数字标签
+    private Rectangle lastMoveRect = null; // 标量的落子标记框
+
+    // Board 构造函数
+    /** 初始化棋盘外边距，使棋盘居中显示 */
     private void initMargin(int height, int width) {
         int size = squareSize * (totalLines - 1);
         marginHeight = (height - size) / 2;
         marginWidth = (width - size) / 2;
     }
 
+    /** 初始化每格像素大小（squareSize） */
     private void initSquareSize() {
         squareSize = size / totalLines;
     }
-
+    /** 初始化棋盘外边距，使棋盘居中显示 */
     private void updateDots() {
         for (int i = 0; i < dotsCoordinate.size(); i++) {
             Circle dot = dots.get(i);
@@ -46,7 +59,7 @@ public class Board {
             dot.setStrokeWidth(1);
         }
     }
-
+    /** 根据 dotsCoordinate 创建dots */
     private void createDots() {
         for (Point p : dotsCoordinate) {
             Circle dots = new Circle();
@@ -60,6 +73,7 @@ public class Board {
         }
     }
 
+    /** 初始化棋盘的（dots） */
     private void initDots() {
         boolean corner = false;
         boolean line = false;
@@ -84,6 +98,7 @@ public class Board {
         createDots();
     }
 
+    /** 创建棋盘线（横线 + 竖线） */
     private void initLines() {
         for (int i = 0; i < totalLines; i++) {
             Line line = new Line(
@@ -123,11 +138,12 @@ public class Board {
         initScore();
         buildBoard();
     }
-    
+
+    /** 返回 Pane 供 Gomoku class 使用 */
     public Pane getBoard() {
         return board;
     }
-
+    /** 更新棋盘线位置（窗口变化时调用） */
     public void updateLines() {
         for (int i = 0; i < lines.size(); i++) {
             if (i < totalLines) {
@@ -144,7 +160,7 @@ public class Board {
             }
         }
     }
-
+    /** 外部调用：更新棋盘在窗口改变时重新布局 */
     public void updateBoard(int newY, int newX) {
         board.setPrefSize(newX, newY);
         size = Math.min(newX, newY);
@@ -155,7 +171,7 @@ public class Board {
         updateScore();
         updateDots();
     }
-
+    /** 更新棋子位置与大小 */
     private void updateStones() {
         for (int i = 0; i < stones.length; i++) {
             for (int j = 0; j < stones[i].length; j++) {
@@ -185,6 +201,7 @@ public class Board {
         r.setY(centerY - size / 2.0);
     }
 
+    /** 初始化棋子 Circle[][] （默认隐藏） */
     public void initStones() {
         for (int i = 0; i < stones.length; i++) {
             for (int j = 0; j < stones[i].length; j++) {
@@ -200,6 +217,7 @@ public class Board {
         }
     }
 
+    /** 初始化评分显示，游戏中的矩形提示框（AI 调试） */
     public void initScore() {
         double size = squareSize / 5.0;
         for (int i = 0; i < score.length; i++) {
@@ -214,7 +232,7 @@ public class Board {
             }
         }
     }
-
+    /** 建造棋盘*/
     private void buildBoard() {
         board.getChildren().addAll(lines);
         board.getChildren().addAll(dots);
@@ -230,16 +248,17 @@ public class Board {
         }
     }
 
+    /** 初始化棋子 Circle[][] （默认隐藏） */
     public void setStoneStatus(boolean visible, String color, Point point, String text) {
         Circle stone = stones[point.y][point.x];
         stone.setVisible(visible);
-    
+
         Pane parent = (Pane) stone.getParent();
-        parent.getChildren().removeIf(node -> 
-            node instanceof Text && 
-            node.getUserData() != null && 
+        parent.getChildren().removeIf(node ->
+            node instanceof Text &&
+            node.getUserData() != null &&
             node.getUserData().equals("label_" + point.x + "_" + point.y));
-        
+
         if (visible) {
             stone.setFill(javafx.scene.paint.Color.web(color));
 
@@ -277,7 +296,7 @@ public class Board {
     public int getSquareSize() {
         return squareSize;
     }
-
+    /** 从 Map 更新所有棋子显示 */
     public void updateFromMap(Map gameMap) {
         int[][] board = gameMap.getMap();
         for (Text t : txt) {
@@ -288,7 +307,7 @@ public class Board {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 Circle stone = stones[i][j];
-                
+
                 if (board[i][j] == 0) {
                     stone.setVisible(false);
                 } else {
@@ -306,17 +325,16 @@ public class Board {
             }
         }
     }
-
-    public void removeLastMoveRect() {
+    /** 删除上一个红框 */
+    public void removeLastMoveBox() {
         if (lastMoveRect != null) {
             this.getBoard().getChildren().remove(lastMoveRect);
             lastMoveRect = null;
         }
     }
-    
+    /** 在最后落子位置绘制红框 */
     public void drawLastMoveBox(Point p) {
-        // 移除旧红框
-        removeLastMoveRect();
+        removeLastMoveBox();
 
         int marginWidth = getMarginWidth();
         int marginHeight = getMarginHeight();

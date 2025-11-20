@@ -41,7 +41,9 @@ public class App extends Application {
         title.setPreserveRatio(true);
     }
 
-    /** 主菜单按钮事件 */
+    /**
+     * 主菜单按钮事件
+     */
     public void set_home_event() {
 
         home_page.getValidationButton().setOnMouseClicked(event -> {
