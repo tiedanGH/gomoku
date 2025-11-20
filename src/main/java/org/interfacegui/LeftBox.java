@@ -5,6 +5,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.control.Label;
 import javafx.scene.text.Font;
 
+import static org.interfacegui.Gomoku.backgroundColor;
+
 public class LeftBox {
 
     private final VBox gameInfos;
@@ -24,7 +26,7 @@ public class LeftBox {
         gameInfos.setPrefSize(x, y);
         gameInfos.setMinWidth(Region.USE_PREF_SIZE);
         gameInfos.setMinHeight(Region.USE_PREF_SIZE);
-        gameInfos.setBackground(new Background(new BackgroundFill(Color.web("#DEB887"), null, null)));
+        gameInfos.setBackground(new Background(new BackgroundFill(Color.web(backgroundColor), null, null)));
         gameInfos.getChildren().add(turn);
 
         addText();

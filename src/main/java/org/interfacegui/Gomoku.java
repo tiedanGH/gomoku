@@ -18,6 +18,8 @@ import javafx.util.Duration;
 
 public class Gomoku {
 
+    static final String backgroundColor = "#244E1C";
+
     private Point lastMove = null;
     private final Pane gameDisplay;
     private final ArrayList<Map> maps;

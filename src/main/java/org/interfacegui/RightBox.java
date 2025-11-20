@@ -3,6 +3,8 @@ package org.interfacegui;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
+import static org.interfacegui.Gomoku.backgroundColor;
+
 /**
  * RightBox
  * 右侧结束信息面板：展示胜负文本与结束弹窗（包含 replay / backHome 两个按钮）。
@@ -23,7 +25,7 @@ public class RightBox {
         rightBox.setPrefSize(x, y);
         rightBox.setMinWidth(Region.USE_PREF_SIZE);
         rightBox.setMinHeight(Region.USE_PREF_SIZE);
-        rightBox.setBackground(new Background(new BackgroundFill(Color.web("#DEB887"), null, null)));
+        rightBox.setBackground(new Background(new BackgroundFill(Color.web(backgroundColor), null, null)));
 
 //        rightBox.getChildren().addAll();
     }

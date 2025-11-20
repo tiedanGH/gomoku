@@ -5,6 +5,8 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
+import static org.interfacegui.Gomoku.backgroundColor;
+
 public class BottomBox {
 
     private final VBox bottomBox;
@@ -27,7 +29,7 @@ public class BottomBox {
         bottomBox.setPrefSize(x, y);
         bottomBox.setMinWidth(Region.USE_PREF_SIZE);
         bottomBox.setMinHeight(Region.USE_PREF_SIZE);
-        bottomBox.setBackground(new Background(new BackgroundFill(Color.web("#DEB887"), null, null)));
+        bottomBox.setBackground(new Background(new BackgroundFill(Color.web(backgroundColor), null, null)));
 
         ImageButtonUtil.applyImage(hint, "./img/hint.png", 50, 50);
         ImageButtonUtil.applyImage(undo, "./img/undo.png", 50, 50);
