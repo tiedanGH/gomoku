@@ -16,8 +16,8 @@ public interface Rules {
     boolean isValidMove(Point point, ArrayList<Map> map);
     boolean endGame(Map map, Point point);
     int getWinner();
-    boolean hasIa();
-    int get_board_size();
+    boolean hasAI();
+    int getBoardSize();
     GameMode getGameMode();
     ArrayList<Point> verticalWin = new ArrayList<Point>();
     ArrayList<Point> horizontalWin = new ArrayList<Point>();
@@ -29,7 +29,7 @@ public interface Rules {
     default void checkCaptures(Point coord, Map game_map, int inc_x, int inc_y, ArrayList<Point> captured){
         if ((coord.x + (inc_x * 3) > 18 || coord.x + (inc_x * 3) < 0) || (coord.y + (inc_y * 3) > 18 || coord.y + (inc_y * 3) < 0))
             return ;
-        final int[][] map = game_map.get_map();
+        final int[][] map = game_map.getMap();
         final int color = map[coord.y][coord.x];
         final int color1 = map[coord.y + inc_y][coord.x + inc_x];
         final int color2 = map[coord.y + (inc_y * 2)][coord.x + (inc_x * 2)];
@@ -69,14 +69,14 @@ public interface Rules {
             return false;
 
         }
-        if (map.get_map()[y][x] != 0) {
+        if (map.getMap()[y][x] != 0) {
             return false;
         }
         return true;
     }
 
     default boolean check_with_dir(Map map, Point point, int dir_x, int dir_y, int color){
-        if (map.get_map()[point.y + dir_y][point.x + dir_x] == color)
+        if (map.getMap()[point.y + dir_y][point.x + dir_x] == color)
             return true;
         else
             return false;
@@ -86,7 +86,7 @@ public interface Rules {
         boolean right = true;
         boolean left = true;
         int count = 1;
-        final int color = map.get_map()[point.y][point.x];
+        final int color = map.getMap()[point.y][point.x];
         if (color == 0)
             return false;
         horizontalWin.add(point);
@@ -117,7 +117,7 @@ public interface Rules {
         boolean right = true;
         boolean left = true;
         int count = 1;
-        final int color = map.get_map()[point.y][point.x];
+        final int color = map.getMap()[point.y][point.x];
         if (color == 0)
             return false;
         verticalWin.add(point);
@@ -148,7 +148,7 @@ public interface Rules {
         boolean right = true;
         boolean left = true;
         int count = 1;
-        final int color = map.get_map()[point.y][point.x];
+        final int color = map.getMap()[point.y][point.x];
         if (color == 0)
             return false;
         diagonalLeftWin.add(point);
@@ -179,7 +179,7 @@ public interface Rules {
         boolean right = true;
         boolean left = true;
         int count = 1;
-        final int color = map.get_map()[point.y][point.x];
+        final int color = map.getMap()[point.y][point.x];
         if (color == 0)
             return false;
         diagonalRightWin.add(point);
@@ -208,7 +208,7 @@ public interface Rules {
 
 
     default int getColor(Map map, Point point){
-        return map.get_map()[point.y][point.x];
+        return map.getMap()[point.y][point.x];
     }
 
     default void check_diagonal(Map map, Point point){
@@ -217,7 +217,7 @@ public interface Rules {
     }
 
     default boolean check_five(Map map, Point point){
-        if (map.get_map()[point.y][point.x] == 0)
+        if (map.getMap()[point.y][point.x] == 0)
             return false;
         verticalWin.clear();
         horizontalWin.clear();

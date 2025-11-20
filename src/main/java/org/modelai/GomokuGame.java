@@ -2,7 +2,6 @@ package org.modelai;
 
 /*
  * GomokuGame
- *
  * 中文说明：
  * GomokuGame 继承 MinimaxEngine，用于 Gomoku（五子棋）专用的节点实现。
  */

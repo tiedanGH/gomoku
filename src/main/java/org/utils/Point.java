@@ -24,18 +24,18 @@ public class Point {
         return "( x: " + x + ", y: " + y + ")" + ", val: " + val;
     }
 
-    public String colormove() {
+    public String colorMove() {
         String C = this.color == 1 ? "B" : "W";
         if (color == 0)
             return "(" + x + "," + y + ")";
         return C + "(" + x + "," + y + ")";
     }
 
-    public void set_val(float v){
+    public void setValue(float v){
         val = v;
     }
 
-    public float get_val(){
+    public float getValue(){
         return val;
     }
 

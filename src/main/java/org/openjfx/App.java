@@ -64,34 +64,6 @@ public class App extends Application {
             switchScene(board);
             stage.setResizable(true);
         });
-
-        // 只支持 Gomoku 的教学 SGF
-        home_page.getLearnOrViewButton().setOnMouseClicked(event -> {
-
-            // TODO rule
-//            SGF.setFile("./", "tuto/Gomoku.sgf");
-//            if (!SGF.parseFile()) {
-//                home_page.setErrorMsg("Missing Gomoku tutorial SGF.");
-//                home_page.displayErrorMsg();
-//                return;
-//            }
-
-//            ArrayList<Map> sgfMap = SGF.get_game_moves();
-//            home_page.setRulesInstance(SGF.getRuleInstance());
-            home_page.setGameMode(Rules.GameMode.LEARNING);
-
-            double scenex = stage.getWidth();
-            double sceney = stage.getHeight();
-
-            gomoku = new Gomoku((int) sceney, (int) scenex, home_page);
-            Pane board_root = new Pane();
-            board = new Scene(board_root, scenex, sceney);
-            set_board_event(board_root);
-            board_root.getChildren().add(gomoku.getGameDisplay());
-
-            switchScene(board);
-            stage.setResizable(true);
-        });
     }
 
     private void setNewHome() {
@@ -118,29 +90,16 @@ public class App extends Application {
 
     private void set_board_event(Pane board_root) {
         gomoku.getBackHomeButton().setOnMouseClicked(event -> {
-            gomoku.killIa();
+            gomoku.endAI();
             setNewHome();
         });
-
-        gomoku.get_home_button().setOnMouseClicked(event -> setNewHome());
-
-        gomoku.get_replay_button().setOnMouseClicked(event -> gomoku.reset_gomoku());
-
-        board.widthProperty().addListener((obs, oldV, newV) -> {
-            gomoku.updateGameDisplay((int) board.getHeight(), newV.intValue());
-        });
-
-        board.heightProperty().addListener((obs, oldV, newV) -> {
-            gomoku.updateGameDisplay(newV.intValue(), (int) board.getWidth());
-        });
-        Pane board = gomoku.getGameDisplay();
-        board.layoutXProperty().bind(
-            board.widthProperty().subtract(board.widthProperty()).divide(2)
+        gomoku.getReplayButton().setOnMouseClicked(event -> gomoku.resetGame());
+        board.widthProperty().addListener((obs, oldV, newV) ->
+                gomoku.updateGameDisplay((int) board.getHeight(), newV.intValue())
         );
-        board.layoutYProperty().bind(
-            board.heightProperty().subtract(board.heightProperty()).divide(2).subtract(80)
+        board.heightProperty().addListener((obs, oldV, newV) ->
+                gomoku.updateGameDisplay(newV.intValue(), (int) board.getWidth())
         );
-
     }
 
     @Override
