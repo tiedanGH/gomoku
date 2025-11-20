@@ -38,12 +38,15 @@ public class EndInfos {
         popupBox = new VBox();
         replay = new Button("Replay");
         backHome = new Button("Back Home");
+
+        ImageButtonUtil.applyImage(replay, "./img/replay.png", 30, 30);
+        ImageButtonUtil.applyImage(backHome, "./img/home.png", 30, 30);
+
         setButtonMinHeight(replay, backHome);
 
         popupBox.getChildren().addAll(replay, backHome);
         popupBox.setVisible(false);
         popupBox.setManaged(false);
-//        popupBox.setStyle("-fx-padding:8; -fx-alignment:center;");
 
         endInfos.getChildren().addAll(endText, popupBox);
     }
