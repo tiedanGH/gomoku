@@ -193,23 +193,22 @@ public class MinimaxEngine
     public float minimax(int depth, int turn, int player)
     {
 
-        int nb_candidates;
-        float reteval;
+        int totalCandidates;
+        float result;
 
-        nb_candidates = candidate.oldLoad(depth, turn);
+        totalCandidates = candidate.oldLoad(depth, turn);
 
         if (depth == 0)
         {
-
             positionCounter++;
-            reteval = eval(player, len, turn);
+            result = eval(player, len, turn);
 
-            return reteval;
+            return result;
         }
 
-        values = new float[nb_candidates];
+        values = new float[totalCandidates];
 
-        for (int i = 0 ; i < nb_candidates ; i++)
+        for (int i = 0 ; i < totalCandidates ; i++)
         {
             MinimaxEngine m = new MinimaxEngine(this, depth);
             if (m.play(candidate.list.get(i), turn))

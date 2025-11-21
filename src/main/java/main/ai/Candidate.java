@@ -298,7 +298,7 @@ public class Candidate {
     public int allProbableCandidate(int turn, int ignoredDepth)
     {
         int res;
-        int nb_mv = 0;
+        int totalMove = 0;
 
         for (int i = limitMin.x - 1 ; i <= limitMax.x + 1 ; i++)
         {
@@ -306,16 +306,16 @@ public class Candidate {
             {
                 res = nearCount(i, j);
                 if (MinimaxEngine.board[i][j] == 1 || MinimaxEngine.board[i][j] == 2)
-                    nb_mv++;
+                    totalMove++;
                 if (MinimaxEngine.board[i][j] == 0 && res !=0 && (!capturePossible || doubleFreeThree.checkDoubleFree(i, j, turn, MinimaxEngine.board)))
                     this.list.add(new Coordinate(i, j, res));
             }
         }
 
-            if (nb_mv == 1 && oneMoveCandidate() != 0)
+            if (totalMove == 1 && oneMoveCandidate() != 0)
                 return this.list.size();
 
-            if (nb_mv == 2 && twoMoveCandidate() != 0)
+            if (totalMove == 2 && twoMoveCandidate() != 0)
                 return this.list.size();
 
         // sorting
@@ -323,7 +323,7 @@ public class Candidate {
 
         if (this.list.size() >= Game.minCan + 1)
         {
-            if (nb_mv >=3)
+            if (totalMove >=3)
             {
                 if (limitMax.x - limitMin.x > 14 || limitMax.y - limitMin.y > 14)
                     this.list = new ArrayList<>(this.list.subList(0, 3));

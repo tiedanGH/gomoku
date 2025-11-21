@@ -22,7 +22,7 @@ public class Home {
 
     // UI页面
     private final HomePage homePage = new HomePage();
-    private int boardSize = 19;  // 棋盘是19格子
+    private static final int boardSize = 19;  // 棋盘是19格子
 
     public Home() {
         // ===========================================================
@@ -125,13 +125,6 @@ public class Home {
         homePage.getBlackEasyButton().setOnAction(e -> homePage.getWhiteEasyButton().fire());
         homePage.getBlackMediumButton().setOnAction(e -> homePage.getWhiteMediumButton().fire());
         homePage.getBlackHardButton().setOnAction(e -> homePage.getWhiteHardButton().fire());
-
-        // ======== BoardSize ========
-        homePage.get19Button().setOnAction(e -> boardSize = 19);
-
-        // Start 按钮
-        homePage.getValidationButton().setOnAction(e -> {
-        });
 
     }
 

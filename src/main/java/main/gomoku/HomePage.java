@@ -2,12 +2,9 @@ package main.gomoku;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
 
 public class HomePage {
 
-    private final Pane page;                // 主页面 Pane
     private final Pane pageContainer;       // 外层容器（可在 App 中放入 Scene）
 
     // 玩家选择按钮
@@ -20,18 +17,12 @@ public class HomePage {
     private final Button blackEasy, blackMedium, blackHard;
     private final Button whiteEasy, whiteMedium, whiteHard;
 
-    // Board Size（只剩 19）
-    private final Button nineteenButton;
-
     // Start / Learn
     private final Button startButton;
 
-    // 错误信息
-    private final Label errorMessage = new Label();
-
     public HomePage() {
-
-        page = new Pane();
+        // 主页面 Pane
+        Pane page = new Pane();
         page.setPrefSize(800, 800);   // 你可以改成窗口大小
 
         // ========== 颜色样式 ==========
@@ -162,21 +153,6 @@ public class HomePage {
 
         page.getChildren().addAll(whiteEasy, whiteMedium, whiteHard);
 
-        // ========== Board Size（19） ==========
-        nineteenButton = new Button("19");
-        nineteenButton.setStyle(selectedStyle);
-        nineteenButton.setLayoutX(370);
-        nineteenButton.setLayoutY(460);
-        page.getChildren().add(nineteenButton);
-
-        // ========== 错误信息 ==========
-        errorMessage.setTextFill(Color.RED);
-        errorMessage.setLayoutX(300);
-        errorMessage.setLayoutY(520);
-        errorMessage.setVisible(false);
-
-        page.getChildren().add(errorMessage);
-
         // 页面容器
         pageContainer = new Pane(page);
     }
@@ -229,10 +205,6 @@ public class HomePage {
 
     public Button getBlackHardButton() {
         return blackHard;
-    }
-
-    public Button get19Button() {
-        return nineteenButton;
     }
 
     // 选中样式（浅红/金色）
