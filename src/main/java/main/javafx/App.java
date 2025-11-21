@@ -16,8 +16,8 @@ public class App extends Application {
     private Stage stage;
 
     private Scene board, home;
-    private Pane home_root = new Pane();
-    private Home home_page = new Home();
+    private Pane homeRoot = new Pane();
+    private Home homePage = new Home();
 
     private ImageView background;
     private ImageView title;
@@ -32,29 +32,28 @@ public class App extends Application {
         background = new ImageView(img1);
         title = new ImageView(img2);
 
-        background.setFitWidth(home_root.getWidth());
-        background.setFitHeight(home_root.getHeight());
+        background.setFitWidth(homeRoot.getWidth());
+        background.setFitHeight(homeRoot.getHeight());
         background.setPreserveRatio(false);
 
-        title.setFitWidth(home_root.getWidth());
-        title.setFitHeight(home_root.getHeight());
+        title.setFitWidth(homeRoot.getWidth());
+        title.setFitHeight(homeRoot.getHeight());
         title.setPreserveRatio(true);
     }
 
     /**
      * 主菜单按钮事件
      */
-    public void set_home_event() {
-
-        home_page.getValidationButton().setOnMouseClicked(event -> {
+    public void setHomeEvent() {
+        homePage.getStartButton().setOnMouseClicked(event -> {
             double sceneX = 830;
             double sceneY = 700;
 
-            gomoku = new Gomoku((int) sceneY, (int) sceneX, home_page);
-            Pane board_root = new Pane();
-            board = new Scene(board_root, sceneX, sceneY);
-            set_board_event();
-            board_root.getChildren().add(gomoku.getGameDisplay());
+            gomoku = new Gomoku((int) sceneY, (int) sceneX, homePage);
+            Pane boardRoot = new Pane();
+            board = new Scene(boardRoot, sceneX, sceneY);
+            setBoardEvent();
+            boardRoot.getChildren().add(gomoku.getGameDisplay());
 
             switchScene(board);
             stage.setResizable(true);
@@ -62,28 +61,28 @@ public class App extends Application {
     }
 
     private void setNewHome() {
-        home_root = new Pane();
-        home = new Scene(home_root, 962, 550);
+        homeRoot = new Pane();
+        home = new Scene(homeRoot, 962, 550);
 
-        home_page = new Home();
+        homePage = new Home();
         openBackground();
 
         background.setMouseTransparent(true);
         title.setMouseTransparent(true);
 
-        home_root.getChildren().add(background);
-        home_root.getChildren().add(title);
+        homeRoot.getChildren().add(background);
+        homeRoot.getChildren().add(title);
 
-        set_home_event();
-        home_root.getChildren().add(home_page.getHomePage());
+        setHomeEvent();
+        homeRoot.getChildren().add(homePage.getHomePage());
 
         stage.setResizable(false);
-        home_page.getHomePage().setTranslateY(160);
+        homePage.getHomePage().setTranslateY(160);
 
         switchScene(home);
     }
 
-    private void set_board_event() {
+    private void setBoardEvent() {
         gomoku.getBackHomeButton().setOnMouseClicked(event -> {
             gomoku.endAI();
             setNewHome();
@@ -103,17 +102,17 @@ public class App extends Application {
         stage = primaryStage;
         stage.setTitle("Gomoku");
 
-        home = new Scene(home_root, 962, 550);
+        home = new Scene(homeRoot, 962, 550);
         openBackground();
 
         background.setMouseTransparent(true);
         title.setMouseTransparent(true);
-        home_root.getChildren().add(background);
-        home_root.getChildren().add(title);
+        homeRoot.getChildren().add(background);
+        homeRoot.getChildren().add(title);
 
-        set_home_event();
-        home_root.getChildren().add(home_page.getHomePage());
-        home_page.getHomePage().setTranslateY(160);
+        setHomeEvent();
+        homeRoot.getChildren().add(homePage.getHomePage());
+        homePage.getHomePage().setTranslateY(160);
 
         stage.setResizable(false);
         stage.centerOnScreen();

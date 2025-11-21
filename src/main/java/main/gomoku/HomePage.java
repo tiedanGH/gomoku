@@ -13,12 +13,21 @@ public class HomePage {
     private final Button whitePlayer;
     private final Button whiteAI;
 
-    // AI 难度（黑方 & 白方）
-    private final Button blackEasy, blackMedium, blackHard;
-    private final Button whiteEasy, whiteMedium, whiteHard;
+    // AI 难度
+    private final Button AIEasy, AIMedium, AIHard;
 
     // Start / Learn
     private final Button startButton;
+
+    // Base style ensures padding, border and font remain the same so switching color won't change size.
+    private static final String BASE_STYLE =
+            "-fx-background-radius: 10; "
+            + "-fx-border-color: #B19776; "
+            + "-fx-border-width: 2; "
+            + "-fx-border-radius: 10; "
+            + "-fx-padding: 10 20 10 20; "
+            + "-fx-font-size: 16px; "
+            + "-fx-font-weight: bold; ";
 
     public HomePage() {
         // 主页面 Pane
@@ -26,33 +35,11 @@ public class HomePage {
         page.setPrefSize(800, 800);   // 你可以改成窗口大小
 
         // ========== 颜色样式 ==========
-        String selectedColor = "-fx-text-fill: #000000;";
-        String deselectedColor = "-fx-text-fill: #000000;";
-        String selectedBackground = "-fx-background-color: "
-                + "linear-gradient(#E3C799, #C49A6C, #8B5A2B);"
-                + "-fx-background-radius: 10; "
-                + "-fx-border-color: #B19776; "
-                + "-fx-border-width: 2; "
-                + "-fx-border-radius: 10; "
-                + "-fx-padding: 10 20 10 20; "
-                + "-fx-font-size: 16px; "
-                + "-fx-font-weight: bold; ";
-        String deselectedBackground = "-fx-background-color: "
-                + "linear-gradient(#E3C799, #C49A6C, #8B5A2B);"
-                + "-fx-background-radius: 10; "
-                + "-fx-border-color: #B19776; "
-                + "-fx-border-width: 2; "
-                + "-fx-border-radius: 10; "
-                + "-fx-padding: 10 20 10 20; "
-                + "-fx-font-size: 16px; "
-                + "-fx-font-weight: bold; ";
-
-        String selectedStyle = selectedBackground + selectedColor;
-        String deselectedStyle = deselectedBackground + deselectedColor;
+        // Use applySelected/applyDefault below to set color while keeping BASE_STYLE the same.
 
         // ========== Start 按钮 ==========
         startButton = new Button("Start");
-        startButton.setStyle(selectedStyle);
+        applyDefault(startButton);
         startButton.setLayoutX(650);
         startButton.setLayoutY(80);
         startButton.setPrefWidth(100);
@@ -62,8 +49,8 @@ public class HomePage {
         blackPlayer = new Button("Black Player");
         blackAI = new Button("Black AI");
 
-        blackPlayer.setStyle(selectedStyle);
-        blackAI.setStyle(deselectedStyle);
+        applySelected(blackPlayer);
+        applyDefault(blackAI);
 
         //黑子选择按钮
         blackPlayer.setLayoutX(500);
@@ -81,8 +68,8 @@ public class HomePage {
         whitePlayer = new Button("White Player");
         whiteAI = new Button("White AI");
 
-        whitePlayer.setStyle(selectedStyle);
-        whiteAI.setStyle(deselectedStyle);
+        applySelected(whitePlayer);
+        applyDefault(whiteAI);
 
         //白子选择按钮
         whitePlayer.setLayoutX(500);
@@ -96,62 +83,34 @@ public class HomePage {
 
         page.getChildren().addAll(whitePlayer, whiteAI);
 
-        // ========== AI 难度（黑方） ==========
-        blackEasy = new Button("Easy");
-        blackMedium = new Button("Medium");
-        blackHard  = new Button("Hard");
+        // ========== AI 难度 ==========
+        AIEasy = new Button("Easy");
+        AIMedium = new Button("Medium");
+        AIHard = new Button("Hard");
 
-        blackEasy.setStyle(selectedStyle);
-        blackMedium.setStyle(selectedStyle);
-        blackHard.setStyle(selectedStyle);
+        applySelected(AIEasy);
+        applyDefault(AIMedium);
+        applyDefault(AIHard);
 
-        blackEasy.setPrefWidth(100);
-        blackMedium.setPrefWidth(140);
-        blackHard.setPrefWidth(100);
-
-        //黑子难度位置显示
-        blackEasy.setLayoutX(520);
-        blackMedium.setLayoutX(630);
-        blackHard.setLayoutX(780);
-
-        blackEasy.setLayoutY(300);
-        blackMedium.setLayoutY(300);
-        blackHard.setLayoutY(300);
-
-        blackEasy.setVisible(false);
-        blackMedium.setVisible(false);
-        blackHard.setVisible(false);
-
-        page.getChildren().addAll(blackEasy, blackMedium, blackHard);
-
-        // ========== AI 难度（白方） ==========
-        whiteEasy   = new Button("Easy");
-        whiteMedium = new Button("Medium");
-        whiteHard   = new Button("Hard");
-
-        whiteEasy.setStyle(deselectedStyle);
-        whiteMedium.setStyle(deselectedStyle);
-        whiteHard.setStyle(deselectedStyle);
-
-        whiteEasy.setPrefWidth(100);
-        whiteMedium.setPrefWidth(140);
-        whiteHard.setPrefWidth(100);
+        AIEasy.setPrefWidth(100);
+        AIMedium.setPrefWidth(140);
+        AIHard.setPrefWidth(100);
 
         // 默认隐藏
-        whiteEasy.setVisible(false);
-        whiteMedium.setVisible(false);
-        whiteHard.setVisible(false);
+        AIEasy.setVisible(false);
+        AIMedium.setVisible(false);
+        AIHard.setVisible(false);
 
         // 白子难度位置
-        whiteEasy.setLayoutX(520);
-        whiteMedium.setLayoutX(630);
-        whiteHard.setLayoutX(780);
+        AIEasy.setLayoutX(520);
+        AIMedium.setLayoutX(630);
+        AIHard.setLayoutX(780);
 
-        whiteEasy.setLayoutY(300);
-        whiteMedium.setLayoutY(300);
-        whiteHard.setLayoutY(300);
+        AIEasy.setLayoutY(300);
+        AIMedium.setLayoutY(300);
+        AIHard.setLayoutY(300);
 
-        page.getChildren().addAll(whiteEasy, whiteMedium, whiteHard);
+        page.getChildren().addAll(AIEasy, AIMedium, AIHard);
 
         // 页面容器
         pageContainer = new Pane(page);
@@ -163,7 +122,7 @@ public class HomePage {
         return pageContainer;
     }
 
-    public Button getValidationButton() {
+    public Button getStartButton() {
         return startButton;
     }
 
@@ -171,7 +130,7 @@ public class HomePage {
         return whitePlayer;
     }
 
-    public Button getWhiteIaTypeButton() {
+    public Button getWhiteAITypeButton() {
         return whiteAI;
     }
 
@@ -179,48 +138,33 @@ public class HomePage {
         return blackPlayer;
     }
 
-    public Button getBlackIaTypeButton() {
+    public Button getBlackAITypeButton() {
         return blackAI;
     }
 
     public Button getWhiteEasyButton() {
-        return whiteEasy;
+        return AIEasy;
     }
 
     public Button getWhiteMediumButton() {
-        return whiteMedium;
+        return AIMedium;
     }
 
     public Button getWhiteHardButton() {
-        return whiteHard;
-    }
-
-    public Button getBlackEasyButton() {
-        return blackEasy;
-    }
-
-    public Button getBlackMediumButton() {
-        return blackMedium;
-    }
-
-    public Button getBlackHardButton() {
-        return blackHard;
+        return AIHard;
     }
 
     // 选中样式（浅红/金色）
     public void applySelected(Button btn) {
-        btn.setStyle("-fx-background-color: #DC143C; -fx-text-fill: #000000; "
-                + "-fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold;");
+        btn.setStyle("-fx-background-color: #DC143C; -fx-text-fill: #000000; " + BASE_STYLE);
     }
 
     // 默认样式（原金色背景）
     public void applyDefault(Button btn) {
-        btn.setStyle("-fx-background-color: linear-gradient(#E3C799, #C49A6C, #8B5A2B); "
-                + "-fx-text-fill: #000000; "
-                + "-fx-background-radius: 10; -fx-font-size: 16px; -fx-font-weight: bold;");
+        btn.setStyle("-fx-background-color: linear-gradient(#E3C799, #C49A6C, #8B5A2B); -fx-text-fill: #000000; " + BASE_STYLE);
     }
     // 将某个按钮组全部恢复默认样式
-    public void resetGroup(Button... buttons) {
+    public void resetButtons(Button... buttons) {
         for (Button b : buttons) {
             applyDefault(b);
         }

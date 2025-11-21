@@ -29,17 +29,17 @@ public class Home {
         //                   黑方玩家选择（AI / Player）
         // ===========================================================
 
-        homePage.getBlackIaTypeButton().setOnAction(e -> {
+        homePage.getBlackAITypeButton().setOnAction(e -> {
             blackPlayerType = 1;
 
             // 变色
-            homePage.resetGroup(homePage.getBlackHumanTypeButton(), homePage.getBlackIaTypeButton());
-            homePage.applySelected(homePage.getBlackIaTypeButton());
+            homePage.resetButtons(homePage.getBlackHumanTypeButton(), homePage.getBlackAITypeButton());
+            homePage.applySelected(homePage.getBlackAITypeButton());
 
             // 显示黑方 AI 难度按钮
-            homePage.getBlackEasyButton().setVisible(true);
-            homePage.getBlackMediumButton().setVisible(true);
-            homePage.getBlackHardButton().setVisible(true);
+            homePage.getWhiteEasyButton().setVisible(true);
+            homePage.getWhiteMediumButton().setVisible(true);
+            homePage.getWhiteHardButton().setVisible(true);
 
         });
 
@@ -47,23 +47,23 @@ public class Home {
             blackPlayerType = 0;
 
             // 变色
-            homePage.resetGroup(homePage.getBlackHumanTypeButton(), homePage.getBlackIaTypeButton());
+            homePage.resetButtons(homePage.getBlackHumanTypeButton(), homePage.getBlackAITypeButton());
             homePage.applySelected(homePage.getBlackHumanTypeButton());
 
             // 隐藏黑方难度按钮
-            homePage.getBlackEasyButton().setVisible(false);
-            homePage.getBlackMediumButton().setVisible(false);
-            homePage.getBlackHardButton().setVisible(false);
+            homePage.getWhiteEasyButton().setVisible(false);
+            homePage.getWhiteMediumButton().setVisible(false);
+            homePage.getWhiteHardButton().setVisible(false);
         });
 
         // ======== 白方玩家选择（AI / Human） ========
 
-        homePage.getWhiteIaTypeButton().setOnAction(e -> {
+        homePage.getWhiteAITypeButton().setOnAction(e -> {
             whitePlayerType = 1;
 
             //变色
-            homePage.resetGroup(homePage.getWhiteHumanTypeButton(), homePage.getWhiteIaTypeButton());
-            homePage.applySelected(homePage.getWhiteIaTypeButton());
+            homePage.resetButtons(homePage.getWhiteHumanTypeButton(), homePage.getWhiteAITypeButton());
+            homePage.applySelected(homePage.getWhiteAITypeButton());
 
             // 显示白方 AI 难度按钮
             homePage.getWhiteEasyButton().setVisible(true);
@@ -75,7 +75,7 @@ public class Home {
             whitePlayerType = 0;
 
             //变色
-            homePage.resetGroup(homePage.getWhiteHumanTypeButton(), homePage.getWhiteIaTypeButton());
+            homePage.resetButtons(homePage.getWhiteHumanTypeButton(), homePage.getWhiteAITypeButton());
             homePage.applySelected(homePage.getWhiteHumanTypeButton());
 
             // 隐藏白方 AI 难度按钮
@@ -91,10 +91,7 @@ public class Home {
             // 更新难度和同步
 
             //变色
-            homePage.resetGroup(homePage.getBlackEasyButton(), homePage.getBlackMediumButton(), homePage.getBlackHardButton());
-            homePage.applySelected(homePage.getBlackEasyButton());
-
-            homePage.resetGroup(homePage.getWhiteEasyButton(), homePage.getWhiteMediumButton(), homePage.getWhiteHardButton());
+            homePage.resetButtons(homePage.getWhiteEasyButton(), homePage.getWhiteMediumButton(), homePage.getWhiteHardButton());
             homePage.applySelected(homePage.getWhiteEasyButton());
         });
 
@@ -102,10 +99,7 @@ public class Home {
             level = 2;
 
             //变色
-            homePage.resetGroup(homePage.getBlackEasyButton(), homePage.getBlackMediumButton(), homePage.getBlackHardButton());
-            homePage.applySelected(homePage.getBlackMediumButton());
-
-            homePage.resetGroup(homePage.getWhiteEasyButton(), homePage.getWhiteMediumButton(), homePage.getWhiteHardButton());
+            homePage.resetButtons(homePage.getWhiteEasyButton(), homePage.getWhiteMediumButton(), homePage.getWhiteHardButton());
             homePage.applySelected(homePage.getWhiteMediumButton());
         });
 
@@ -114,18 +108,9 @@ public class Home {
             level = 1;
 
             //变色
-            homePage.resetGroup(homePage.getBlackEasyButton(), homePage.getBlackMediumButton(), homePage.getBlackHardButton());
-            homePage.applySelected(homePage.getBlackHardButton());
-
-            homePage.resetGroup(homePage.getWhiteEasyButton(), homePage.getWhiteMediumButton(), homePage.getWhiteHardButton());
+            homePage.resetButtons(homePage.getWhiteEasyButton(), homePage.getWhiteMediumButton(), homePage.getWhiteHardButton());
             homePage.applySelected(homePage.getWhiteHardButton());
         });
-
-        // 黑方难度按钮触发白方按钮（继续复用原来的“同步”逻辑）
-        homePage.getBlackEasyButton().setOnAction(e -> homePage.getWhiteEasyButton().fire());
-        homePage.getBlackMediumButton().setOnAction(e -> homePage.getWhiteMediumButton().fire());
-        homePage.getBlackHardButton().setOnAction(e -> homePage.getWhiteHardButton().fire());
-
     }
 
     // ===========================================================
@@ -142,6 +127,6 @@ public class Home {
 
     public Pane getHomePage() { return homePage.getHomePage(); }
 
-    public Button getValidationButton() { return homePage.getValidationButton(); }
+    public Button getStartButton() { return homePage.getStartButton(); }
 }
 
