@@ -187,10 +187,7 @@ public class Gomoku {
     public Gomoku(int height, int width, Home gameInfosRules) {
         home = gameInfosRules;
 
-        if (home.getRuleInstance() != null)
-            rule = home.getRuleInstance();
-        else
-            initRules(home.getBoardSize());
+        initRules(home.getBoardSize());
 
         totalLines = rule.getBoardSize();
 

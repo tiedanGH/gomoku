@@ -150,7 +150,5 @@ public class Home {
     public Pane getHomePage() { return homePage.getHomePage(); }
 
     public Button getValidationButton() { return homePage.getValidationButton(); }
-
-    public Rules getRuleInstance() { return homePage.getRuleInstance(); }
 }
 

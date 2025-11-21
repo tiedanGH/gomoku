@@ -29,8 +29,6 @@ public class HomePage {
     // 错误信息
     private final Label errorMessage = new Label();
 
-    private Rules rulesInstance = null;
-
     public HomePage() {
 
         page = new Pane();
@@ -235,10 +233,6 @@ public class HomePage {
 
     public Button get19Button() {
         return nineteenButton;
-    }
-
-    public Rules getRuleInstance() {
-        return rulesInstance;
     }
 
     // 选中样式（浅红/金色）
