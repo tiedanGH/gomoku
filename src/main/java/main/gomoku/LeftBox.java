@@ -6,7 +6,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.control.Label;
 
 import java.io.File;
 
@@ -17,7 +16,6 @@ public class LeftBox {
     private final VBox leftBox;
     private int sizeX;
     private int sizeY;
-    private final Label turn = new Label("Round : 0");
 
     private static final Image blackBox =
             new Image(new File("./img/black-box.png").toURI().toString());
@@ -36,7 +34,6 @@ public class LeftBox {
         leftBox.setMinWidth(Region.USE_PREF_SIZE);
         leftBox.setMinHeight(Region.USE_PREF_SIZE);
         leftBox.setBackground(new Background(new BackgroundFill(Color.web(backgroundColor), null, null)));
-//        gameInfos.getChildren().add(turn);
 
         // 初始化图片视图并加入到容器（放置在中间偏下一点）
         boxImageView = new ImageView(blackBox);
@@ -46,8 +43,6 @@ public class LeftBox {
 
         boxContainer = new StackPane(boxImageView);
         boxContainer.setAlignment(Pos.CENTER);
-        // 向下偏移一点，让图片显得位于“中间偏下一点”
-//        boxContainer.setTranslateY(sizeY * 0.2);
 
         // 将图片容器加入主容器，并允许垂直伸展以便居中
         VBox.setVgrow(boxContainer, Priority.ALWAYS);
@@ -62,12 +57,7 @@ public class LeftBox {
         if (boxImageView != null) {
             double targetWidth = Math.max(50, Math.min(250, sizeX * 0.95));
             boxImageView.setFitWidth(targetWidth);
-//            boxContainer.setTranslateY(sizeY * 0.2);
         }
-    }
-
-    public void setTurn(int turn) {
-        this.turn.setText("Round : " + turn);
     }
 
     public VBox getLeftPane() {
@@ -86,19 +76,11 @@ public class LeftBox {
             // 添加金色光晕作为高亮提示
             DropShadow glow = new DropShadow();
             glow.setColor(Color.web("#FFD700"));
-            glow.setRadius(50);
+            glow.setRadius(60);
             boxContainer.setEffect(glow);
         } else {
             // 非当前玩家，移除高亮
             boxContainer.setEffect(null);
         }
     }
-
-//    public VBox getBlackBox() {
-//        return blackBox;
-//    }
-//
-//    public VBox getWhiteBox() {
-//        return whiteBox;
-//    }
 }

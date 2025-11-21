@@ -45,7 +45,6 @@ public class Gomoku {
 
     private ArrayList<Point> hintList = null;
 
-    private int round = 0;
     private Game game;
     private boolean toggleHint = false;
     private boolean iaPlaying = false;
@@ -125,11 +124,6 @@ public class Gomoku {
             setEndGame();
         }
 
-        if (playerTurn == 0) {
-            round++;
-            leftBox.setTurn(round);
-        }
-
         updatePlayerTurn();
         setBoxHighlight();
     }
@@ -158,9 +152,6 @@ public class Gomoku {
         }
 
         updatePlayerTurn();
-
-        if (mapIndex % 2 == 0) round--;
-        leftBox.setTurn(round);
     }
 
     private void setBoxHighlight() {

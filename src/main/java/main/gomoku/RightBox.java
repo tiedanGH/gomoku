@@ -48,12 +48,9 @@ public class RightBox {
 
         boxContainer = new StackPane(boxImageView);
         boxContainer.setAlignment(Pos.CENTER);
-//        boxContainer.setTranslateY(sizeY * 0.2);
 
         VBox.setVgrow(boxContainer, Priority.ALWAYS);
         rightBox.getChildren().add(boxContainer);
-
-//        rightBox.getChildren().addAll();
     }
 
     public void updateRightSize(int newY, int newX) {
@@ -82,7 +79,7 @@ public class RightBox {
         if (currentPlayer == 1) { // Assuming 1 represents WHITE
             DropShadow glow = new DropShadow();
             glow.setColor(Color.web("#FFD700"));
-            glow.setRadius(50);
+            glow.setRadius(60);
             boxContainer.setEffect(glow);
         } else {
             boxContainer.setEffect(null);
