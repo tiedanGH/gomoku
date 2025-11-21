@@ -45,29 +45,29 @@ public class Game {
         }
     }
 
-    public void treeConfig(int lvl) {
-        if (lvl == 1)
+    public void treeConfig(int level) {
+        if (level == 1)
         {
             maxDepth = 10;
             maxCan = 8;
             minCan = 5;
             fastSearch = 0;
         }
-        else if (lvl == 2)
+        else if (level == 2)
         {
             maxDepth = 9;
             maxCan = 7;
             minCan = 6;
             fastSearch = 0;
         }
-        else if (lvl == 3)
+        else if (level == 3)
         {
             maxDepth = 3;
             maxCan = 8;
             minCan = 8;
             fastSearch = 0;
         }
-        else if (lvl == 4)
+        else if (level == 4)
         {
             maxDepth = 9;
             maxCan = 8;

@@ -201,15 +201,14 @@ public class Gomoku {
         gameDisplay = new Pane();
 
         topBox.hideEnd();
+        blockHintIfAllAI();
+        setBoxHighlight();
 
         boardPane = board.getBoard();
         VBox leftPane = leftBox.getLeftPane();
         VBox rightPane = rightBox.getRightPane();
         VBox topPane = topBox.getTopPane();
         VBox bottomPane = bottomBox.getBottomPane();
-
-        blockHintIfAllAI();
-        setBoxHighlight();
 
         // create main layout
         Pane mainPane = new Pane();
@@ -379,8 +378,7 @@ public class Gomoku {
         if (rule.hasAI()) {
             game = new Game(home.getRules(), rule.getBoardSize());
             game.resetMinMax();
-            if (home.getBlackPlayerType() == 0 &&
-                    home.getWhitePlayerType() == 0)
+            if (home.getBlackPlayerType() == 0 && home.getWhitePlayerType() == 0)
                 game.treeConfig(1);
             else
                 game.treeConfig(home.getLevel());
@@ -393,6 +391,7 @@ public class Gomoku {
         changeHintVisibility(false);
         topBox.hideEnd();
         bottomBox.resetButtons();
+        blockHintIfAllAI();
 
         createGameLoop();
     }
