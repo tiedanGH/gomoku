@@ -219,7 +219,7 @@ public class Gomoku {
 
         // apply wood texture as repeating background (place a wood image at ./img/wood-texture.jpg)
         try {
-            Image wood = new Image(new File("./img/wood.png").toURI().toString());
+            Image wood = new Image(new File("./img/bg.jpg").toURI().toString());
             BackgroundImage bimg = new BackgroundImage(
                     wood,
                     BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
