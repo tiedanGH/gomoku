@@ -1,7 +1,5 @@
 package main.ai;
 
-import java.util.ArrayList;
-
 public class MinimaxEngine
 {
     // 类说明：MinimaxEngine 实现了用于五子棋的极大极小搜索逻辑，
@@ -189,6 +187,9 @@ public class MinimaxEngine
     }
 
     // 经典的深度为 depth 的 minimax 递归
+    //针对每个候选走法进行模拟
+    //递归切换 max/min 层
+    //返回最大值或最小值
     public float minimax(int depth, int turn, int player)
     {
 
@@ -314,28 +315,4 @@ public class MinimaxEngine
         System.out.println();
     }
 
-    // 将指定棋盘输出到控制台（静态方法，带参数）
-    static public void displayBoardStatic(int [][] arg_map)
-    {
-        for (int i = 0 ; i < 19 ; i ++)
-        {
-            for (int j = 0 ; j < 19 ; j++)
-            {
-                System.out.printf("%2d", arg_map[i][j]);
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-    // 打印候选位置对应的评估值（用于调试）
-    public void displayValues(float [] val, ArrayList<Candidate.Coordinate> lst)
-    {
-        Candidate.Coordinate c;
-        for(int i = 0 ; i < val.length ; i++)
-        {
-            c = lst.get(i);
-            System.out.printf("pos %d %d : %f\n", c.y, c.x, val[i]);
-        }
-    }
 }
