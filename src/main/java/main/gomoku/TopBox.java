@@ -6,11 +6,8 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 
 import java.io.File;
-
-import static main.gomoku.Gomoku.backgroundColor;
 
 public class TopBox {
 
@@ -81,11 +78,9 @@ public class TopBox {
         double winWidth = getWinTargetWidth(totalHeight, winReserved);
         // apply sizes
         for (Node n : topPane.getChildren()) {
-            if (n instanceof Button) {
-                Button b = (Button) n;
+            if (n instanceof Button b) {
                 Node g = b.getGraphic();
-                if (g instanceof ImageView) {
-                    ImageView iv = (ImageView) g;
+                if (g instanceof ImageView iv) {
                     iv.setPreserveRatio(true);
                     iv.setFitWidth(btnSize);
                     iv.setFitHeight(btnSize);

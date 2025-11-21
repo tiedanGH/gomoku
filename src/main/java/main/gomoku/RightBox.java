@@ -9,8 +9,6 @@ import javafx.scene.paint.Color;
 
 import java.io.File;
 
-import static main.gomoku.Gomoku.backgroundColor;
-
 /**
  * RightBox
  * 右侧结束信息面板：展示胜负文本与结束弹窗（包含 replay / backHome 两个按钮）。

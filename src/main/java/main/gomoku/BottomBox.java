@@ -6,9 +6,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-
-import static main.gomoku.Gomoku.backgroundColor;
 
 public class BottomBox {
 
@@ -62,11 +59,9 @@ public class BottomBox {
     private void adjustButtonImageSizes() {
         double imageSize = getImageSize();
         for (Node n : bottomButtons.getChildren()) {
-            if (n instanceof Button) {
-                Button b = (Button) n;
+            if (n instanceof Button b) {
                 Node graphic = b.getGraphic();
-                if (graphic instanceof ImageView) {
-                    ImageView iv = (ImageView) graphic;
+                if (graphic instanceof ImageView iv) {
                     iv.setPreserveRatio(true);
                     iv.setFitWidth(imageSize);
                     iv.setFitHeight(imageSize);

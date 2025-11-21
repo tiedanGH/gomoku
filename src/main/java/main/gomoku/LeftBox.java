@@ -9,8 +9,6 @@ import javafx.scene.paint.Color;
 
 import java.io.File;
 
-import static main.gomoku.Gomoku.backgroundColor;
-
 public class LeftBox {
 
     private final VBox leftBox;

@@ -198,7 +198,7 @@ public class HomePage {
 
     // 选中样式（浅红/金色）
     public void applySelected(Button btn) {
-        btn.setStyle("-fx-background-color: #DC143C; -fx-text-fill: #000000; " + BASE_STYLE);
+        btn.setStyle("-fx-background-color: #FFB84D; -fx-text-fill: #000000; " + BASE_STYLE);
     }
 
     // 默认样式（原金色背景）
