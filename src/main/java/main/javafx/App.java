@@ -72,7 +72,7 @@ public class App extends Application {
     }
 
     private void setBoardEvent() {
-        gomoku.getBackHomeButton().setOnMouseClicked(event -> setNewHome());
+        gomoku.getHomeButton().setOnMouseClicked(event -> setNewHome());
         gomoku.getReplayButton().setOnMouseClicked(event -> gomoku.resetGame());
         board.widthProperty().addListener((obs, oldV, newV) ->
                 gomoku.updateGameDisplay((int) board.getHeight(), newV.intValue())

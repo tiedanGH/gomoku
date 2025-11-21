@@ -21,7 +21,7 @@ public class TopBox {
     private final HBox topPane;
     private final ImageView win = new ImageView();
     private final Button replay = new Button();
-    private final Button backHome = new Button();
+    private final Button home = new Button();
 
     private final Image draw =
             new Image(new File("./img/draw.png").toURI().toString());
@@ -41,9 +41,9 @@ public class TopBox {
         topBox.setBackground(new Background(new BackgroundFill(Color.web(backgroundColor), null, null)));
 
         ImageButtonUtil.applyImage(replay, "./img/replay.png", 50, 50);
-        ImageButtonUtil.applyImage(backHome, "./img/home.png", 50, 50);
+        ImageButtonUtil.applyImage(home, "./img/home.png", 50, 50);
 
-        topPane = new HBox(10, win, replay, backHome);
+        topPane = new HBox(10, win, replay, home);
         topPane.setAlignment(Pos.CENTER);
         topBox.setAlignment(Pos.CENTER);
         topPane.prefWidthProperty().bind(topBox.widthProperty());
@@ -148,7 +148,7 @@ public class TopBox {
         return replay;
     }
 
-    public Button getBackHomeButton() {
-        return backHome;
+    public Button getHomeButton() {
+        return home;
     }
 }

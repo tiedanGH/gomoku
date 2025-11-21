@@ -405,8 +405,8 @@ public class Gomoku {
         return topBox.getReplayButton();
     }
 
-    public Button getBackHomeButton() {
-        return topBox.getBackHomeButton();
+    public Button getHomeButton() {
+        return topBox.getHomeButton();
     }
 
     public void updateGameDisplay(int newY, int newX){
