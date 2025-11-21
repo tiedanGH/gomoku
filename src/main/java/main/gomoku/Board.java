@@ -357,7 +357,6 @@ public class Board {
                     stone.setVisible(false);
                     img.setVisible(false);
                 } else {
-                    stone.setVisible(true);
                     if (board[i][j] == 1) {
                     	img.setImage(blackPiece);
                         img.setFitWidth(squareSize);

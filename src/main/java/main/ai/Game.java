@@ -26,8 +26,8 @@ public class Game {
     static public int minCan = 5;
     static public int fastSearch = 0;
 
-    public Game(String rules, int board_size) {
-        gameMap = new int[board_size][board_size];
+    public Game(String rules, int boardSize) {
+        gameMap = new int[boardSize][boardSize];
         totalMove = 0;
         m = minmaxTree(rules);
         m.len = 0;

@@ -46,9 +46,9 @@ public class GomokuGame extends MinimaxEngine {
 
     public float minimax(int depth, int turn, int player)
     {
-        int nb_candidates;
+        int totalCandidates;
 
-        nb_candidates = candidate.oldLoad(depth, player);
+        totalCandidates = candidate.oldLoad(depth, player);
 
         if (depth == 0)
         {
@@ -56,9 +56,9 @@ public class GomokuGame extends MinimaxEngine {
             return eval(player, len, turn);
         }
 
-        values = new float[nb_candidates];
+        values = new float[totalCandidates];
 
-        for (int i = 0 ; i < nb_candidates ; i++)
+        for (int i = 0 ; i < totalCandidates ; i++)
         {
             GomokuGame m = new GomokuGame(this.len);
             if (m.play(candidate.list.get(i), turn))
@@ -76,14 +76,14 @@ public class GomokuGame extends MinimaxEngine {
 
     public float minimaxAB(int depth, int turn, int player, float alpha, float beta)
     {
-        int nb_candidates;
-        float cur_alpha;
-        float cur_beta;
+        int totalCandidates;
+        float curAlpha;
+        float curBeta;
         float res;
 
         evaluator.curTurn = turn;
 
-        nb_candidates = candidate.oldLoad(depth, turn);
+        totalCandidates = candidate.oldLoad(depth, turn);
         if (depth == 0)
         {
             positionCounter++;
@@ -91,23 +91,23 @@ public class GomokuGame extends MinimaxEngine {
             return res;
         }
 
-        if (nb_candidates == 0)
+        if (totalCandidates == 0)
             return 0;
 
-        values = new float[nb_candidates];
+        values = new float[totalCandidates];
 
-        cur_alpha = Float.NEGATIVE_INFINITY;
-        cur_beta = Float.POSITIVE_INFINITY;
+        curAlpha = Float.NEGATIVE_INFINITY;
+        curBeta = Float.POSITIVE_INFINITY;
 
-        for (int i = 0 ; i < nb_candidates ; i++)
+        for (int i = 0 ; i < totalCandidates ; i++)
         {
             GomokuGame m = new GomokuGame(this.len);
             Candidate.Coordinate cand = candidate.list.get(i);
             boolean isMaxLayer = (turn == player);
 
             // 统一计算递归窗口
-            float recAlpha = isMaxLayer ? Math.max(alpha, cur_alpha) : alpha;
-            float recBeta  = isMaxLayer ? beta : Math.min(beta, cur_beta);
+            float recAlpha = isMaxLayer ? Math.max(alpha, curAlpha) : alpha;
+            float recBeta  = isMaxLayer ? beta : Math.min(beta, curBeta);
 
             if (m.play(cand, turn))
             {
@@ -123,15 +123,15 @@ public class GomokuGame extends MinimaxEngine {
 
             if (isMaxLayer)
             {
-                cur_alpha = Math.max(cur_alpha, res);
-                if (cur_alpha > beta) // beta cut
-                    return cur_alpha;
+                curAlpha = Math.max(curAlpha, res);
+                if (curAlpha > beta) // beta cut
+                    return curAlpha;
             }
             else
             {
-                cur_beta = Math.min(cur_beta, res);
-                if (alpha > cur_beta) // alpha cut
-                    return cur_beta;
+                curBeta = Math.min(curBeta, res);
+                if (alpha > curBeta) // alpha cut
+                    return curBeta;
             }
         }
 

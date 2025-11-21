@@ -228,14 +228,14 @@ public class MinimaxEngine
     // 带 alpha-beta 剪枝的 minimax 实现
     public float minimaxAB(int depth, int turn, int player, float alpha, float beta)
     {
-        int nb_candidates;
-        float cur_alpha;
-        float cur_beta;
+        int totalCandidates;
+        float curAlpha;
+        float curBeta;
         float res;
 
         evaluator.curTurn = turn;
 
-        nb_candidates = candidate.oldLoad(depth, turn);
+        totalCandidates = candidate.oldLoad(depth, turn);
         if (depth == 0)
         {
             positionCounter++;
@@ -243,23 +243,23 @@ public class MinimaxEngine
             return res;
         }
 
-        if (nb_candidates == 0)
+        if (totalCandidates == 0)
             return 0;
 
-        values = new float[nb_candidates];
+        values = new float[totalCandidates];
 
-        cur_alpha = Float.NEGATIVE_INFINITY;
-        cur_beta = Float.POSITIVE_INFINITY;
+        curAlpha = Float.NEGATIVE_INFINITY;
+        curBeta = Float.POSITIVE_INFINITY;
 
-        for (int i = 0 ; i < nb_candidates ; i++)
+        for (int i = 0 ; i < totalCandidates ; i++)
         {
             MinimaxEngine m = new MinimaxEngine(this.len);
             Candidate.Coordinate cand = candidate.list.get(i);
             boolean isMaxLayer = (turn == player);
 
             // 根据当前层决定递归时传入的窗口（不改变外部 alpha/beta）
-            float recAlpha = isMaxLayer ? Math.max(alpha, cur_alpha) : alpha;
-            float recBeta  = isMaxLayer ? beta : Math.min(beta, cur_beta);
+            float recAlpha = isMaxLayer ? Math.max(alpha, curAlpha) : alpha;
+            float recBeta  = isMaxLayer ? beta : Math.min(beta, curBeta);
 
             if (m.play(cand, turn))
             {
@@ -278,18 +278,18 @@ public class MinimaxEngine
             // 更新局部窗口并判断剪枝
             if (isMaxLayer)
             {
-                cur_alpha = Math.max(cur_alpha, res);
-                if (cur_alpha > beta) // beta cut
+                curAlpha = Math.max(curAlpha, res);
+                if (curAlpha > beta) // beta cut
                 {
-                    return cur_alpha;
+                    return curAlpha;
                 }
             }
             else
             {
-                cur_beta = Math.min(cur_beta, res);
-                if (alpha > cur_beta) // alpha cut
+                curBeta = Math.min(curBeta, res);
+                if (alpha > curBeta) // alpha cut
                 {
-                    return cur_beta;
+                    return curBeta;
                 }
             }
         }

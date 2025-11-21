@@ -59,6 +59,7 @@ public class Gomoku {
         iaPlaying = false;
         if (gameLoop != null) gameLoop.stop();
         topBox.showEnd(winner);
+        bottomBox.gameEnd();
     }
 
     private void updateGameMap(int index) {
@@ -171,8 +172,8 @@ public class Gomoku {
     }
 
     private void setStepButtonVisibility() {
-        bottomBox.getPreviousButton().setVisible(mapIndex > 0);
-        bottomBox.getNextButton().setVisible(mapIndex < maps.size() - 1);
+        bottomBox.getPreviousButton().setDisable(mapIndex <= 0);
+        bottomBox.getNextButton().setDisable(mapIndex >= maps.size() - 1);
     }
 
     public Gomoku(int height, int width, Home gameInfosRules) {
@@ -244,6 +245,7 @@ public class Gomoku {
             gameEnd = true;
             iaPlaying = false;
             topBox.showEnd(0);
+            bottomBox.gameEnd();
             endAI();
             if (future2 != null){
                 future2 = null;
@@ -384,6 +386,7 @@ public class Gomoku {
         board.removeLastMoveBox();
         changeHintVisibility(false);
         topBox.hideEnd();
+        bottomBox.resetButtons();
 
         createGameLoop();
     }

@@ -87,6 +87,18 @@ public class BottomBox {
         return Math.min(Math.min(maxByWidth, maxByHeight), 100);
     }
 
+    public void gameEnd() {
+        hint.setDisable(true);
+        resign.setDisable(true);
+        undo.setDisable(true);
+    }
+
+    public void resetButtons() {
+        hint.setDisable(false);
+        resign.setDisable(false);
+        undo.setDisable(false);
+    }
+
     public VBox getBottomPane() {
         return bottomBox;
     }
