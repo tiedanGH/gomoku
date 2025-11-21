@@ -39,7 +39,6 @@ public class RightBox {
         rightBox.setPrefSize(x, y);
         rightBox.setMinWidth(Region.USE_PREF_SIZE);
         rightBox.setMinHeight(Region.USE_PREF_SIZE);
-        rightBox.setBackground(new Background(new BackgroundFill(Color.web(backgroundColor), null, null)));
 
         // 初始化白色盒子图片视图并加入容器
         boxImageView = new ImageView(whiteBox);

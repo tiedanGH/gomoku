@@ -124,17 +124,11 @@ public class Board {
 
     public Board(int height, int width, int lineNum) {
         board = new Pane();
-//        LinearGradient boardGradient = new LinearGradient(
-//                0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
-//                new Stop(0.0, Color.web("#f7edd9")),
-//                new Stop(0.5, Color.web("#e6c99a")),
-//                new Stop(1.0, Color.web("#b8865b"))
-//        );
         LinearGradient boardGradient = new LinearGradient(
                 0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(0.0, Color.web("#4b2e18")),   // 深棕（顶部）
-                new Stop(0.5, Color.web("#6b4423")),   // 中棕（中间）
-                new Stop(1.0, Color.web("#8b5a2b"))    // 暖棕（金棕）
+                new Stop(0.0, Color.web("#f7edd9")),
+                new Stop(0.5, Color.web("#e6c99a")),
+                new Stop(1.0, Color.web("#b8865b"))
         );
         board.setBackground(new Background(new BackgroundFill(boardGradient, CornerRadii.EMPTY, Insets.EMPTY)));
         board.setPrefSize(width, height);

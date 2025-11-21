@@ -38,7 +38,6 @@ public class TopBox {
         topBox.setPrefSize(x, y);
         topBox.setMinWidth(Region.USE_PREF_SIZE);
         topBox.setMinHeight(Region.USE_PREF_SIZE);
-        topBox.setBackground(new Background(new BackgroundFill(Color.web(backgroundColor), null, null)));
 
         ImageButtonUtil.applyImage(replay, "./img/replay.png", 50, 50);
         ImageButtonUtil.applyImage(home, "./img/home.png", 50, 50);

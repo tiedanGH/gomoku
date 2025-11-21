@@ -15,9 +15,13 @@ import javafx.animation.Timeline;
 import javafx.scene.control.Button;
 import javafx.util.Duration;
 
+import java.io.File;
+import javafx.scene.image.Image;
+
 public class Gomoku {
 
-    static final String backgroundColor = "#7A8F5C";
+    // change background color to deep brown
+    static final String backgroundColor = "#3E2723";
 
     private Point lastMove = null;
     private final Pane gameDisplay;
@@ -212,6 +216,23 @@ public class Gomoku {
 
         // create main layout
         Pane mainPane = new Pane();
+
+        // apply wood texture as repeating background (place a wood image at ./img/wood-texture.jpg)
+        try {
+            Image wood = new Image(new File("./img/wood.png").toURI().toString());
+            BackgroundImage bimg = new BackgroundImage(
+                    wood,
+                    BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, true, true)
+            );
+            mainPane.setBackground(new Background(bimg));
+        } catch (Exception e) {
+            // fallback: solid deep brown if image not found
+            e.printStackTrace();
+            mainPane.setBackground(new Background(new BackgroundFill(javafx.scene.paint.Color.web(backgroundColor), null, null)));
+        }
+
         VBox middlePane = new VBox();
         middlePane.getChildren().addAll(topPane, boardPane, bottomPane);
         HBox hbox = new HBox();

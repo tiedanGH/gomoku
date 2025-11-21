@@ -33,7 +33,6 @@ public class LeftBox {
         leftBox.setPrefSize(x, y);
         leftBox.setMinWidth(Region.USE_PREF_SIZE);
         leftBox.setMinHeight(Region.USE_PREF_SIZE);
-        leftBox.setBackground(new Background(new BackgroundFill(Color.web(backgroundColor), null, null)));
 
         // 初始化图片视图并加入到容器（放置在中间偏下一点）
         boxImageView = new ImageView(blackBox);
