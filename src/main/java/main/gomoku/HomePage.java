@@ -13,8 +13,9 @@ public class HomePage {
     private final Button whitePlayer;
     private final Button whiteAI;
 
-    // AI 难度
-    private final Button AIEasy, AIMedium, AIHard;
+    // AI 难度（黑方 & 白方）
+    private final Button blackEasy, blackMedium, blackHard;
+    private final Button whiteEasy, whiteMedium, whiteHard;
 
     // Start / Learn
     private final Button startButton;
@@ -83,34 +84,63 @@ public class HomePage {
 
         page.getChildren().addAll(whitePlayer, whiteAI);
 
-        // ========== AI 难度 ==========
-        AIEasy = new Button("Easy");
-        AIMedium = new Button("Medium");
-        AIHard = new Button("Hard");
+        // ========== AI 难度（黑方） ==========
+        blackEasy = new Button("Easy");
+        blackMedium = new Button("Medium");
+        blackHard = new Button("Hard");
 
-        applySelected(AIEasy);
-        applyDefault(AIMedium);
-        applyDefault(AIHard);
+        applySelected(blackEasy);
+        applyDefault(blackMedium);
+        applyDefault(blackHard);
 
-        AIEasy.setPrefWidth(100);
-        AIMedium.setPrefWidth(140);
-        AIHard.setPrefWidth(100);
+        blackEasy.setPrefWidth(100);
+        blackMedium.setPrefWidth(140);
+        blackHard.setPrefWidth(100);
 
         // 默认隐藏
-        AIEasy.setVisible(false);
-        AIMedium.setVisible(false);
-        AIHard.setVisible(false);
+        blackEasy.setVisible(false);
+        blackMedium.setVisible(false);
+        blackHard.setVisible(false);
+
+        // 黑子难度位置
+        blackEasy.setLayoutX(520);
+        blackMedium.setLayoutX(630);
+        blackHard.setLayoutX(780);
+
+        blackEasy.setLayoutY(300);
+        blackMedium.setLayoutY(300);
+        blackHard.setLayoutY(300);
+
+        page.getChildren().addAll(blackEasy, blackMedium, blackHard);
+
+        // ========== AI 难度（白方） ==========
+        whiteEasy = new Button("Easy");
+        whiteMedium = new Button("Medium");
+        whiteHard = new Button("Hard");
+
+        applySelected(whiteEasy);
+        applyDefault(whiteMedium);
+        applyDefault(whiteHard);
+
+        whiteEasy.setPrefWidth(100);
+        whiteMedium.setPrefWidth(140);
+        whiteHard.setPrefWidth(100);
+
+        // 默认隐藏
+        whiteEasy.setVisible(false);
+        whiteMedium.setVisible(false);
+        whiteHard.setVisible(false);
 
         // 白子难度位置
-        AIEasy.setLayoutX(520);
-        AIMedium.setLayoutX(630);
-        AIHard.setLayoutX(780);
+        whiteEasy.setLayoutX(520);
+        whiteMedium.setLayoutX(630);
+        whiteHard.setLayoutX(780);
 
-        AIEasy.setLayoutY(300);
-        AIMedium.setLayoutY(300);
-        AIHard.setLayoutY(300);
+        whiteEasy.setLayoutY(300);
+        whiteMedium.setLayoutY(300);
+        whiteHard.setLayoutY(300);
 
-        page.getChildren().addAll(AIEasy, AIMedium, AIHard);
+        page.getChildren().addAll(whiteEasy, whiteMedium, whiteHard);
 
         // 页面容器
         pageContainer = new Pane(page);
@@ -143,15 +173,27 @@ public class HomePage {
     }
 
     public Button getWhiteEasyButton() {
-        return AIEasy;
+        return whiteEasy;
     }
 
     public Button getWhiteMediumButton() {
-        return AIMedium;
+        return whiteMedium;
     }
 
     public Button getWhiteHardButton() {
-        return AIHard;
+        return whiteHard;
+    }
+
+    public Button getBlackEasyButton() {
+        return blackEasy;
+    }
+
+    public Button getBlackMediumButton() {
+        return blackMedium;
+    }
+
+    public Button getBlackHardButton() {
+        return blackHard;
     }
 
     // 选中样式（浅红/金色）

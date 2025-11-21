@@ -20,25 +20,17 @@ public class App extends Application {
     private Home homePage = new Home();
 
     private ImageView background;
-    private ImageView title;
 
     private void openBackground() {
         File f1 = new File("./img/background.png");
-        File f2 = new File("./img/title.png");
 
         Image img1 = new Image(f1.toURI().toString(), false);
-        Image img2 = new Image(f2.toURI().toString(), false);
 
         background = new ImageView(img1);
-        title = new ImageView(img2);
 
         background.setFitWidth(homeRoot.getWidth());
         background.setFitHeight(homeRoot.getHeight());
         background.setPreserveRatio(false);
-
-        title.setFitWidth(homeRoot.getWidth());
-        title.setFitHeight(homeRoot.getHeight());
-        title.setPreserveRatio(true);
     }
 
     /**
@@ -68,10 +60,7 @@ public class App extends Application {
         openBackground();
 
         background.setMouseTransparent(true);
-        title.setMouseTransparent(true);
-
         homeRoot.getChildren().add(background);
-        homeRoot.getChildren().add(title);
 
         setHomeEvent();
         homeRoot.getChildren().add(homePage.getHomePage());
@@ -83,10 +72,7 @@ public class App extends Application {
     }
 
     private void setBoardEvent() {
-        gomoku.getBackHomeButton().setOnMouseClicked(event -> {
-            gomoku.endAI();
-            setNewHome();
-        });
+        gomoku.getBackHomeButton().setOnMouseClicked(event -> setNewHome());
         gomoku.getReplayButton().setOnMouseClicked(event -> gomoku.resetGame());
         board.widthProperty().addListener((obs, oldV, newV) ->
                 gomoku.updateGameDisplay((int) board.getHeight(), newV.intValue())
@@ -106,9 +92,7 @@ public class App extends Application {
         openBackground();
 
         background.setMouseTransparent(true);
-        title.setMouseTransparent(true);
         homeRoot.getChildren().add(background);
-        homeRoot.getChildren().add(title);
 
         setHomeEvent();
         homeRoot.getChildren().add(homePage.getHomePage());

@@ -55,6 +55,7 @@ public class Gomoku {
 
     private void setEndGame() {
         int winner = rule.getWinner();
+        endAI();
         gameEnd = true;
         iaPlaying = false;
         if (gameLoop != null) gameLoop.stop();
@@ -176,8 +177,8 @@ public class Gomoku {
         bottomBox.getNextButton().setDisable(mapIndex >= maps.size() - 1);
     }
 
-    public Gomoku(int height, int width, Home gameInfosRules) {
-        home = gameInfosRules;
+    public Gomoku(int height, int width, Home rules) {
+        home = rules;
 
         initRules(home.getBoardSize());
 
@@ -190,7 +191,7 @@ public class Gomoku {
         topBox = new TopBox(topBoxSizeY, boardSizeX);
         bottomBox = new BottomBox(bottomSizeY, boardSizeX);
 
-        game = new Game(gameInfosRules.getRules(), rule.getBoardSize());
+        game = new Game(rules.getRules(), rule.getBoardSize());
         game.resetMinMax();
         maps = new ArrayList<>();
         board = new Board(boardSizeY, boardSizeX, rule.getBoardSize());
@@ -207,6 +208,7 @@ public class Gomoku {
         VBox topPane = topBox.getTopPane();
         VBox bottomPane = bottomBox.getBottomPane();
 
+        blockHintIfAllAI();
         setBoxHighlight();
 
         // create main layout
@@ -308,6 +310,10 @@ public class Gomoku {
         boardSizeY = boardSizeX = width - sideBoxSizeX * 2;
         topBoxSizeY = (height - boardSizeY) * 4 / 7;
         bottomSizeY = (height - boardSizeY) * 3 / 7;
+    }
+
+    private void blockHintIfAllAI() {
+        bottomBox.getHintButton().setDisable(home.getBlackPlayerType() == 1 && home.getWhitePlayerType() == 1);
     }
 
     public void createGameLoop() {
