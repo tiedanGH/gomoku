@@ -50,7 +50,7 @@ public class HomePage {
         blackPlayer = new Button("Black Player");
         blackAI = new Button("Black AI");
 
-        applySelected(blackPlayer);
+        applyDefault(blackPlayer);
         applyDefault(blackAI);
 
         //黑子选择按钮
@@ -69,7 +69,7 @@ public class HomePage {
         whitePlayer = new Button("White Player");
         whiteAI = new Button("White AI");
 
-        applySelected(whitePlayer);
+        applyDefault(whitePlayer);
         applyDefault(whiteAI);
 
         //白子选择按钮
