@@ -1,7 +1,7 @@
-package org.openjfx;
+package main.javafx;
 
 public class Launcher {
     public static void main(String[] args) {
         App.main(args);
-        }
+    }
 }

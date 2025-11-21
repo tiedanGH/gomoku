@@ -1,4 +1,4 @@
-package org.interfacegui;
+package main.gomoku;
 import javafx.scene.shape.*;
 
 import java.io.File;
@@ -9,7 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import org.utils.Point;
+import main.utils.Point;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.shape.Rectangle;
@@ -124,6 +124,12 @@ public class Board {
 
     public Board(int height, int width, int lineNum) {
         board = new Pane();
+//        LinearGradient boardGradient = new LinearGradient(
+//                0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+//                new Stop(0.0, Color.web("#f7edd9")),
+//                new Stop(0.5, Color.web("#e6c99a")),
+//                new Stop(1.0, Color.web("#b8865b"))
+//        );
         LinearGradient boardGradient = new LinearGradient(
                 0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0.0, Color.web("#4b2e18")),   // 深棕（顶部）

@@ -1,6 +1,7 @@
-package org.openjfx;
+package main.javafx;
 
-import org.interfacegui.*;
+import main.gomoku.Gomoku;
+import main.gomoku.Home;
 import javafx.application.Application;
 import javafx.scene.layout.Pane;
 import javafx.scene.Scene;
@@ -13,7 +14,6 @@ public class App extends Application {
 
     private Gomoku gomoku;
     private Stage stage;
-
 
     private Scene board, home;
     private Pane home_root = new Pane();
@@ -47,9 +47,7 @@ public class App extends Application {
     public void set_home_event() {
 
         home_page.getValidationButton().setOnMouseClicked(event -> {
-//            double sceneX = stage.getWidth();
-//            double sceneY = stage.getHeight();
-            double sceneX = 880;
+            double sceneX = 830;
             double sceneY = 700;
 
             gomoku = new Gomoku((int) sceneY, (int) sceneX, home_page);

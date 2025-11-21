@@ -1,7 +1,8 @@
-package org.modelai;
+package main.ai;
 import java.util.ArrayList;
 
-import org.utils.*;
+import main.utils.Blocker;
+import main.utils.Score;
 
 /**
  * Evaluator
@@ -436,7 +437,7 @@ public class Evaluator {
                     createBlocker(i, 1);
                 }
             }
-            else if (Game.fast_search == 0 && !(x > 4 && x < 14 && y < 4))
+            else if (Game.fastSearch == 0 && !(x > 4 && x < 14 && y < 4))
                 createBlocker(i, 1);
 
             if (inBoard(x - 5 * dirOffsets[i][0], y - 5 * dirOffsets[i][1]))
@@ -446,7 +447,7 @@ public class Evaluator {
                     createBlocker(i, -1);
                 }
             }
-            else if (Game.fast_search == 0 && !(x > 4 && x < 14 && y < 4))
+            else if (Game.fastSearch == 0 && !(x > 4 && x < 14 && y < 4))
                 createBlocker(i, -1);
         }
     }
@@ -487,14 +488,14 @@ public class Evaluator {
             b = this.blockerList.get(i);
 
             b.updateBlockInfo();
-            if (MinimaxEngine.board[b.bl1[0]] [b.bl1[1]] != b.blockcolor || ( b.bl2[0] != -1 &&
-                MinimaxEngine.board[b.bl2[0]] [b.bl2[1]] != b.blockcolor))
+            if (MinimaxEngine.board[b.bl1[0]] [b.bl1[1]] != b.blockColor || ( b.bl2[0] != -1 &&
+                MinimaxEngine.board[b.bl2[0]] [b.bl2[1]] != b.blockColor))
             {
 
                 this.blockerList.remove(i);
                 i--;
             }
-            if (i != -1 && Game.fast_search == 0 && b.bl2[0] == -1)
+            if (i != -1 && Game.fastSearch == 0 && b.bl2[0] == -1)
                 this.blockerList.remove(i);
         }
     }

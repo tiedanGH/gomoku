@@ -1,4 +1,4 @@
-package org.interfacegui;
+package main.gomoku;
 
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;

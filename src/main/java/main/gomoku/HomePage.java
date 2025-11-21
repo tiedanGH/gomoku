@@ -1,10 +1,8 @@
-package org.interfacegui;
+package main.gomoku;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.beans.property.StringProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.paint.Color;
 
 public class HomePage {
@@ -31,7 +29,6 @@ public class HomePage {
     // 错误信息
     private final Label errorMessage = new Label();
 
-    private StringProperty cruleType = new SimpleStringProperty("gomoku");
     private Rules rulesInstance = null;
 
     public HomePage() {
@@ -238,11 +235,6 @@ public class HomePage {
 
     public Button get19Button() {
         return nineteenButton;
-    }
-
-    public void set_error(String msg) {
-        errorMessage.setText(msg);
-        errorMessage.setVisible(true);
     }
 
     public Rules getRuleInstance() {

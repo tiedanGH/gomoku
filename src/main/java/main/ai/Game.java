@@ -1,6 +1,6 @@
-package org.modelai;
+package main.ai;
 
-import org.utils.*;
+import main.utils.Point;
 
 public class Game {
 
@@ -14,33 +14,30 @@ public class Game {
     // 当前棋局评分对象（Evaluator）
     public Evaluator miniScore =  new Evaluator();
     // 已落子数量
-    public int nb_move;
+    public int totalMove;
     // 上次搜索得到的估值
     public Float val;
     // 上次搜索耗时（毫秒）
     public long time;
     // 游戏规则标识字符串（例如 "Gomoku" 或 "None"）
     public String rules;
-    static public int max_depth = 10;
-    static public int max_can = 7;
-    static public int min_can = 5;
-    static public int fast_search = 0;
+    static public int maxDepth = 10;
+    static public int maxCan = 7;
+    static public int minCan = 5;
+    static public int fastSearch = 0;
 
-
-    public Game(String rules, int board_size)
-    {
+    public Game(String rules, int board_size) {
         gameMap = new int[board_size][board_size];
-        nb_move = 0;
+        totalMove = 0;
         m = minmaxTree(rules);
         m.len = 0;
     }
 
-    private MinimaxEngine minmaxTree(String str)
-    {
+    private MinimaxEngine minmaxTree(String str) {
         str = Character.toUpperCase(str.charAt(0)) + str.substring(1);
         if (str.equals("Gomoku")) {
             this.rules = "Gomoku";
-            max_depth = 10;
+            maxDepth = 10;
             return new GomokuGame();
         } else {
             this.rules = "None";
@@ -48,72 +45,67 @@ public class Game {
         }
     }
 
-    public void treeConfig(int lvl)
-    {
+    public void treeConfig(int lvl) {
         if (lvl == 1)
         {
-            max_depth = 10;
-            max_can = 8;
-            min_can = 5;
-            fast_search = 0;
+            maxDepth = 10;
+            maxCan = 8;
+            minCan = 5;
+            fastSearch = 0;
         }
         else if (lvl == 2)
         {
-            max_depth = 9;
-            max_can = 7;
-            min_can = 6;
-            fast_search = 0;
+            maxDepth = 9;
+            maxCan = 7;
+            minCan = 6;
+            fastSearch = 0;
         }
         else if (lvl == 3)
         {
-            max_depth = 3;
-            max_can = 8;
-            min_can = 8;
-            fast_search = 0;
+            maxDepth = 3;
+            maxCan = 8;
+            minCan = 8;
+            fastSearch = 0;
         }
         else if (lvl == 4)
         {
-            max_depth = 9;
-            max_can = 8;
-            min_can = 7;
-            fast_search = 0;
+            maxDepth = 9;
+            maxCan = 8;
+            minCan = 7;
+            fastSearch = 0;
         }
     }  
 
-    public void move(Point point, int turn)
-    {
+    public void move(Point point, int turn) {
         // 将落子写入共享静态棋盘（重命名为 board）
         MinimaxEngine.board[point.y][point.x] = turn;
 
         // 更新评分结构
         miniScore.analyseMove(point.y, point.x, turn);
 
-        nb_move++;
+        totalMove++;
     }
 
-    public void resetMinMax()
-    {
+    public void resetMinMax() {
         for (int i = 0 ; i < 19 ; i++)
             for (int j = 0 ; j < 19 ; j++)
                 MinimaxEngine.board[i][j] = 0;
         MinimaxEngine.positionCounter =0;
         MinimaxEngine.moveCount = 0;
-        Game.fast_search = 0;
+        Game.fastSearch = 0;
         miniScore.resetStr();
     }
 
-    private void initializeMap()
-    {
+    private void initializeMap() {
         for (int i = 0 ; i < 19 ; i++)
             System.arraycopy(gameMap[i], 0, MinimaxEngine.board[i], 0, 19);
     }
 
-    public Point bestMove(int turn, int player, boolean display)
-    {
+    public Point bestMove(int turn, int player, boolean display) {
         if (display)
-            System.out.printf("Call best_move turn %d player %d et nb move %d\n", turn, player, nb_move);
+            System.out.printf("Call best_move turn %d player %d et nb move %d\n", turn, player, totalMove);
 
-        if (nb_move == 0)
+        if (totalMove == 0)
                 resetMinMax();
 
         initializeMap();
@@ -121,17 +113,15 @@ public class Game {
             displayAllBoardInfo();
 
         time = System.currentTimeMillis();
-        if (nb_move == 0)
+        if (totalMove == 0)
             m.best = new Candidate.Coordinate(9, 9);
-        else
-        {
+        else {
             m.loadCurrentScore(miniScore, turn);
 
-            // 仅对 Gomoku 使用带 alpha-beta 的 minimaxAB；Pente 分支已移除
             if (this.rules.equals("Gomoku"))
-                val = m.minimaxAB(max_depth, turn, player, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
+                val = m.minimaxAB(maxDepth, turn, player, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
             else
-                val = m.minimax(max_depth, turn, player);
+                val = m.minimax(maxDepth, turn, player);
         }
         if (display)
             displayAllBoardInfo();
@@ -145,15 +135,13 @@ public class Game {
     }
 
     //display function
-    private void displayAllBoardInfo()
-    {
+    private void displayAllBoardInfo() {
         MinimaxEngine.displayBoardStatic();
         System.out.println();
     }
 
     //display function
-    private void bestMoveStamp()
-    {
-        System.out.printf("AI move %d (Turn %d) at %d %d played in %f seconds (%d pos, %d depth, %d speed)\n", nb_move + 1,(nb_move + 1) / 2 + 1, m.best.y, m.best.x,(double)time / 1000, MinimaxEngine.positionCounter, max_depth, fast_search);
+    private void bestMoveStamp() {
+        System.out.printf("AI move %d (Turn %d) at %d %d played in %f seconds (%d pos, %d depth, %d speed)\n", totalMove + 1,(totalMove + 1) / 2 + 1, m.best.y, m.best.x,(double)time / 1000, MinimaxEngine.positionCounter, maxDepth, fastSearch);
     }
 }

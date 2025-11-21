@@ -1,4 +1,4 @@
-package org.interfacegui;
+package main.gomoku;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -7,18 +7,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javafx.scene.layout.*;
-import org.modelai.Candidate;
-import org.modelai.Game;
-import org.utils.Point;
+import main.ai.Candidate;
+import main.ai.Game;
+import main.utils.Point;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
 import javafx.util.Duration;
 
 public class Gomoku {
 
-    static final String backgroundColor = "#244E1C";
+    static final String backgroundColor = "#7A8F5C";
 
     private Point lastMove = null;
     private final Pane gameDisplay;
@@ -132,7 +131,7 @@ public class Gomoku {
         }
 
         updatePlayerTurn();
-        setPlayerColor();
+        setBoxHighlight();
     }
 
     private void undoMove() {
@@ -164,18 +163,9 @@ public class Gomoku {
         leftBox.setTurn(round);
     }
 
-    private void setPlayerColor() {
-        if (playerTurn == 0) {
-            leftBox.getBlackBox().setBackground(
-                    new Background(new BackgroundFill(Color.GOLDENROD, null, null)));
-            leftBox.getWhiteBox().setBackground(
-                    new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
-        } else {
-            leftBox.getBlackBox().setBackground(
-                    new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
-            leftBox.getWhiteBox().setBackground(
-                    new Background(new BackgroundFill(Color.GOLDENROD, null, null)));
-        }
+    private void setBoxHighlight() {
+        leftBox.highlightForPlayer(playerTurn);
+        rightBox.highlightForPlayer(playerTurn);
     }
 
     private void initRules(int size) {
@@ -204,12 +194,7 @@ public class Gomoku {
 
         totalLines = rule.getBoardSize();
 
-        sideBoxSizeX = width / 5;
-        sideBoxSizeY = height;
-        topBoxSizeY = height / 7;
-        bottomSizeY = height / 8;
-        boardSizeX = width - sideBoxSizeX * 2;
-        boardSizeY = height - topBoxSizeY - bottomSizeY;
+        updateAllSizes(height, width);
 
         leftBox = new LeftBox(sideBoxSizeY, sideBoxSizeX);
         rightBox = new RightBox(sideBoxSizeY, sideBoxSizeX);
@@ -233,8 +218,9 @@ public class Gomoku {
         VBox topPane = topBox.getTopPane();
         VBox bottomPane = bottomBox.getBottomPane();
 
-        setPlayerColor();
+        setBoxHighlight();
 
+        // create main layout
         Pane mainPane = new Pane();
         VBox middlePane = new VBox();
         middlePane.getChildren().addAll(topPane, boardPane, bottomPane);
@@ -324,6 +310,14 @@ public class Gomoku {
         });
 
         createGameLoop();
+    }
+
+    private void updateAllSizes(int height, int width) {
+        sideBoxSizeX = width / 5;
+        sideBoxSizeY = height;
+        boardSizeY = boardSizeX = width - sideBoxSizeX * 2;
+        topBoxSizeY = (height - boardSizeY) * 4 / 7;
+        bottomSizeY = (height - boardSizeY) * 3 / 7;
     }
 
     public void createGameLoop() {
@@ -419,12 +413,7 @@ public class Gomoku {
     }
 
     public void updateGameDisplay(int newY, int newX){
-        sideBoxSizeX = newX / 5;
-        sideBoxSizeY = newY;
-        topBoxSizeY = newY / 7;
-        bottomSizeY = newY / 8;
-        boardSizeX = newX - sideBoxSizeX * 2;
-        boardSizeY = newY - topBoxSizeY - bottomSizeY;
+        updateAllSizes(newY, newX);
         leftBox.updateLeftSize(newY, sideBoxSizeX);
         rightBox.updateRightSize(newY, sideBoxSizeX);
         topBox.updateTopSize(topBoxSizeY, boardSizeX);

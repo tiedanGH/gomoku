@@ -1,4 +1,4 @@
-package org.interfacegui;
+package main.gomoku;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Button;

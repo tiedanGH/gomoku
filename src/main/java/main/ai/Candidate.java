@@ -1,8 +1,8 @@
-package org.modelai;
+package main.ai;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.utils.DoubleFree;
+import main.utils.DoubleFree;
 
 public class Candidate {
     // 类说明（中文）：
@@ -145,7 +145,7 @@ public class Candidate {
         if (val == 0 && totCase1 == 0 && totCase2 == 0)
             return;
         // 保留 double-free-three 检查调用点（若需要可以由外部配置 capturePossible）
-        if (capturePossible && !doubleFreeThree.check_double_free(x, y, turn, MinimaxEngine.board))
+        if (capturePossible && !doubleFreeThree.checkDoubleFree(x, y, turn, MinimaxEngine.board))
             return;
 
         if (val == 0)
@@ -184,7 +184,7 @@ public class Candidate {
         int res;
 
         for (Coordinate coord : this.list) {
-            if (dp == Game.max_depth)
+            if (dp == Game.maxDepth)
                 coord.strength = 5;
         }
 
@@ -196,7 +196,7 @@ public class Candidate {
                     continue;
 
                 res = nearCount(i, j);
-                if (MinimaxEngine.board[i][j] == 0 && res !=0 && (!capturePossible || doubleFreeThree.check_double_free(i, j, turn, MinimaxEngine.board)))
+                if (MinimaxEngine.board[i][j] == 0 && res !=0 && (!capturePossible || doubleFreeThree.checkDoubleFree(i, j, turn, MinimaxEngine.board)))
                     this.list.add(new Coordinate(i, j, res));
             }
         }
@@ -204,17 +204,17 @@ public class Candidate {
         // sorting
         sortListByOrder(this.list, this.order);
 
-        if (dp == Game.max_depth && display)
+        if (dp == Game.maxDepth && display)
                 displayCandidates("before Select");
-        if (this.list.size() >= Game.min_can  + 1)
+        if (this.list.size() >= Game.minCan + 1)
         {
             if (ret == 3)
                 this.list = new ArrayList<>(this.list.subList(0, 4));
             else
-                this.list = new ArrayList<>(this.list.subList(0, Game.min_can + 1));
+                this.list = new ArrayList<>(this.list.subList(0, Game.minCan + 1));
         }
 
-        if (dp == Game.max_depth && display)
+        if (dp == Game.maxDepth && display)
                 displayCandidates("Candidate Selected");
         return this.list.size();
     }
@@ -307,7 +307,7 @@ public class Candidate {
                 res = nearCount(i, j);
                 if (MinimaxEngine.board[i][j] == 1 || MinimaxEngine.board[i][j] == 2)
                     nb_mv++;
-                if (MinimaxEngine.board[i][j] == 0 && res !=0 && (!capturePossible || doubleFreeThree.check_double_free(i, j, turn, MinimaxEngine.board)))
+                if (MinimaxEngine.board[i][j] == 0 && res !=0 && (!capturePossible || doubleFreeThree.checkDoubleFree(i, j, turn, MinimaxEngine.board)))
                     this.list.add(new Coordinate(i, j, res));
             }
         }
@@ -321,21 +321,21 @@ public class Candidate {
         // sorting
         sortListByOrder(this.list, this.order);
 
-        if (this.list.size() >= Game.min_can + 1)
+        if (this.list.size() >= Game.minCan + 1)
         {
             if (nb_mv >=3)
             {
                 if (limitMax.x - limitMin.x > 14 || limitMax.y - limitMin.y > 14)
                     this.list = new ArrayList<>(this.list.subList(0, 3));
                 else
-                    this.list = new ArrayList<>(this.list.subList(0, Game.min_can));
+                    this.list = new ArrayList<>(this.list.subList(0, Game.minCan));
             }
             else
             {
                 if (limitMax.x - limitMin.x > 14 || limitMax.y - limitMin.y > 14)
-                    this.list = new ArrayList<>(this.list.subList(0, Game.min_can));
+                    this.list = new ArrayList<>(this.list.subList(0, Game.minCan));
                 else
-                    this.list = new ArrayList<>(this.list.subList(0, Game.min_can + 1));
+                    this.list = new ArrayList<>(this.list.subList(0, Game.minCan + 1));
             }
         }
         return this.list.size();
@@ -343,19 +343,19 @@ public class Candidate {
 
     private int numCandidates(int depth)
     {
-        if (this.threshold > Game.min_can)
+        if (this.threshold > Game.minCan)
         {
-            if (depth == Game.max_depth)
-                return Math.min(this.threshold, Game.max_can +1);
+            if (depth == Game.maxDepth)
+                return Math.min(this.threshold, Game.maxCan +1);
             else
                 return Math.min(this.threshold, 10);
         }
-        if (depth == Game.max_depth)
-            return Game.max_can;
-        else if (depth == Game.max_depth - 1 || depth == Game.max_depth - 2)
-            return Game.min_can + 1;
+        if (depth == Game.maxDepth)
+            return Game.maxCan;
+        else if (depth == Game.maxDepth - 1 || depth == Game.maxDepth - 2)
+            return Game.minCan + 1;
         else
-            return Game.min_can;
+            return Game.minCan;
     }
 
     public int oldLoad(int depth, int turn)
@@ -367,7 +367,7 @@ public class Candidate {
 
         this.list.clear();
 
-        if (depth == Game.max_depth)
+        if (depth == Game.maxDepth)
         {
             loadLimits(MinimaxEngine.board);
         }
@@ -376,19 +376,19 @@ public class Candidate {
 
         if (ret > 2)
         {
-            if (display && depth == Game.max_depth)
+            if (display && depth == Game.maxDepth)
                 displayCandidates("Candidate before sort");
 
             // sorting
             sortListByOrder(this.list, this.order);
 
-            if (display && depth == Game.max_depth)
+            if (display && depth == Game.maxDepth)
                 displayCandidates("Candidate after sort");
 
             if (ret >= numCandidates(depth) + 1)
             {
                 this.list = new ArrayList<>(this.list.subList(0, numCandidates(depth)));
-                if (display && depth == Game.max_depth)
+                if (display && depth == Game.maxDepth)
                     displayCandidates("Candidate selected");
             }
             return this.list.size();
@@ -413,22 +413,6 @@ public class Candidate {
             limitMax.x = Math.min(17, c.x);
         if (c.y > limitMax.y )
             limitMax.y = Math.min(17, c.y);
-    }
-
-    //display function
-    public void displayCandidateMap()
-    {
-        System.out.printf("candidate number : %d\n", list.size());
-        int [] [] mapc = new int [19][19];
-        for (int i = 0 ; i < 19 ; i++)
-        {
-            System.arraycopy(MinimaxEngine.board[i], 0, mapc[i], 0, 19);
-        }
-        for (Coordinate coord : this.list) {
-            mapc[coord.x][coord.y] = 3;
-            System.out.printf("%d %d\n", coord.x, coord.y);
-        }
-        MinimaxEngine.displayBoardStatic(mapc);
     }
 
     //display function

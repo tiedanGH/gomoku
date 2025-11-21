@@ -1,7 +1,7 @@
-package org.interfacegui;
+package main.gomoku;
 
 import java.util.ArrayList;
-import org.utils.Point;
+import main.utils.Point;
 
 public interface Rules {
     boolean isValidMove(Point point, ArrayList<Map> map);
