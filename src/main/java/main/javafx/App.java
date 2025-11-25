@@ -10,6 +10,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.io.File;
 
+/*
+ * This class serves as the main JavaFX entry point for the Gomoku application
+   Initialize the home menu, manages scene switching loads background images and creates the game board when the user starts a match
+ */
 public class App extends Application {
 
     private Gomoku gomoku;
@@ -33,9 +37,7 @@ public class App extends Application {
         background.setPreserveRatio(false);
     }
 
-    /**
-     * 主菜单按钮事件
-     */
+    // add event in the main page
     public void setHomeEvent() {
         homePage.getStartButton().setOnMouseClicked(event -> {
             double sceneX = 830;
@@ -52,6 +54,7 @@ public class App extends Application {
         });
     }
 
+    // set a new home page
     private void setNewHome() {
         homeRoot = new Pane();
         home = new Scene(homeRoot, 962, 550);
@@ -71,6 +74,7 @@ public class App extends Application {
         switchScene(home);
     }
 
+    // add event in the game board
     private void setBoardEvent() {
         gomoku.getHomeButton().setOnMouseClicked(event -> setNewHome());
         gomoku.getReplayButton().setOnMouseClicked(event -> gomoku.resetGame());
