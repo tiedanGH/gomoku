@@ -2,32 +2,53 @@ package main.ai;
 
 public class MinimaxEngine
 {
-    // 类说明：MinimaxEngine 实现了用于五子棋的极大极小搜索逻辑，
-    // 变量名重构后提高可读性：board, miniScoreSim, positionCounter, moveCount 等。
+    // Class description:
+    // MinimaxEngine is the “algorithm core layer” of the Gomoku AI.
+    // It mainly handles:
+    //  1. Minimax search
+    //  2. Alpha-beta pruning optimization (minimaxAB)
+    //  3. Board evaluation (eval)
+    //  4. Board simulation (play / undo)
+    //  5. Four-in-a-row check (sub-check for detecting five-in-a-row)
+    //  6. Coordinate & candidate management
 
-    // 全局棋盘表示（19x19），0=空,1=黑,2=白
+    // Global shared board (static 2D array)
+    // Note: all MinimaxEngine / GomokuGame instances share the same board
     static public int[][] board;
-    // 当前候选集合对象（在 Candidate 类中管理候选位置）
+
+    // Current candidate manager (generates candidate moves for this layer)
     public Candidate candidate;
-    // 当前评估出的最佳坐标（搜索时使用）
+
+    // Best move determined after search (used by MAX layer)
     public Candidate.Coordinate best;
-    // 当前走子坐标（用于回溯时 undo）
+
+    // The “move made at this node” (important for undo backtracking)
     public Candidate.Coordinate move;
-    // 存储每个候选位置对应的评估值
+
+    // Stores evaluation results for all candidates at this layer
     public float [] values;
-    // 当前搜索深度或步数计数（语义由调用方使用）
+
+    // Current depth level in the search tree (larger len → deeper in the tree)
     public int len = 0;
-    // 用于仿真评分的共享对象（Evaluator）
+
+    // Position evaluator (Evaluator handles pattern recognition)
     static public Evaluator evaluator;
-    // 统计已评估的局面数
+
+    // Total number of board states visited during search (used to measure complexity)
     static public int positionCounter;
-    // 已走步数计数（在 loadCurrentScore 中自增）
+
+    // Total number of simulated moves (used for pace-based evaluation)
     static public int moveCount;
 
-    // 将传入的 Evaluator 复制到 miniScoreSim，并设置当前回合
+
+    //====================================================
+    // Copy external score data into the evaluator
+    //====================================================
     public void loadCurrentScore(Evaluator score, int turn)
     {
         evaluator.curTurn = turn;
+
+        // patternStr1 / patternStr2 are 4 directions × 19 × 19 pattern caches
         for (int d = 0 ; d < 4 ; d++)
         {
             for(int i = 0 ; i < 19 ; i++)
@@ -39,9 +60,12 @@ public class MinimaxEngine
                 }
             }
         }
+
+        // one / two represent each player's current total score
         evaluator.score.one = score.score.one;
         evaluator.score.two = score.score.two;
 
+        // Initialize search statistics
         positionCounter = 0;
         moveCount += 1;
     }
@@ -54,6 +78,14 @@ public class MinimaxEngine
         this.move = new Candidate.Coordinate(-1, -1);
     }
 
+    /*
+     * Copy constructor (used for creating child nodes during recursion)
+     * Notes:
+     *   - New node's len = parent.len + 1
+     *   - Each node needs its own Candidate object 
+     *     (otherwise candidate ranges overlap and break search)
+     *   - reloadLimits() resets candidate search boundaries
+     */
     public MinimaxEngine(MinimaxEngine m, int ignoredDepth)
     {
         this.len = m.len + 1;
@@ -62,62 +94,90 @@ public class MinimaxEngine
         candidate.reloadLimits();
     }
 
-    // 评估函数：返回当前仿真评分（封装在 Evaluator 中）
+
+    //====================================================
+    // Evaluation function (returns score to minimax)
+    //====================================================
     public float eval(int player, int ignoredLen, int ignoredTurn)
     {
         return evaluator.score.evaluate(player);
     }
 
-    // 判断坐标是否在棋盘内（保护方法）
+
+    //====================================================
+    // Check if (x,y) is inside the board
+    //====================================================
     static public boolean isInBoard(int x, int y)
     {
         return x >= 0 && x < 19 && y >= 0 && y < 19;
     }
 
-    // 检查某方向上是否已连成4（用于判断是否为胜利向量的一部分）
+
+    //====================================================
+    // Check whether (x,y) forms a 4-in-a-row segment in direction (dx,dy)
+    //====================================================
     protected boolean checkDir(int x, int y, int dx, int dy, int player)
     {
         int count = 0;
 
+        // Forward direction
         for (int i=dx , j = dy; isInBoard(x+i, y+j) && board[x + i][y + j] == player ; i+=dx, j+=dy)
             count +=1;
 
+        // Backward direction
         for (int i = -dx, j = -dy ; isInBoard(x + i, y + j) && board[x + i][y + j] == player ; i-=dx, j-=dy)
             count +=1;
 
-        return count >= 4;
+        return count >= 4; // count=4 means five-in-a-row (this cell counts as 1)
     }
 
+    // Combine four directions to detect five-in-a-row
     protected boolean checkWin4Dir(int x, int y, int player)
     {
-        if (checkDir(x,y, 0, 1, player))
+        if (checkDir(x,y, 0, 1, player))  // vertical
             return true;
-        if (checkDir(x, y, 1, 0, player))
+        if (checkDir(x, y, 1, 0, player)) // horizontal
             return true;
-        if (checkDir(x, y, 1, 1, player))
+        if (checkDir(x, y, 1, 1, player)) // main diagonal
             return true;
-        return checkDir(x, y, 1, -1, player);
+        return checkDir(x, y, 1, -1, player); // anti-diagonal
     }
 
-    // 执行落子：设置棋盘、保存候选、并在 Evaluator 中进行分析；返回是否达成四连（胜利检测）
+
+    //====================================================
+    // play: simulate placing a stone
+    //====================================================
     public boolean play(Candidate.Coordinate c, int player)
     {
         this.move = c;
         board[c.x][c.y] = player;
+
+        // Update candidate search boundaries
         this.candidate.save(c);
+
+        // Notify evaluator to update local patterns
         evaluator.analyseMove(c.x, c.y, player);
+
+        // Return whether this is an immediate win
         return checkWin4Dir(c.x, c.y, player);
     }
 
-    // 撤销落子：在棋盘上清空位置，并在 Evaluator 中撤销分析
+    //====================================================
+    // undo: rollback a move (used in backtracking)
+    //====================================================
     public void undo(Candidate.Coordinate c, int depth)
     {
         int val = board[c.x][c.y];
         board[c.x][c.y] = 0;
+
+        // Evaluator reverse-updates patterns affected by this point
         evaluator.analyseUndo(c.x, c.y, val);
     }
 
-    // 切换玩家（1<->2）
+
+    //====================================================
+    // Switch player (1 ↔ 2)
+    //====================================================
     protected int change(int player)
     {
         if (player == 1)
@@ -126,7 +186,10 @@ public class MinimaxEngine
             return 1;
     }
 
-    // 在一组评估值中取最大值，并设置 best 为对应坐标
+
+    //====================================================
+    // max: take maximum value and update best accordingly
+    //====================================================
     protected float max(float [] val)
     {
         float res = val[0];
@@ -143,7 +206,7 @@ public class MinimaxEngine
         return res;
     }
 
-    // 在一组评估值中取最小值，并设置 best 为对应坐标
+    // min: take minimum (used by MIN layer)
     protected float min(float [] val)
     {
         float res = val[0];
@@ -158,23 +221,26 @@ public class MinimaxEngine
         return res;
     }
 
-    // 胜利的中间值（用于 alpha-beta 剪枝时遇到立即胜利的估值）
+
+    //====================================================
+    // Intermediate win evaluation (used during pruning)
+    //====================================================
     protected float victoryIntermediateValue(int player, int turn, int len)
     {
         positionCounter++;
         if (player == turn)
-            return 10000 - len * 100;
+            return 10000 - len * 100; // earlier win → higher value
         else
             return -10000 + len * 100;
     }
 
-    // 胜利的最终估值（区分先手/后手以及 len==0 的情况）
+    // Final win evaluation (also used outside alpha-beta)
     protected float victoryValue(int player, int turn, int len)
     {
         positionCounter++;
         if (player == turn)
         {
-            if (len == 0)
+            if (len == 0)     // win at root
                 return 12000;
             return 10000;
         }
@@ -186,31 +252,32 @@ public class MinimaxEngine
        return -10000;
     }
 
-    // 经典的深度为 depth 的 minimax 递归
-    //针对每个候选走法进行模拟
-    //递归切换 max/min 层
-    //返回最大值或最小值
+
+    //====================================================
+    // Classic minimax recursion (no pruning)
+    //====================================================
     public float minimax(int depth, int turn, int player)
     {
-
         int totalCandidates;
         float result;
 
+        // Generate candidate moves for this layer
         totalCandidates = candidate.oldLoad(depth, turn);
 
         if (depth == 0)
         {
             positionCounter++;
             result = eval(player, len, turn);
-
             return result;
         }
 
         values = new float[totalCandidates];
 
+        // Expand the search tree for every candidate
         for (int i = 0 ; i < totalCandidates ; i++)
         {
             MinimaxEngine m = new MinimaxEngine(this, depth);
+
             if (m.play(candidate.list.get(i), turn))
                 values[i] = victoryValue(player, turn, len);
             else
@@ -218,14 +285,17 @@ public class MinimaxEngine
 
             m.undo(m.move, depth);
         }
-    
+
         if (turn == player)
             return max(values);
         else
             return min(values);
     }
 
-    // 带 alpha-beta 剪枝的 minimax 实现
+
+    //====================================================
+    // Minimax with alpha-beta pruning
+    //====================================================
     public float minimaxAB(int depth, int turn, int player, float alpha, float beta)
     {
         int totalCandidates;
@@ -236,6 +306,7 @@ public class MinimaxEngine
         evaluator.curTurn = turn;
 
         totalCandidates = candidate.oldLoad(depth, turn);
+
         if (depth == 0)
         {
             positionCounter++;
@@ -255,39 +326,41 @@ public class MinimaxEngine
         {
             MinimaxEngine m = new MinimaxEngine(this.len);
             Candidate.Coordinate cand = candidate.list.get(i);
+
             boolean isMaxLayer = (turn == player);
 
-            // 根据当前层决定递归时传入的窗口（不改变外部 alpha/beta）
+            // Decide next-layer search window based on MAX/MIN layer
             float recAlpha = isMaxLayer ? Math.max(alpha, curAlpha) : alpha;
             float recBeta  = isMaxLayer ? beta : Math.min(beta, curBeta);
 
             if (m.play(cand, turn))
             {
-                // 立即胜利（终止节点）
                 res = victoryIntermediateValue(player, turn, len);
             }
             else
             {
-                // 递归调用并撤销（保持原有顺序与深度参数）
                 res = m.minimaxAB(depth - 1, change(turn), player, recAlpha, recBeta);
                 m.undo(m.move, depth);
             }
 
             values[i] = res;
 
-            // 更新局部窗口并判断剪枝
+            // MAX layer: raise alpha
             if (isMaxLayer)
             {
                 curAlpha = Math.max(curAlpha, res);
-                if (curAlpha > beta) // beta cut
+
+                if (curAlpha > beta) // beta cutoff
                 {
                     return curAlpha;
                 }
             }
+            // MIN layer: lower beta
             else
             {
                 curBeta = Math.min(curBeta, res);
-                if (alpha > curBeta) // alpha cut
+
+                if (alpha > curBeta) // alpha cutoff
                 {
                     return curBeta;
                 }
@@ -300,7 +373,10 @@ public class MinimaxEngine
             return min(values);
     }
 
-    // 输出静态棋盘到控制台（静态方法）
+
+    //====================================================
+    // Print current board (debug use only)
+    //====================================================
     static public void displayBoardStatic()
     {
         for (int i = 0 ; i < 19 ; i ++)

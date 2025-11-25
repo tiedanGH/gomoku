@@ -1,6 +1,12 @@
 package main.gomoku;
 import javafx.scene.shape.*;
 
+/*
+ * The Board class is responsible for rendering, updating, and managing the visual Gomoku board in a JavaFX UI. 
+ * It handles grid drawing, stone placement, scaling on window resize, and visual highlights such as scoring overlays 
+ * and last-move indicators.
+ */
+
 import java.io.File;
 import java.util.ArrayList;
 import javafx.scene.layout.Pane;
@@ -181,7 +187,7 @@ public class Board {
         updatePieceImages();
         updateDots();
     }
-    /** 更新棋子位置与大小 */
+    /** rennew the location of stone(piece) */
     private void updateStones() {
         for (int i = 0; i < stones.length; i++) {
             for (int j = 0; j < stones[i].length; j++) {
@@ -245,7 +251,7 @@ public class Board {
                 stones[i][j].setVisible(false);
                 
 
-                // 图片棋子
+                // images of stones
                 pieceImages[i][j] = new ImageView();
                 pieceImages[i][j].setVisible(false);
             }
@@ -383,17 +389,17 @@ public class Board {
     }
     
     public void drawLastMoveBox(Point p) {
-        // 移除旧红框
+        // remove the old red bracket
         removeLastMoveBox();
 
         int marginWidth = getMarginWidth();
         int marginHeight = getMarginHeight();
 
-        // 棋子实际中心点，必须和stones 一样
+        // The actual center point of the piece must match the stones
         double centerX = marginWidth + (p.x * squareSize);
         double centerY = marginHeight + (p.y * squareSize);
 
-        // 红框大小比棋子稍大一点
+        // the red bracket is a little bit larger than stones
         double size = squareSize * 1.1;
 
         Rectangle rect = new Rectangle(

@@ -5,22 +5,22 @@ import javafx.scene.control.Button;
 
 public class HomePage {
 
-    private final Pane pageContainer;       // 外层容器（可在 App 中放入 Scene）
+    private final Pane pageContainer;       // Outer container (placed into the Scene by the App)
 
-    // 玩家选择按钮
+    // Player selection buttons
     private final Button blackPlayer;
     private final Button blackAI;
     private final Button whitePlayer;
     private final Button whiteAI;
 
-    // AI 难度（黑方 & 白方）
+    // AI difficulty buttons (Black & White)
     private final Button blackEasy, blackMedium, blackHard;
     private final Button whiteEasy, whiteMedium, whiteHard;
 
-    // Start / Learn
+    // Start / Learn buttons
     private final Button startButton;
 
-    // Base style ensures padding, border and font remain the same so switching color won't change size.
+    // Base style ensures padding, border, and font stay the same so color switching won't change button size.
     private static final String BASE_STYLE =
             "-fx-background-radius: 10; "
             + "-fx-border-color: #B19776; "
@@ -31,14 +31,14 @@ public class HomePage {
             + "-fx-font-weight: bold; ";
 
     public HomePage() {
-        // 主页面 Pane
+        // Main screen Pane
         Pane page = new Pane();
-        page.setPrefSize(800, 800);   // 你可以改成窗口大小
+        page.setPrefSize(800, 800);   // You can set this to your window size
 
-        // ========== 颜色样式 ==========
-        // Use applySelected/applyDefault below to set color while keeping BASE_STYLE the same.
+        // ========== Color styles ==========
+        // Use applySelected/applyDefault below to control colors while keeping BASE_STYLE fixed.
 
-        // ========== Start 按钮 ==========
+        // ========== Start Button ==========
         startButton = new Button("Start");
         applyDefault(startButton);
         startButton.setLayoutX(650);
@@ -46,14 +46,14 @@ public class HomePage {
         startButton.setPrefWidth(100);
         page.getChildren().add(startButton);
 
-        // ========== 黑方按钮 ==========
+        // ========== Black Player Buttons ==========
         blackPlayer = new Button("Black Player");
         blackAI = new Button("Black AI");
 
         applyDefault(blackPlayer);
         applyDefault(blackAI);
 
-        //黑子选择按钮
+        // Black side selection buttons
         blackPlayer.setLayoutX(500);
         blackPlayer.setLayoutY(170);
 
@@ -65,14 +65,14 @@ public class HomePage {
 
         page.getChildren().addAll(blackPlayer, blackAI);
 
-        // ========== 白方按钮 ==========
+        // ========== White Player Buttons ==========
         whitePlayer = new Button("White Player");
         whiteAI = new Button("White AI");
 
         applyDefault(whitePlayer);
         applyDefault(whiteAI);
 
-        //白子选择按钮
+        // White side selection buttons
         whitePlayer.setLayoutX(500);
         whitePlayer.setLayoutY(220);
 
@@ -84,7 +84,7 @@ public class HomePage {
 
         page.getChildren().addAll(whitePlayer, whiteAI);
 
-        // ========== AI 难度（黑方） ==========
+        // ========== AI Difficulty Buttons (Black) ==========
         blackEasy = new Button("Easy");
         blackMedium = new Button("Medium");
         blackHard = new Button("Hard");
@@ -97,12 +97,12 @@ public class HomePage {
         blackMedium.setPrefWidth(140);
         blackHard.setPrefWidth(100);
 
-        // 默认隐藏
+        // Hidden by default
         blackEasy.setVisible(false);
         blackMedium.setVisible(false);
         blackHard.setVisible(false);
 
-        // 黑子难度位置
+        // Black difficulty button positions
         blackEasy.setLayoutX(520);
         blackMedium.setLayoutX(630);
         blackHard.setLayoutX(780);
@@ -113,7 +113,7 @@ public class HomePage {
 
         page.getChildren().addAll(blackEasy, blackMedium, blackHard);
 
-        // ========== AI 难度（白方） ==========
+        // ========== AI Difficulty Buttons (White) ==========
         whiteEasy = new Button("Easy");
         whiteMedium = new Button("Medium");
         whiteHard = new Button("Hard");
@@ -126,12 +126,12 @@ public class HomePage {
         whiteMedium.setPrefWidth(140);
         whiteHard.setPrefWidth(100);
 
-        // 默认隐藏
+        // Hidden by default
         whiteEasy.setVisible(false);
         whiteMedium.setVisible(false);
         whiteHard.setVisible(false);
 
-        // 白子难度位置
+        // White difficulty button positions
         whiteEasy.setLayoutX(520);
         whiteMedium.setLayoutX(630);
         whiteHard.setLayoutX(780);
@@ -142,11 +142,11 @@ public class HomePage {
 
         page.getChildren().addAll(whiteEasy, whiteMedium, whiteHard);
 
-        // 页面容器
+        // Page container
         pageContainer = new Pane(page);
     }
 
-    // ========= Getter，用于 Home.java 调用 =========
+    // ========= Getters used by Home.java =========
 
     public Pane getHomePage() {
         return pageContainer;
@@ -196,19 +196,21 @@ public class HomePage {
         return blackHard;
     }
 
-    // 选中样式（浅红/金色）
+    // Selected style (orange-gold highlight)
     public void applySelected(Button btn) {
         btn.setStyle("-fx-background-color: #FFB84D; -fx-text-fill: #000000; " + BASE_STYLE);
     }
 
-    // 默认样式（原金色背景）
+    // Default style (gold gradient background)
     public void applyDefault(Button btn) {
         btn.setStyle("-fx-background-color: linear-gradient(#E3C799, #C49A6C, #8B5A2B); -fx-text-fill: #000000; " + BASE_STYLE);
     }
-    // 将某个按钮组全部恢复默认样式
+
+    // Reset a group of buttons to default style
     public void resetButtons(Button... buttons) {
         for (Button b : buttons) {
             applyDefault(b);
         }
     }
 }
+

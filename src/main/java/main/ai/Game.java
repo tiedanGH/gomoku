@@ -4,48 +4,81 @@ import main.utils.Point;
 
 public class Game {
 
-    // 类说明：代表一盘游戏的状态和与 MinimaxEngine 搜索的交互封装，
-    // 包括棋盘数据、计时信息、规则类型以及对 MinimaxEngine 的调用接口。
+    // Class description:
+    // Represents the overall state of a game, acting as a “bridge layer”
+    // between MinimaxEngine and the external UI / rules module.
+    // Responsible for:
+    // 1. Maintaining the board state (gameMap)
+    // 2. Updating the Evaluator
+    // 3. Invoking MinimaxEngine to perform searches (minimax / minimaxAB)
+    // 4. Managing difficulty parameters (maxDepth / maxCan / minCan)
+    // 5. Handling timing, search initialization, etc.
 
-    // 当前 MinimaxEngine 实例（搜索树）
+    // Current MinimaxEngine instance (search tree)
     public MinimaxEngine m;
-    // 游戏棋盘（方阵，0=空，1=黑，2=白）
+
+    // Game board (2D array: 0=empty, 1=black, 2=white)
     public int[][] gameMap;
-    // 当前棋局评分对象（Evaluator）
-    public Evaluator miniScore =  new Evaluator();
-    // 已落子数量
+
+    // Evaluator for the current board state (stores pattern analysis)
+    public Evaluator miniScore = new Evaluator();
+
+    // Total number of moves made so far
     public int totalMove;
-    // 上次搜索得到的估值
+
+    // Last search evaluation value
     public Float val;
-    // 上次搜索耗时（毫秒）
+
+    // Time spent on the current search (milliseconds)
     public long time;
-    // 游戏规则标识字符串（例如 "Gomoku" 或 "None"）
+
+    // Rule name (e.g., "Gomoku")
     public String rules;
+
+    // Search depth (core difficulty parameter)
     static public int maxDepth = 10;
+
+    // Max number of candidate moves per layer
     static public int maxCan = 7;
+
+    // Minimum number of candidate moves per layer
     static public int minCan = 5;
+
+    // Whether fast-search mode is enabled (currently fixed at 0)
     static public int fastSearch = 0;
 
+
+    //=================================
+    // Constructor: initialize board and search engine
+    //=================================
     public Game(String rules, int boardSize) {
         gameMap = new int[boardSize][boardSize];
         totalMove = 0;
-        m = minmaxTree(rules);
+        m = minmaxTree(rules);   // Create Minimax implementation based on rules
         m.len = 0;
     }
 
+
+    // Create MinimaxEngine subclass based on game rule
     private MinimaxEngine minmaxTree(String str) {
         str = Character.toUpperCase(str.charAt(0)) + str.substring(1);
         if (str.equals("Gomoku")) {
             this.rules = "Gomoku";
             maxDepth = 10;
-            return new GomokuGame();
+            return new GomokuGame();  // Use Gomoku-specialized search engine
         } else {
             this.rules = "None";
-            return new MinimaxEngine();
+            return new MinimaxEngine();  // Default generic engine
         }
     }
 
+
+    //=================================
+    // Search configuration (difficulty control)
+    //=================================
     public void treeConfig(int level) {
+
+        // Level 1: Normal difficulty
         if (level == 1)
         {
             maxDepth = 10;
@@ -53,6 +86,7 @@ public class Game {
             minCan = 5;
             fastSearch = 0;
         }
+        // Level 2: Intermediate difficulty
         else if (level == 2)
         {
             maxDepth = 9;
@@ -60,6 +94,7 @@ public class Game {
             minCan = 6;
             fastSearch = 0;
         }
+        // Level 3: Very fast but shallow search
         else if (level == 3)
         {
             maxDepth = 3;
@@ -67,6 +102,7 @@ public class Game {
             minCan = 8;
             fastSearch = 0;
         }
+        // Level 4: More aggressive candidate expansion
         else if (level == 4)
         {
             maxDepth = 9;
@@ -74,74 +110,136 @@ public class Game {
             minCan = 7;
             fastSearch = 0;
         }
-    }  
+    }
 
+
+    //=================================
+    // Write a move (player or AI) into MinimaxEngine’s shared board
+    //=================================
     public void move(Point point, int turn) {
-        // 将落子写入共享静态棋盘（重命名为 board）
+
+        // Update global board (MinimaxEngine.board)
         MinimaxEngine.board[point.y][point.x] = turn;
 
-        // 更新评分结构
+        // Update evaluator (pattern recognition)
         miniScore.analyseMove(point.y, point.x, turn);
 
         totalMove++;
     }
 
+
+    //=================================
+    // Reset Minimax engine (for restart or new game)
+    //=================================
     public void resetMinMax() {
+        // Reset board
         for (int i = 0 ; i < 19 ; i++)
             for (int j = 0 ; j < 19 ; j++)
                 MinimaxEngine.board[i][j] = 0;
-        MinimaxEngine.positionCounter =0;
+
+        // Reset counters
+        MinimaxEngine.positionCounter = 0;
         MinimaxEngine.moveCount = 0;
         Game.fastSearch = 0;
+
+        // Reset Evaluator internal states
         miniScore.resetStr();
     }
 
+
+    //=================================
+    // Copy gameMap into MinimaxEngine.board
+    //=================================
     private void initializeMap() {
         for (int i = 0 ; i < 19 ; i++)
             System.arraycopy(gameMap[i], 0, MinimaxEngine.board[i], 0, 19);
     }
 
+
+    //=================================
+    // Core API: Get AI's best move (Minimax entry point)
+    //=================================
     public Point bestMove(int turn, int player, boolean display) {
+
         if (display)
-            System.out.printf("Call best_move turn %d player %d et nb move %d\n", turn, player, totalMove);
+            System.out.printf("Call best_move turn %d player %d et nb move %d\n",
+                    turn, player, totalMove);
 
+        // First move: reset Minimax engine
         if (totalMove == 0)
-                resetMinMax();
+            resetMinMax();
 
+        // Synchronize board
         initializeMap();
+
         if (display)
             displayAllBoardInfo();
 
+        // Timestamp: search start
         time = System.currentTimeMillis();
+
+        // First move → AI plays center (9,9)
         if (totalMove == 0)
             m.best = new Candidate.Coordinate(9, 9);
+
         else {
+
+            // Load evaluator state into MinimaxEngine
             m.loadCurrentScore(miniScore, turn);
 
+            // Gomoku uses alpha-beta search
             if (this.rules.equals("Gomoku"))
-                val = m.minimaxAB(maxDepth, turn, player, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
+                val = m.minimaxAB(
+                        maxDepth,
+                        turn,
+                        player,
+                        Float.NEGATIVE_INFINITY,
+                        Float.POSITIVE_INFINITY
+                );
             else
                 val = m.minimax(maxDepth, turn, player);
         }
+
         if (display)
             displayAllBoardInfo();
 
+        // Compute elapsed search time
         time = System.currentTimeMillis() - time;
 
         if (display)
             bestMoveStamp();
 
+        // Return AI-selected point
+        // NOTE: best.x and best.y are stored reversed
         return new Point(m.best.y, m.best.x);
     }
 
-    //display function
+
+    //=================================
+    // Print current board (debug)
+    //=================================
     private void displayAllBoardInfo() {
         MinimaxEngine.displayBoardStatic();
         System.out.println();
     }
 
-    //display function
+
+    //=================================
+    // Print search statistics (debug)
+    //=================================
     private void bestMoveStamp() {
-        System.out.printf("AI move %d (Turn %d) at %d %d played in %f seconds (%d pos, %d depth, %d speed)\n", totalMove + 1,(totalMove + 1) / 2 + 1, m.best.y, m.best.x,(double)time / 1000, MinimaxEngine.positionCounter, maxDepth, fastSearch);
+        System.out.printf(
+                "AI move %d (Turn %d) at %d %d played in %f seconds (%d pos, %d depth, %d speed)\n",
+                totalMove + 1,
+                (totalMove + 1) / 2 + 1,
+                m.best.y,
+                m.best.x,
+                (double)time / 1000,
+                MinimaxEngine.positionCounter,
+                maxDepth,
+                fastSearch
+        );
     }
 }
+
+

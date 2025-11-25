@@ -7,6 +7,11 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
+/*
+ * The BottomBox class creates and manages the bottom control panel of the Gomoku UI.
+   It displays the interactive gameplay buttons (Hint, Undo, Previous, Next, Resign) and automatically 
+   resizes their icons based on the available space.
+ */
 public class BottomBox {
 
     private final VBox bottomBox;

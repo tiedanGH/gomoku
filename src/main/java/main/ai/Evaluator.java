@@ -6,61 +6,67 @@ import main.utils.Score;
 
 /**
  * Evaluator
- * *
- * 五子棋的局部模式评分与快速仿真器（用于 MinimaxEngine 搜索时的局面增量维护）。
- * 说明：
- * - 该类维护两个玩家的方向性模式数组 patternStr1 / patternStr2（维度 [4][19][19]）。
- * - score 保存当前两个玩家的累计评分（Score.one, Score.two）。
- * - 外部（MinimaxEngine）会直接访问 patternStr1 / patternStr2 / score / curTurn，
- *   因此这些字段名保持不变以保证兼容性。
- * *
- * 对外公开的方法（被 MinimaxEngine / GomokuGame 调用）：
- * - analyseMove(x,y,turn)：在棋盘放置棋子后更新模式/评分（对外名保持不变）
- * - analyseUnmove(x,y,turn)：在棋盘撤子后回滚模式/评分（对外名保持不变）
- * *
- * 内部方法与字段均使用驼峰命名以提高可读性。
+ *
+ * Local pattern evaluator and fast simulator for Gomoku, used for
+ * incremental maintenance of board state during MinimaxEngine search.
+ *
+ * Explanation:
+ * - This class maintains directional pattern arrays patternStr1 / patternStr2
+ *   for both players (dimensions: [4][19][19]).
+ * - score stores the accumulated score for both players (Score.one, Score.two).
+ * - External classes (MinimaxEngine) directly access patternStr1 / patternStr2 /
+ *   score / curTurn, so their field names must remain unchanged for compatibility.
+ *
+ * Public methods (used by MinimaxEngine / GomokuGame):
+ * - analyseMove(x, y, turn): update pattern and score after placing a stone.
+ * - analyseUndo(x, y, turn): rollback pattern and score after removing a stone.
+ *
+ * Internal methods and fields use camelCase for better readability.
  */
 public class Evaluator {
 
-    /* 对外字段（不要改名以保证与其它文件兼容） */
+    /* External fields (do not rename — they must stay compatible) */
 
-    // 全局评分对象（包含 one/two 字段）
+    // Global score object (contains score.one and score.two)
     Score score;
 
-    // 用于临时引用当前玩家的方向性模式数组（内部使用）
+    // Temporary reference to the current player's directional pattern array
     int [][][] currentPattern;
 
-    // 两位玩家的方向性模式数组（外部 MinimaxEngine 直接读取/写入）
+    // Directional pattern arrays for both players (directly used by MinimaxEngine)
     int [][][] patternStr1;
     int [][][] patternStr2;
 
-    // 当前要仿真的回合（1 或 2），MinimaxEngine 会设置此字段
+    // Current turn being simulated (1 or 2). MinimaxEngine sets this.
     int curTurn;
 
-    /* 内部状态变量（已改为驼峰命名） */
+    /* Internal state variables (camelCase naming) */
 
-    // 当前处理的坐标
+    // Current coordinates being processed
     int x;
     int y;
-    // 当前方向增量
+
+    // Current directional increments
     int dx;
     int dy;
-    // 当前方向索引（0..3）
+
+    // Current direction index (0..3)
     int dirIndex;
 
-    // 当前是否检测到胜利（五连）
+    // Whether a victory (five in a row) is detected
     boolean victory;
 
-    // 当前方向的阻挡信息列表
+    // Current list of blockers in this direction
     ArrayList<Blocker> blockerList = new ArrayList<>();
 
-    // 模式到分值的映射因子（索引即模式编号）
+    // Mapping from pattern type to score (index = pattern ID)
     static int [] factor = {0, 0, 2, 10, 25, 0, 0, 0, 0, 0};
-    // 四个方向偏移（水平、竖直、主对角、次对角）
+
+    // Four directional offsets (horizontal, vertical, major diagonal, minor diagonal)
     static int [][] dirOffsets = {{1, 0}, {0, 1}, {1, 1}, {-1, 1}};
 
     /**
-     * 构造器：初始化评分器与模式数组
+     * Constructor: initialize evaluator, score, and pattern arrays
      */
     public Evaluator()
     {
@@ -71,25 +77,27 @@ public class Evaluator {
     }
 
     // ----------------------
-    // 公共/对外方法（保留原名以兼容外部调用）
+    // Public / external methods (names preserved for compatibility)
     // ----------------------
 
     /**
      * analyseMove
-     * 对外接口：在棋盘放置棋子后调用，更新内部模式与评分（增量）。
-     * 参数：
-     *  - x,y: 棋子坐标
-     *  - turn: 当前落子玩家（1 或 2）
+     * External interface: called when a new stone is placed.
+     * Updates internal patterns and scores incrementally.
+     *
+     * Parameters:
+     *  - x, y: stone position
+     *  - turn: current player (1 or 2)
      */
     public void analyseMove(int x, int y, int turn)
     {
-        // 保持原有行为，但调用已重命名的内部方法
+        // Preserve original behavior while calling renamed internal helpers
         this.curTurn = turn;
         this.currentPattern = turn == 1 ? patternStr1 : patternStr2;
         this.x = x;
         this.y = y;
 
-        // 四个方向分别检查并 connect（合并/扩展模式）
+        // Check and connect in all four directions
         if (x + 1 != 19 && MinimaxEngine.board[x+1][y] == curTurn)
         {
             dirIndex = 0;
@@ -142,19 +150,21 @@ public class Evaluator {
             connectInternal();
         }
 
-        // 填充方向边界或创建 blocker
+        // Clear pattern values at current position or create blockers
         fillTwo();
 
-        // 更新 blocker 列表（移除已失效的）
+        // Update blocker list (remove invalid ones)
         updateBlockers();
     }
 
     /**
      * analyseUndo
-     * 对外接口：在棋盘撤子后调用，回滚内部模式与评分（对外名保持不变）
-     * 参数：
-     *  - x,y: 撤去棋子坐标
-     *  - turn: 撤去的棋手（1 或 2）
+     * External interface: called when a stone is removed.
+     * Rolls back internal pattern and score changes.
+     *
+     * Parameters:
+     *  - x, y: removed stone position
+     *  - turn: removed player's ID (1 or 2)
      */
     public void analyseUndo(int x, int y, int turn)
     {
@@ -163,7 +173,7 @@ public class Evaluator {
         this.x = x;
         this.y = y;
 
-        // 四方向分别尝试回退连接（unconnect）和 unfill
+        // Roll back direction connections and unfill in all four directions
         if ((x + 1 != 19 && isPlayer(MinimaxEngine.board[x+1][y])) || (x - 1 != -1 && isPlayer(MinimaxEngine.board[x-1][y])))
         {
             dirIndex = 0;
@@ -221,7 +231,7 @@ public class Evaluator {
             unFill();
         }
 
-        // 处理周边位置的 unfill0（更名为 unfillZero）
+        // Roll back zero-pattern adjustments for surrounding empty positions
         for (int i = 0; i < 4 ; i++)
         {
             unfillZero(x, y, i);
@@ -231,12 +241,12 @@ public class Evaluator {
     }
 
     // ----------------------
-    // 内部帮助方法（已统一为驼峰命名）
+    // Internal helper methods (camelCase)
     // ----------------------
 
     /**
      * isPlayer
-     * 辅助：判断该格是否为有效玩家编号（1 或 2）
+     * Helper: check whether a cell contains a valid player (1 or 2)
      */
     public boolean isPlayer(int c)
     {
@@ -245,7 +255,7 @@ public class Evaluator {
 
     /**
      * inBoard
-     * 辅助：判断坐标是否在 19x19 棋盘内
+     * Helper: check whether coordinates are inside the 19×19 board
      */
     private boolean inBoard(int x, int y)
     {
@@ -254,7 +264,7 @@ public class Evaluator {
 
     /**
      * caseInBoard
-     * 辅助：判断坐标在棋盘内且为空格（可放子）
+     * Helper: check whether coordinates are inside board AND empty
      */
     private boolean caseInBoard(int x, int y)
     {
@@ -263,11 +273,13 @@ public class Evaluator {
 
     /**
      * repCase
-     * 在 (x,y) 位置根据方向和当前连续性更新 patternStr，并调整 score（回滚/设置模式值）
-     * 参数：
-     *  - st: 要设置的模式值（例如 2/3/4）
-     * *
-     * 说明：只对空格（board==0）进行模式赋值并更新 score.one/score.two。
+     * Update patternStr at (x,y) based on direction and current continuity,
+     * and adjust score accordingly (rollback or set).
+     *
+     * Parameter:
+     *  - st: pattern value to apply (e.g., 2/3/4)
+     *
+     * Only applies patterns to empty cells (board == 0).
      */
     private void repCase(int x, int y, int st)
     {
@@ -297,13 +309,13 @@ public class Evaluator {
 
     /**
      * spawnCase
-     * 在没有被当前玩家占据的位置上“生成”一个对手的模式（用于 unfill）
+     * Generate the opponent’s pattern on this empty cell during unfill.
      */
     private void spawnCase(int x, int y, int st)
     {
         if (curTurn == 1)
         {
-            // curTurn==1 时，生成给对手（玩家2）
+            // curTurn==1 → generate for opponent (player 2)
             patternStr2[dirIndex][x][y] = st;
             score.two += factor[st];
         }
@@ -316,7 +328,7 @@ public class Evaluator {
 
     /**
      * addCase
-     * 在 (x,y) 位置直接把模式设置为 st，并修正对应玩家评分（只在空格上操作）
+     * Directly sets pattern value on (x,y) and adjusts score (only for empty cells).
      */
     private void addCase(int x, int y, int st)
     {
@@ -339,7 +351,8 @@ public class Evaluator {
 
     /**
      * newAlignment
-     * 根据两个偏移（dec1/dec2）更新相邻位置的 pattern（用于 connectInternal）
+     * Update adjacent pattern values based on two offsets (dec1/dec2),
+     * used by connectInternal.
      */
     public void newAlignment(int dec1, int dec2, int st)
     {
@@ -352,8 +365,10 @@ public class Evaluator {
 
     /**
      * connectInternal
-     * 连接当前新棋子与同一方向上的已有连续棋子，扩展/合并模式并在达到 5 连时标记胜利。
-     * （原方法 connect，重命名为 connectInternal）
+     * Connect the newly placed stone with adjacent stones in the same direction.
+     * Extends and merges patterns, and detects five-in-a-row.
+     *
+     * (Original name: connect — now renamed for clarity)
      */
     public void connectInternal()
     {
@@ -405,7 +420,9 @@ public class Evaluator {
 
     /**
      * fillTwo
-     * 对四个方向处理：清除当前位置已有的模式分值并判断是否需要创建 blocker（边界/远端阻挡）
+     * For each direction:
+     * - Clear any existing pattern values on this cell.
+     * - Check whether blockers should be created (edge or remote blocks).
      */
     public void fillTwo()
     {
@@ -454,19 +471,20 @@ public class Evaluator {
 
     /**
      * createBlocker
-     * 创建一个 Blocker 实例并加入 blockerList（用于后续更新/删除）
-     * 参数：
-     *  - dir: 方向索引（0..3）
-     *  - sign: 方向符号（1 或 -1）
-     * *
-     * 说明：此处保持对 Blocker 提供的原始方法名（bl1/bl2/update_block_info）。
+     * Create a Blocker instance and add it to blockerList.
+     *
+     * Parameters:
+     *  - dir: direction index (0..3)
+     *  - sign: +1 or -1 indicating forward/backward
+     *
+     * Note: Keeps the original method names (bl1/bl2/update_block_info).
      */
     private void createBlocker(int dir, int sign)
     {
         Blocker res = new Blocker(curTurn, dir, sign);
         res.bl1(x, y);
 
-        if (!inBoard(x + sign * 5 * dirOffsets[dir][0], y + sign * 5 * dirOffsets[dir][1]))
+        if (!inBoard(x + sign * 5 * dirOffsets[dir][0], y + sign * 5 * dirOffsets[dir][0]))
             res.bl2(-1, -1);
         else
             res.bl2(x + 5 * dirOffsets[dir][0] * sign, y + 5 * dirOffsets[dir][1] * sign);
@@ -477,7 +495,7 @@ public class Evaluator {
 
     /**
      * updateBlockers
-     * 遍历 blockerList，更新每个 blocker 的信息，并删除已失效或与棋盘不匹配的 blocker。
+     * Update each blocker in blockerList and remove invalid or mismatched blockers.
      */
     private void updateBlockers()
     {
@@ -502,7 +520,7 @@ public class Evaluator {
 
     /**
      * saveVictory
-     * 标记或切换 victory 标志（用于 connectInternal 中五连检测）
+     * Set or toggle victory flag (used for five-in-a-row detection).
      */
     private void saveVictory()
     {
@@ -516,7 +534,7 @@ public class Evaluator {
 
     /**
      * minFour
-     * 辅助：根据正负方向计数返回合并后的模式值（上限 4）
+     * Helper: returns merged pattern type based on positive/negative direction counts (max 4)
      */
     private int minFour(int decx, int decxx)
     {
@@ -529,7 +547,7 @@ public class Evaluator {
 
     /**
      * unconnectInternal
-     * connect 的回滚版本：在撤子时根据当前方向还原周边两个位置的模式值
+     * Reverse-connect logic: rollback pattern values around the removed stone.
      */
     public void unconnectInternal()
     {
@@ -573,8 +591,8 @@ public class Evaluator {
     }
 
     /**
-     * unfill
-     * 撤子时根据相邻敌方连续段生成对手的模式（spawnCase）
+     * unFill
+     * During undo: regenerate opponent's pattern based on contiguous enemy sequence.
      */
     public void unFill()
     {
@@ -598,7 +616,7 @@ public class Evaluator {
 
     /**
      * unfillZero
-     * 回滚时调整临近空格的模式（原名 unfill0）
+     * During undo: roll back pattern for nearby empty cells (original name: unfill0)
      */
     public void unfillZero(int x, int y, int dir)
     {
@@ -655,13 +673,13 @@ public class Evaluator {
     }
 
     // ----------------------
-    // 清理 / 重置方法
+    // Reset / cleanup methods
     // ----------------------
 
     /**
      * resetStr
-     * 将所有方向模式数组置零，清空 blocker 列表并重置 victory 与 score
-     * （保留原名以便外部可能直接调用）
+     * Reset all pattern arrays, clear blocker list, and reset victory + score.
+     * (Name preserved in case external classes call it)
      */
     public void resetStr()
     {
@@ -682,10 +700,12 @@ public class Evaluator {
     }
 
     // ----------------------
-    // 已删除/移除的方法说明（记录）
+    // Removed method documentation
     // ----------------------
-    // 为了精简类并避免与项目其它部分耦合，已移除以下仅作为调试/打印或未被项目其它文件调用的函数：
+    // For clarity and reduced coupling, debug/printing functions that were unused
+    // by other project components have been removed:
     // - display_str / display / display_blockers / noCase
     // - check_str / iscapt / check_capt
-    // 这些函数为输出/调试用途，删除不会影响 MinimaxEngine 搜索逻辑。如需调试可单独恢复。
+    // These were only for debugging output and do not affect search logic.
+    // They can be restored if needed.
 }

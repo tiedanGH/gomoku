@@ -1,11 +1,16 @@
 package main.gomoku;
 
 import java.util.ArrayList;
+
+/*
+ * The Gomoku class is the central controller for the entire Gomoku game.
+   It coordinates UI elements, manages the game flow, handles both human and AI moves, updates the board state, and maintains the game loop.
+ */
+
 import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
 import javafx.scene.layout.*;
 import main.ai.Candidate;
 import main.ai.Game;
@@ -14,7 +19,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.control.Button;
 import javafx.util.Duration;
-
 import java.io.File;
 import javafx.scene.image.Image;
 

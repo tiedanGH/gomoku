@@ -11,11 +11,15 @@ import java.io.File;
 
 /**
  * RightBox
- * 右侧结束信息面板：展示胜负文本与结束弹窗（包含 replay / backHome 两个按钮）。
- * - 负责展示/隐藏弹窗与放大/恢复胜利文本字号
- * - 负责自身尺寸更新（由 Gomoku.updateGameDisplay 调用）
- * *
- * 此处扩展：在右侧中下部展示白色盒子图片，并支持根据当前行动玩家为图片添加/移除高亮提示。
+ * Right-side end-game information panel: displays the victory message
+ * and the end-game pop-up (which includes the replay and backHome buttons).
+ *
+ * - Responsible for showing/hiding the pop-up and enlarging/resetting the victory text size
+ * - Handles resizing of this panel (called by Gomoku.updateGameDisplay)
+ *
+ * Extension:
+ * Displays a white box image at the lower-middle area, and supports
+ * applying/removing a highlight glow depending on which player is currently active.
  */
 public class RightBox {
 
@@ -38,7 +42,7 @@ public class RightBox {
         rightBox.setMinWidth(Region.USE_PREF_SIZE);
         rightBox.setMinHeight(Region.USE_PREF_SIZE);
 
-        // 初始化白色盒子图片视图并加入容器
+        // Initialize the white box image view and add it to the container
         boxImageView = new ImageView(whiteBox);
         boxImageView.setPreserveRatio(true);
         boxImageView.setFitWidth(Math.min(250, sizeX * 0.95));
@@ -66,10 +70,12 @@ public class RightBox {
     }
 
     /**
-     * 根据当前行动玩家来设置右侧盒子的高亮状态。
-     * 如果 currentPlayer 等于白方（PLAYER_WHITE），为图片添加高亮（光晕）；否则移除高亮。
+     * Sets the highlight state of the right-side box based on the active player.
+     * If currentPlayer corresponds to WHITE (PLAYER_WHITE), apply a golden glow.
+     * Otherwise, remove any glow.
      *
-     * @param currentPlayer 当前行动玩家标识（使用类中的常量 PLAYER_BLACK / PLAYER_WHITE）
+     * @param currentPlayer Identifier of the current active player
+     *                      (using constants PLAYER_BLACK / PLAYER_WHITE)
      */
     public void highlightForPlayer(int currentPlayer) {
         if (boxContainer == null) return;
@@ -83,3 +89,4 @@ public class RightBox {
         }
     }
 }
+

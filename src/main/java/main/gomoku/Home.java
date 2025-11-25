@@ -4,39 +4,39 @@ import javafx.scene.layout.Pane;
 import javafx.scene.control.Button;
 
 /**
- * Home（主菜单逻辑控制）
- * — 负责处理主菜单点击逻辑
- * — 记录玩家设置（AI、Human、难度）
+ * Home (main menu logic controller)
+ * — Handles main menu button interactions
+ * — Stores player settings (AI, Human, difficulty level)
  */
 public class Home {
 
-    // 玩家类型：0 = human, 1 = AI
+    // Player type: 0 = human, 1 = AI
     private int whitePlayerType = 0;
     private int blackPlayerType = 0;
 
-    // 当前规则（固定为 Gomoku）
+    // Current rules (fixed to Gomoku)
     private final static String rule = "Gomoku";
 
-    // AI难度：1=hard, 2=medium, 3=easy
+    // AI difficulty: 1 = hard, 2 = medium, 3 = easy
     private int level = 3;
 
-    // UI页面
+    // UI page
     private final HomePage homePage = new HomePage();
-    private static final int boardSize = 19;  // 棋盘是19格子
+    private static final int boardSize = 19;  // Board is 19x19
 
     public Home() {
         // ===========================================================
-        //                   黑方玩家选择（AI / Player）
+        //                 Black player selection (AI / Human)
         // ===========================================================
 
         homePage.getBlackAITypeButton().setOnAction(e -> {
             blackPlayerType = 1;
 
-            // 变色
+            // Change highlight color
             homePage.resetButtons(homePage.getBlackHumanTypeButton(), homePage.getBlackAITypeButton());
             homePage.applySelected(homePage.getBlackAITypeButton());
 
-            // 显示黑方 AI 难度按钮
+            // Show black AI difficulty buttons
             homePage.getBlackEasyButton().setVisible(true);
             homePage.getBlackMediumButton().setVisible(true);
             homePage.getBlackHardButton().setVisible(true);
@@ -46,26 +46,26 @@ public class Home {
         homePage.getBlackHumanTypeButton().setOnAction(e -> {
             blackPlayerType = 0;
 
-            // 变色
+            // Change highlight color
             homePage.resetButtons(homePage.getBlackHumanTypeButton(), homePage.getBlackAITypeButton());
             homePage.applySelected(homePage.getBlackHumanTypeButton());
 
-            // 隐藏黑方难度按钮
+            // Hide black difficulty buttons
             homePage.getBlackEasyButton().setVisible(false);
             homePage.getBlackMediumButton().setVisible(false);
             homePage.getBlackHardButton().setVisible(false);
         });
 
-        // ======== 白方玩家选择（AI / Human） ========
+        // ======== White player selection (AI / Human) ========
 
         homePage.getWhiteAITypeButton().setOnAction(e -> {
             whitePlayerType = 1;
 
-            //变色
+            // Change highlight color
             homePage.resetButtons(homePage.getWhiteHumanTypeButton(), homePage.getWhiteAITypeButton());
             homePage.applySelected(homePage.getWhiteAITypeButton());
 
-            // 显示白方 AI 难度按钮
+            // Show white AI difficulty buttons
             homePage.getWhiteEasyButton().setVisible(true);
             homePage.getWhiteMediumButton().setVisible(true);
             homePage.getWhiteHardButton().setVisible(true);
@@ -74,26 +74,27 @@ public class Home {
         homePage.getWhiteHumanTypeButton().setOnAction(e -> {
             whitePlayerType = 0;
 
-            //变色
+            // Change highlight color
             homePage.resetButtons(homePage.getWhiteHumanTypeButton(), homePage.getWhiteAITypeButton());
             homePage.applySelected(homePage.getWhiteHumanTypeButton());
 
-            // 隐藏白方 AI 难度按钮
+            // Hide white AI difficulty buttons
             homePage.getWhiteEasyButton().setVisible(false);
             homePage.getWhiteMediumButton().setVisible(false);
             homePage.getWhiteHardButton().setVisible(false);
         });
 
-        // ======== AI 难度选择（以白方按钮为主，同步黑白） ========
+        // ======== AI difficulty selection (white side drives sync to black) ========
 
         homePage.getWhiteEasyButton().setOnAction(e -> {
             level = 3;
-            // 更新难度和同步
+            // Update difficulty and sync both sides
 
-            //变色
+            // Update black difficulty button highlight
             homePage.resetButtons(homePage.getBlackEasyButton(), homePage.getBlackMediumButton(), homePage.getBlackHardButton());
             homePage.applySelected(homePage.getBlackEasyButton());
 
+            // Update white difficulty button highlight
             homePage.resetButtons(homePage.getWhiteEasyButton(), homePage.getWhiteMediumButton(), homePage.getWhiteHardButton());
             homePage.applySelected(homePage.getWhiteEasyButton());
         });
@@ -101,10 +102,11 @@ public class Home {
         homePage.getWhiteMediumButton().setOnAction(e -> {
             level = 2;
 
-            //变色
+            // Update black highlight
             homePage.resetButtons(homePage.getBlackEasyButton(), homePage.getBlackMediumButton(), homePage.getBlackHardButton());
             homePage.applySelected(homePage.getBlackMediumButton());
 
+            // Update white highlight
             homePage.resetButtons(homePage.getWhiteEasyButton(), homePage.getWhiteMediumButton(), homePage.getWhiteHardButton());
             homePage.applySelected(homePage.getWhiteMediumButton());
         });
@@ -113,23 +115,23 @@ public class Home {
         homePage.getWhiteHardButton().setOnAction(e -> {
             level = 1;
 
-            //变色
+            // Update black highlight
             homePage.resetButtons(homePage.getBlackEasyButton(), homePage.getBlackMediumButton(), homePage.getBlackHardButton());
             homePage.applySelected(homePage.getBlackHardButton());
 
+            // Update white highlight
             homePage.resetButtons(homePage.getWhiteEasyButton(), homePage.getWhiteMediumButton(), homePage.getWhiteHardButton());
             homePage.applySelected(homePage.getWhiteHardButton());
         });
 
-        // 黑方难度按钮触发白方按钮（继续复用原来的“同步”逻辑）
+        // Black difficulty buttons trigger white buttons (reuse sync logic)
         homePage.getBlackEasyButton().setOnAction(e -> homePage.getWhiteEasyButton().fire());
         homePage.getBlackMediumButton().setOnAction(e -> homePage.getWhiteMediumButton().fire());
         homePage.getBlackHardButton().setOnAction(e -> homePage.getWhiteHardButton().fire());
-
     }
 
     // ===========================================================
-    //                        Getter
+    //                        Getters
     // ===========================================================
 
     public String getRules() { return rule; }
@@ -144,4 +146,5 @@ public class Home {
 
     public Button getStartButton() { return homePage.getStartButton(); }
 }
+
 

@@ -7,7 +7,7 @@ import javafx.scene.layout.Background;
 
 public class ImageButtonUtil {
 
-    /** 将普通按钮变成图片按钮 */
+    /** turn regular button into image button */
     public static void applyImage(Button btn, String imgPath, double w, double h) {
 
         Image img = new Image("file:" + imgPath);

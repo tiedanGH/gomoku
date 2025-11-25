@@ -18,9 +18,9 @@ public class LeftBox {
     private static final Image blackBox =
             new Image(new File("./img/black-box.png").toURI().toString());
 
-    // 用于显示图片的 ImageView（可缩放）
+    // ImageView used to display the image (resizable)
     private final ImageView boxImageView;
-    // 包裹图片的容器，用于设置边框/效果与位置偏移
+    // Container that wraps the image, allowing border effects / glow / positioning adjustments
     private final StackPane boxContainer;
 
     public LeftBox(int y, int x) {
@@ -32,16 +32,16 @@ public class LeftBox {
         leftBox.setMinWidth(Region.USE_PREF_SIZE);
         leftBox.setMinHeight(Region.USE_PREF_SIZE);
 
-        // 初始化图片视图并加入到容器（放置在中间偏下一点）
+        // Initialize the ImageView and add it to the container (slightly lower than center)
         boxImageView = new ImageView(blackBox);
         boxImageView.setPreserveRatio(true);
-        // 初始宽度基于面板宽度的比例，后续 updateLeftSize 会调整
+        // Initial width based on a percentage of the panel width; updated later by updateLeftSize()
         boxImageView.setFitWidth(Math.min(250, sizeX * 0.95));
 
         boxContainer = new StackPane(boxImageView);
         boxContainer.setAlignment(Pos.CENTER);
 
-        // 将图片容器加入主容器，并允许垂直伸展以便居中
+        // Allow the container to grow vertically so the image stays centered
         VBox.setVgrow(boxContainer, Priority.ALWAYS);
         leftBox.getChildren().add(boxContainer);
     }
@@ -62,21 +62,22 @@ public class LeftBox {
     }
 
     /**
-     * 根据当前行动玩家来设置左侧盒子的高亮状态。
-     * 如果 currentPlayer 等于黑方（PLAYER_BLACK），为图片添加高亮（光晕）；否则移除高亮。
+     * Sets the highlight status of the left-side box based on the current active player.
+     * If currentPlayer equals the black player (PLAYER_BLACK), a glowing highlight is applied.
+     * Otherwise, the highlight is removed.
      *
-     * @param currentPlayer 当前行动玩家标识（使用类中的常量 PLAYER_BLACK / PLAYER_WHITE）
+     * @param currentPlayer Identifier of the current player (using constants PLAYER_BLACK / PLAYER_WHITE)
      */
     public void highlightForPlayer(int currentPlayer) {
         if (boxContainer == null) return;
         if (currentPlayer == 0) { // Assuming 0 represents BLACK
-            // 添加金色光晕作为高亮提示
+            // Apply a golden glow as a highlight indicator
             DropShadow glow = new DropShadow();
             glow.setColor(Color.web("#FFD700"));
             glow.setRadius(60);
             boxContainer.setEffect(glow);
         } else {
-            // 非当前玩家，移除高亮
+            // Not the current player → remove highlight
             boxContainer.setEffect(null);
         }
     }

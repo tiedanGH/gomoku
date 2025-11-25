@@ -1,6 +1,13 @@
 package main.gomoku;
 
 import java.util.ArrayList;
+
+/*
+ * GomokuRules defines the core rule logic for a Gomoku game, including move validation, win detection, 
+ * board size settings, and game-ending conditions.
+   It serves as the rule engine that the game controller (Gomoku) relies on.
+ */
+
 import main.utils.Point;
 
 public class GomokuRules implements Rules {
