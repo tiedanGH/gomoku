@@ -7,15 +7,18 @@ import java.util.ArrayList;
  * board size settings, and game-ending conditions.
    It serves as the rule engine that the game controller (Gomoku) relies on.
  */
-
 import main.utils.Point;
 
 public class GomokuRules implements Rules {
 
+    // winner
     int winner;
+    // boardSize with default 19
     int boardSize = 19;
+    // totalMove counts
     int totalMove = 0;
 
+    // Lists to hold winning points
     ArrayList<Point> verticalWin = new ArrayList<>();
     ArrayList<Point> horizontalWin = new ArrayList<>();
     ArrayList<Point> diagonalLeftWin = new ArrayList<>();
@@ -59,6 +62,7 @@ public class GomokuRules implements Rules {
         return false;
     }
 
+    // check if the cell at (x, y) is empty
     private boolean isEmpty(int x, int y, Map map) {
         if ((x < 0 || x >= 19) || (y < 0 || y >= 19)){
             return false;
@@ -66,10 +70,12 @@ public class GomokuRules implements Rules {
         return map.getMap()[y][x] == 0;
     }
 
+    // direction helper to check if the piece in the specified direction matches the given color
     private boolean direction(Map map, Point point, int dirX, int dirY, int color) {
         return map.getMap()[point.y + dirY][point.x + dirX] == color;
     }
 
+    // scan horizontally from the given point
     private void horizontal(Map map, Point point) {
         boolean right = true;
         boolean left = true;
@@ -91,6 +97,7 @@ public class GomokuRules implements Rules {
         }
     }
 
+    // scan horizontally from the given point
     private void vertical(Map map, Point point) {
         boolean right = true;
         boolean left = true;
@@ -112,6 +119,7 @@ public class GomokuRules implements Rules {
         }
     }
 
+    // scan the top-left to bottom-right diagonal for contiguous same-colored pieces.
     private void diagonalLeft(Map map, Point point){
         boolean right = true;
         boolean left = true;
@@ -133,6 +141,7 @@ public class GomokuRules implements Rules {
         }
     }
 
+    // scan the top-right to bottom-left diagonal for contiguous same-colored pieces.
     private void diagonalRight(Map map, Point point){
         boolean right = true;
         boolean left = true;
@@ -154,15 +163,18 @@ public class GomokuRules implements Rules {
         }
     }
 
+    // returns the color at the specified point on the map
     private int getColor(Map map, Point point) {
         return map.getMap()[point.y][point.x];
     }
 
+    // diagonal helper to run both diagonal checks
     private void diagonals(Map map, Point point) {
         diagonalLeft(map, point);
         diagonalRight(map, point);
     }
 
+    // Runs all directional checks
     private boolean checkWin(Map map, Point point) {
         if (map.getMap()[point.y][point.x] == 0)
             return false;

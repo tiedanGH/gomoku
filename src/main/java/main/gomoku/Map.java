@@ -3,14 +3,25 @@ package main.gomoku;
 import java.util.ArrayList;
 import main.utils.Point;
 
+/*
+ * Map represents an immutable-like snapshot of the board state used by the controller.
+ * Internally it stores a 2D int array where 0 indicates an empty cell and non-zero values
+ * indicate player colors. Coordinates are indexed as map[y][x].
+ */
 public class Map implements MapInterface {
 
+    // 2D array representing the board state
     private final int[][] map;
+    // board size
     private final int size;
+    // current player color
     private int playerColor;
+    // last move points recorded
     private final ArrayList<Point> lastMove = new ArrayList<>();
+    // last move colors recorded
     private final ArrayList<Integer> lastMoveColor = new ArrayList<>();
 
+    // Constructor
     public Map(int size) {
         this.size = size;
         map = new int[size][size];
@@ -21,6 +32,7 @@ public class Map implements MapInterface {
         }
     }
 
+    // Copy constructor
     public Map(Map other) {
         size = other.getSize();
         map = new int[other.getSize()][other.getSize()];
