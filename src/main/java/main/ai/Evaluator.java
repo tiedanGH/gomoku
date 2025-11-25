@@ -484,7 +484,7 @@ public class Evaluator {
         Blocker res = new Blocker(curTurn, dir, sign);
         res.bl1(x, y);
 
-        if (!inBoard(x + sign * 5 * dirOffsets[dir][0], y + sign * 5 * dirOffsets[dir][0]))
+        if (!inBoard(x + sign * 5 * dirOffsets[dir][0], y + sign * 5 * dirOffsets[dir][1]))
             res.bl2(-1, -1);
         else
             res.bl2(x + 5 * dirOffsets[dir][0] * sign, y + 5 * dirOffsets[dir][1] * sign);
