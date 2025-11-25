@@ -1,0 +1,22 @@
+Prerequisites:
+- JDK 17 or higher version installed.
+- Eclipse IDE with Maven support installed.
+
+
+Run In Eclipse IDE:
+1. Open project in Eclipse.
+2. Right-click on the project, Select "Run As" > "Maven build...".
+3. In the "Goals" field, enter "javafx:run".
+4. Click "Run". The application should start.
+
+Run In Command Line:
+1. Open terminal or command prompt.
+2. Navigate to the project directory.
+3. Run the command:
+    mvn javafx:run
+4. The application should start.
+
+
+Possible Errors and Solutions:
+- If encounter Exceptions like java.lang.UnsatisfiedLinkError, try another JDK version or add the following VM arguments in the Run Configuration:
+    --module-path "path\to\javafx-sdk\lib" --add-modules javafx.controls,javafx.fxml
