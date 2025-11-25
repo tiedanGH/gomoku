@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import main.utils.Point;
 
 /*
- * Map represents an immutable-like snapshot of the board state used by the controller.
- * Internally it stores a 2D int array where 0 indicates an empty cell and non-zero values
- * indicate player colors. Coordinates are indexed as map[y][x].
+ * Map class implementing MapInterface for Gomoku game board management.
  */
 public class Map implements MapInterface {
 

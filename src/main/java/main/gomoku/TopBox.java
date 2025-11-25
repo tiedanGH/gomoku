@@ -11,22 +11,21 @@ import java.io.File;
 
 public class TopBox {
 
-    // The container representing the entire top panel (win banner + replay/home buttons)
+    // container
     private final VBox topBox;
     private int sizeX;
     private int sizeY;
-
-    // Horizontal layout for win banner + control buttons
+    // horizontal pane holding win banner and buttons
     private final HBox topPane;
 
     // Win message image view (e.g., black wins / white wins / draw)
     private final ImageView win = new ImageView();
 
-    // Replay and Home buttons
+    // buttons
     private final Button replay = new Button();
     private final Button home = new Button();
 
-    // Win/draw images
+    // images
     private final Image draw =
             new Image(new File("./img/draw.png").toURI().toString());
     private final Image blackWin =
@@ -34,11 +33,7 @@ public class TopBox {
     private final Image whiteWin =
             new Image(new File("./img/white-win.png").toURI().toString());
 
-    /**
-     * Constructor
-     * Creates the top UI region that displays the end-game banner and
-     * a pair of buttons (replay / home). All sizing is responsive.
-     */
+    // Constructor
     public TopBox(int y, int x) {
         sizeX = x;
         sizeY = y;
@@ -52,12 +47,11 @@ public class TopBox {
         ImageButtonUtil.applyImage(replay, "./img/replay.png", 50, 50);
         ImageButtonUtil.applyImage(home, "./img/home.png", 50, 50);
 
-        // Compose layout: [ win-banner | replay | home ]
         topPane = new HBox(10, win, replay, home);
         topPane.setAlignment(Pos.CENTER);
         topBox.setAlignment(Pos.CENTER);
 
-        // Let topPane automatically match the width of the container
+        // topPane automatically match the width of the container
         topPane.prefWidthProperty().bind(topBox.widthProperty());
 
         // Hidden initially until a game ends
@@ -71,9 +65,7 @@ public class TopBox {
         topBox.heightProperty().addListener((obs, oldV, newV) -> adjustImageSizes());
     }
 
-    /**
-     * Updates the top panel dimensions and recalculates image sizes.
-     */
+    // Updates the top panel dimensions and recalculates image sizes.
     public void updateTopSize(int newY, int newX) {
         sizeX = newX;
         sizeY = newY;
@@ -81,11 +73,7 @@ public class TopBox {
         adjustImageSizes();
     }
 
-    /**
-     * Dynamically adjusts image sizes for:
-     * - the win banner image (scaled larger)
-     * - replay/home button images (scaled based on available width)
-     */
+    // Dynamically adjusts image sizes
     private void adjustImageSizes() {
         double totalWidth = topBox.getWidth() > 0 ? topBox.getWidth() : sizeX;
         double totalHeight = topBox.getHeight() > 0 ? topBox.getHeight() : sizeY;
@@ -130,10 +118,7 @@ public class TopBox {
         }
     }
 
-    /**
-     * Calculates how large the win banner image should be,
-     * respecting aspect ratio and available height.
-     */
+    // Calculates win banner image size based on available space
     private double getWinTargetWidth(double totalHeight, double winReserved) {
         double winWidth = 0;
         if (win.isVisible() && win.getImage() != null) {
@@ -153,10 +138,7 @@ public class TopBox {
         return winWidth;
     }
 
-    /**
-     * Displays the end-game banner depending on the final result:
-     * 0 = draw, 1 = black wins, 2 = white wins.
-     */
+    // Displays the end-game banner depending on the final result
     public void showEnd(int winner) {
         Image img;
         if (winner == 0)       img = draw;
@@ -170,9 +152,7 @@ public class TopBox {
         adjustImageSizes();
     }
 
-    /**
-     * Hides the end-game banner (used when resetting the game).
-     */
+    // Hides the end-game banner
     public void hideEnd() {
         win.setVisible(false);
         topPane.setVisible(false);

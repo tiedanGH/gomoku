@@ -1,12 +1,6 @@
 package main.gomoku;
 import javafx.scene.shape.*;
 
-/*
- * The Board class is responsible for rendering, updating, and managing the visual Gomoku board in a JavaFX UI. 
- * It handles grid drawing, stone placement, scaling on window resize, and visual highlights such as scoring overlays 
- * and last-move indicators.
- */
-
 import java.io.File;
 import java.util.ArrayList;
 import javafx.scene.layout.Pane;
@@ -25,6 +19,9 @@ import javafx.scene.paint.Stop;
 import javafx.geometry.Insets;
 import javafx.scene.layout.CornerRadii;
 
+/*
+ * The Board class is responsible for rendering, updating, and managing the game board's visual elements.
+ */
 public class Board {
     private final Pane board;
     private final Circle[][] stones;
@@ -187,7 +184,7 @@ public class Board {
         updatePieceImages();
         updateDots();
     }
-    /** rennew the location of stone(piece) */
+    /** renew the location of stone */
     private void updateStones() {
         for (int i = 0; i < stones.length; i++) {
             for (int j = 0; j < stones[i].length; j++) {

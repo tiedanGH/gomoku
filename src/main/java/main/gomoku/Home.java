@@ -3,18 +3,13 @@ package main.gomoku;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Button;
 
-/**
- * Home (main menu logic controller)
- * — Handles main menu button interactions
- * — Stores player settings (AI, Human, difficulty level)
- */
 public class Home {
 
     // Player type: 0 = human, 1 = AI
     private int whitePlayerType = 0;
     private int blackPlayerType = 0;
 
-    // Current rules (fixed to Gomoku)
+    // Current rules
     private final static String rule = "Gomoku";
 
     // AI difficulty: 1 = hard, 2 = medium, 3 = easy
@@ -25,10 +20,6 @@ public class Home {
     private static final int boardSize = 19;  // Board is 19x19
 
     public Home() {
-        // ===========================================================
-        //                 Black player selection (AI / Human)
-        // ===========================================================
-
         homePage.getBlackAITypeButton().setOnAction(e -> {
             blackPlayerType = 1;
 
@@ -56,8 +47,6 @@ public class Home {
             homePage.getBlackHardButton().setVisible(false);
         });
 
-        // ======== White player selection (AI / Human) ========
-
         homePage.getWhiteAITypeButton().setOnAction(e -> {
             whitePlayerType = 1;
 
@@ -84,11 +73,8 @@ public class Home {
             homePage.getWhiteHardButton().setVisible(false);
         });
 
-        // ======== AI difficulty selection (white side drives sync to black) ========
-
         homePage.getWhiteEasyButton().setOnAction(e -> {
             level = 3;
-            // Update difficulty and sync both sides
 
             // Update black difficulty button highlight
             homePage.resetButtons(homePage.getBlackEasyButton(), homePage.getBlackMediumButton(), homePage.getBlackHardButton());
@@ -124,15 +110,11 @@ public class Home {
             homePage.applySelected(homePage.getWhiteHardButton());
         });
 
-        // Black difficulty buttons trigger white buttons (reuse sync logic)
+        // Black difficulty buttons trigger white buttons
         homePage.getBlackEasyButton().setOnAction(e -> homePage.getWhiteEasyButton().fire());
         homePage.getBlackMediumButton().setOnAction(e -> homePage.getWhiteMediumButton().fire());
         homePage.getBlackHardButton().setOnAction(e -> homePage.getWhiteHardButton().fire());
     }
-
-    // ===========================================================
-    //                        Getters
-    // ===========================================================
 
     public String getRules() { return rule; }
 

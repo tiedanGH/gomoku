@@ -1,49 +1,35 @@
 package main.ai;
 
-public class MinimaxEngine
-{
-    // Class description:
-    // MinimaxEngine is the “algorithm core layer” of the Gomoku AI.
-    // It mainly handles:
-    //  1. Minimax search
-    //  2. Alpha-beta pruning optimization (minimaxAB)
-    //  3. Board evaluation (eval)
-    //  4. Board simulation (play / undo)
-    //  5. Four-in-a-row check (sub-check for detecting five-in-a-row)
-    //  6. Coordinate & candidate management
-
-    // Global shared board (static 2D array)
-    // Note: all MinimaxEngine / GomokuGame instances share the same board
+// MinimaxEngine is the “algorithm core layer” of the Gomoku AI.
+// It mainly handles:
+//  1. Minimax search
+//  2. Alpha-beta pruning optimization (minimaxAB)
+//  3. Board evaluation (eval)
+//  4. Board simulation (play / undo)
+//  5. Four-in-a-row check (sub-check for detecting five-in-a-row)
+//  6. Coordinate & candidate management
+public class MinimaxEngine {
+    // game board
     static public int[][] board;
-
-    // Current candidate manager (generates candidate moves for this layer)
+    // Current candidate manager
     public Candidate candidate;
-
-    // Best move determined after search (used by MAX layer)
+    // Best move determined after search
     public Candidate.Coordinate best;
-
-    // The “move made at this node” (important for undo backtracking)
+    // The move made at this node
     public Candidate.Coordinate move;
-
     // Stores evaluation results for all candidates at this layer
     public float [] values;
-
-    // Current depth level in the search tree (larger len → deeper in the tree)
+    // Current depth level in the search tree
     public int len = 0;
-
-    // Position evaluator (Evaluator handles pattern recognition)
+    // Position evaluator
     static public Evaluator evaluator;
-
-    // Total number of board states visited during search (used to measure complexity)
+    // Total number of board states visited during search
     static public int positionCounter;
-
-    // Total number of simulated moves (used for pace-based evaluation)
+    // Total number of simulated moves
     static public int moveCount;
 
 
-    //====================================================
     // Copy external score data into the evaluator
-    //====================================================
     public void loadCurrentScore(Evaluator score, int turn)
     {
         evaluator.curTurn = turn;
@@ -78,14 +64,7 @@ public class MinimaxEngine
         this.move = new Candidate.Coordinate(-1, -1);
     }
 
-    /*
-     * Copy constructor (used for creating child nodes during recursion)
-     * Notes:
-     *   - New node's len = parent.len + 1
-     *   - Each node needs its own Candidate object 
-     *     (otherwise candidate ranges overlap and break search)
-     *   - reloadLimits() resets candidate search boundaries
-     */
+    // Copy constructor
     public MinimaxEngine(MinimaxEngine m, int ignoredDepth)
     {
         this.len = m.len + 1;
@@ -95,27 +74,20 @@ public class MinimaxEngine
     }
 
 
-    //====================================================
-    // Evaluation function (returns score to minimax)
-    //====================================================
+    // Evaluation function
     public float eval(int player, int ignoredLen, int ignoredTurn)
     {
         return evaluator.score.evaluate(player);
     }
 
 
-    //====================================================
     // Check if (x,y) is inside the board
-    //====================================================
     static public boolean isInBoard(int x, int y)
     {
         return x >= 0 && x < 19 && y >= 0 && y < 19;
     }
 
-
-    //====================================================
     // Check whether (x,y) forms a 4-in-a-row segment in direction (dx,dy)
-    //====================================================
     protected boolean checkDir(int x, int y, int dx, int dy, int player)
     {
         int count = 0;
@@ -128,7 +100,7 @@ public class MinimaxEngine
         for (int i = -dx, j = -dy ; isInBoard(x + i, y + j) && board[x + i][y + j] == player ; i-=dx, j-=dy)
             count +=1;
 
-        return count >= 4; // count=4 means five-in-a-row (this cell counts as 1)
+        return count >= 4; // count=4 means five-in-a-row
     }
 
     // Combine four directions to detect five-in-a-row
@@ -143,10 +115,7 @@ public class MinimaxEngine
         return checkDir(x, y, 1, -1, player); // anti-diagonal
     }
 
-
-    //====================================================
     // play: simulate placing a stone
-    //====================================================
     public boolean play(Candidate.Coordinate c, int player)
     {
         this.move = c;
@@ -162,9 +131,7 @@ public class MinimaxEngine
         return checkWin4Dir(c.x, c.y, player);
     }
 
-    //====================================================
-    // undo: rollback a move (used in backtracking)
-    //====================================================
+    // undo: rollback a move
     public void undo(Candidate.Coordinate c, int depth)
     {
         int val = board[c.x][c.y];
@@ -174,10 +141,7 @@ public class MinimaxEngine
         evaluator.analyseUndo(c.x, c.y, val);
     }
 
-
-    //====================================================
     // Switch player (1 ↔ 2)
-    //====================================================
     protected int change(int player)
     {
         if (player == 1)
@@ -186,10 +150,7 @@ public class MinimaxEngine
             return 1;
     }
 
-
-    //====================================================
     // max: take maximum value and update best accordingly
-    //====================================================
     protected float max(float [] val)
     {
         float res = val[0];
@@ -206,7 +167,7 @@ public class MinimaxEngine
         return res;
     }
 
-    // min: take minimum (used by MIN layer)
+    // min: take minimum
     protected float min(float [] val)
     {
         float res = val[0];
@@ -222,9 +183,7 @@ public class MinimaxEngine
     }
 
 
-    //====================================================
-    // Intermediate win evaluation (used during pruning)
-    //====================================================
+    // Intermediate win evaluation
     protected float victoryIntermediateValue(int player, int turn, int len)
     {
         positionCounter++;
@@ -234,7 +193,7 @@ public class MinimaxEngine
             return -10000 + len * 100;
     }
 
-    // Final win evaluation (also used outside alpha-beta)
+    // Final win evaluation
     protected float victoryValue(int player, int turn, int len)
     {
         positionCounter++;
@@ -252,10 +211,7 @@ public class MinimaxEngine
        return -10000;
     }
 
-
-    //====================================================
-    // Classic minimax recursion (no pruning)
-    //====================================================
+    // Classic minimax recursion
     public float minimax(int depth, int turn, int player)
     {
         int totalCandidates;
@@ -292,10 +248,7 @@ public class MinimaxEngine
             return min(values);
     }
 
-
-    //====================================================
     // Minimax with alpha-beta pruning
-    //====================================================
     public float minimaxAB(int depth, int turn, int player, float alpha, float beta)
     {
         int totalCandidates;
@@ -373,10 +326,7 @@ public class MinimaxEngine
             return min(values);
     }
 
-
-    //====================================================
-    // Print current board (debug use only)
-    //====================================================
+    // Print current board
     static public void displayBoardStatic()
     {
         for (int i = 0 ; i < 19 ; i ++)

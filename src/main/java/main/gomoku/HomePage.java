@@ -5,7 +5,7 @@ import javafx.scene.control.Button;
 
 public class HomePage {
 
-    private final Pane pageContainer;       // Outer container (placed into the Scene by the App)
+    private final Pane pageContainer;       // Outer container
 
     // Player selection buttons
     private final Button blackPlayer;
@@ -13,14 +13,14 @@ public class HomePage {
     private final Button whitePlayer;
     private final Button whiteAI;
 
-    // AI difficulty buttons (Black & White)
+    // AI difficulty buttons
     private final Button blackEasy, blackMedium, blackHard;
     private final Button whiteEasy, whiteMedium, whiteHard;
 
     // Start / Learn buttons
     private final Button startButton;
 
-    // Base style ensures padding, border, and font stay the same so color switching won't change button size.
+    // Base style ensures padding, border, font size, and radius are consistent
     private static final String BASE_STYLE =
             "-fx-background-radius: 10; "
             + "-fx-border-color: #B19776; "
@@ -33,12 +33,9 @@ public class HomePage {
     public HomePage() {
         // Main screen Pane
         Pane page = new Pane();
-        page.setPrefSize(800, 800);   // You can set this to your window size
+        page.setPrefSize(800, 800);
 
-        // ========== Color styles ==========
-        // Use applySelected/applyDefault below to control colors while keeping BASE_STYLE fixed.
-
-        // ========== Start Button ==========
+        // Start Button
         startButton = new Button("Start");
         applyDefault(startButton);
         startButton.setLayoutX(650);
@@ -46,7 +43,7 @@ public class HomePage {
         startButton.setPrefWidth(100);
         page.getChildren().add(startButton);
 
-        // ========== Black Player Buttons ==========
+        // Black Player Buttons
         blackPlayer = new Button("Black Player");
         blackAI = new Button("Black AI");
 
@@ -65,7 +62,7 @@ public class HomePage {
 
         page.getChildren().addAll(blackPlayer, blackAI);
 
-        // ========== White Player Buttons ==========
+        // White Player Buttons
         whitePlayer = new Button("White Player");
         whiteAI = new Button("White AI");
 
@@ -84,7 +81,7 @@ public class HomePage {
 
         page.getChildren().addAll(whitePlayer, whiteAI);
 
-        // ========== AI Difficulty Buttons (Black) ==========
+        // AI Difficulty Buttons (Black)
         blackEasy = new Button("Easy");
         blackMedium = new Button("Medium");
         blackHard = new Button("Hard");
@@ -113,7 +110,7 @@ public class HomePage {
 
         page.getChildren().addAll(blackEasy, blackMedium, blackHard);
 
-        // ========== AI Difficulty Buttons (White) ==========
+        // AI Difficulty Buttons (White)
         whiteEasy = new Button("Easy");
         whiteMedium = new Button("Medium");
         whiteHard = new Button("Hard");
@@ -145,8 +142,6 @@ public class HomePage {
         // Page container
         pageContainer = new Pane(page);
     }
-
-    // ========= Getters used by Home.java =========
 
     public Pane getHomePage() {
         return pageContainer;
@@ -196,12 +191,12 @@ public class HomePage {
         return blackHard;
     }
 
-    // Selected style (orange-gold highlight)
+    // Selected style
     public void applySelected(Button btn) {
         btn.setStyle("-fx-background-color: #FFB84D; -fx-text-fill: #000000; " + BASE_STYLE);
     }
 
-    // Default style (gold gradient background)
+    // Default style
     public void applyDefault(Button btn) {
         btn.setStyle("-fx-background-color: linear-gradient(#E3C799, #C49A6C, #8B5A2B); -fx-text-fill: #000000; " + BASE_STYLE);
     }

@@ -4,48 +4,23 @@ import java.util.ArrayList;
 import main.utils.Blocker;
 import main.utils.Score;
 
-/**
- * Evaluator
- *
- * Local pattern evaluator and fast simulator for Gomoku, used for
- * incremental maintenance of board state during MinimaxEngine search.
- *
- * Explanation:
- * - This class maintains directional pattern arrays patternStr1 / patternStr2
- *   for both players (dimensions: [4][19][19]).
- * - score stores the accumulated score for both players (Score.one, Score.two).
- * - External classes (MinimaxEngine) directly access patternStr1 / patternStr2 /
- *   score / curTurn, so their field names must remain unchanged for compatibility.
- *
- * Public methods (used by MinimaxEngine / GomokuGame):
- * - analyseMove(x, y, turn): update pattern and score after placing a stone.
- * - analyseUndo(x, y, turn): rollback pattern and score after removing a stone.
- *
- * Internal methods and fields use camelCase for better readability.
- */
+// Evaluator
+// Responsible for evaluating the board state, updating patterns and scores
 public class Evaluator {
 
-    /* External fields (do not rename — they must stay compatible) */
-
-    // Global score object (contains score.one and score.two)
+    // Global score object
     Score score;
-
     // Temporary reference to the current player's directional pattern array
     int [][][] currentPattern;
-
-    // Directional pattern arrays for both players (directly used by MinimaxEngine)
+    // Directional pattern arrays for both players
     int [][][] patternStr1;
     int [][][] patternStr2;
-
-    // Current turn being simulated (1 or 2). MinimaxEngine sets this.
+    // Current turn being simulated
     int curTurn;
-
-    /* Internal state variables (camelCase naming) */
 
     // Current coordinates being processed
     int x;
     int y;
-
     // Current directional increments
     int dx;
     int dy;
@@ -59,7 +34,7 @@ public class Evaluator {
     // Current list of blockers in this direction
     ArrayList<Blocker> blockerList = new ArrayList<>();
 
-    // Mapping from pattern type to score (index = pattern ID)
+    // Mapping from pattern type to score
     static int [] factor = {0, 0, 2, 10, 25, 0, 0, 0, 0, 0};
 
     // Four directional offsets (horizontal, vertical, major diagonal, minor diagonal)
@@ -76,18 +51,10 @@ public class Evaluator {
         this.victory = false;
     }
 
-    // ----------------------
-    // Public / external methods (names preserved for compatibility)
-    // ----------------------
-
     /**
      * analyseMove
      * External interface: called when a new stone is placed.
      * Updates internal patterns and scores incrementally.
-     *
-     * Parameters:
-     *  - x, y: stone position
-     *  - turn: current player (1 or 2)
      */
     public void analyseMove(int x, int y, int turn)
     {
@@ -161,10 +128,6 @@ public class Evaluator {
      * analyseUndo
      * External interface: called when a stone is removed.
      * Rolls back internal pattern and score changes.
-     *
-     * Parameters:
-     *  - x, y: removed stone position
-     *  - turn: removed player's ID (1 or 2)
      */
     public void analyseUndo(int x, int y, int turn)
     {
@@ -173,17 +136,17 @@ public class Evaluator {
         this.x = x;
         this.y = y;
 
-        // Roll back direction connections and unfill in all four directions
+        // Roll back direction connections and unFill in all four directions
         if ((x + 1 != 19 && isPlayer(MinimaxEngine.board[x+1][y])) || (x - 1 != -1 && isPlayer(MinimaxEngine.board[x-1][y])))
         {
             dirIndex = 0;
             dx = 1; dy = 0;
             if (x + 1 != 19 && MinimaxEngine.board[x+1][y] == curTurn)
-                unconnectInternal();
+                unConnectInternal();
             else if (x - 1 != -1 && MinimaxEngine.board[x-1][y] == curTurn)
             {
                 dx=-1;
-                unconnectInternal();
+                unConnectInternal();
             }
             unFill();
         }
@@ -193,11 +156,11 @@ public class Evaluator {
             dirIndex = 1;
             dx = 0; dy = 1;
             if (y + 1 != 19 && MinimaxEngine.board[x][y+1] == curTurn)
-                unconnectInternal();
+                unConnectInternal();
             else if (y - 1 != -1 && MinimaxEngine.board[x][y-1] == curTurn)
             {
                 dy=-1;
-                unconnectInternal();
+                unConnectInternal();
             }
             unFill();
         }
@@ -207,11 +170,11 @@ public class Evaluator {
             dirIndex = 2;
             dx = 1; dy = 1;
             if (x + 1 != 19 && y + 1 != 19 && MinimaxEngine.board[x+1][y+1] == curTurn)
-                unconnectInternal();
+                unConnectInternal();
             else if ( x - 1 != -1 && y - 1 != -1 && MinimaxEngine.board[x-1][y-1] == curTurn)
             {
                 dx=-1; dy=-1;
-                unconnectInternal();
+                unConnectInternal();
             }
             unFill();
         }
@@ -221,11 +184,11 @@ public class Evaluator {
             dirIndex = 3;
             dx = 1; dy = -1;
             if (x + 1 != 19 && y - 1 != -1 && MinimaxEngine.board[x+1][y-1] == curTurn)
-                unconnectInternal();
+                unConnectInternal();
             else if (x - 1 != -1 && y + 1 != 19 && MinimaxEngine.board[x-1][y+1] == curTurn)
             {
                 dx = -1; dy=1;
-                unconnectInternal();
+                unConnectInternal();
             }
 
             unFill();
@@ -234,15 +197,11 @@ public class Evaluator {
         // Roll back zero-pattern adjustments for surrounding empty positions
         for (int i = 0; i < 4 ; i++)
         {
-            unfillZero(x, y, i);
+            unFillZero(x, y, i);
         }
 
         updateBlockers();
     }
-
-    // ----------------------
-    // Internal helper methods (camelCase)
-    // ----------------------
 
     /**
      * isPlayer
@@ -275,11 +234,6 @@ public class Evaluator {
      * repCase
      * Update patternStr at (x,y) based on direction and current continuity,
      * and adjust score accordingly (rollback or set).
-     *
-     * Parameter:
-     *  - st: pattern value to apply (e.g., 2/3/4)
-     *
-     * Only applies patterns to empty cells (board == 0).
      */
     private void repCase(int x, int y, int st)
     {
@@ -309,7 +263,7 @@ public class Evaluator {
 
     /**
      * spawnCase
-     * Generate the opponent’s pattern on this empty cell during unfill.
+     * Generate the opponent’s pattern on this empty cell during unFill.
      */
     private void spawnCase(int x, int y, int st)
     {
@@ -328,7 +282,7 @@ public class Evaluator {
 
     /**
      * addCase
-     * Directly sets pattern value on (x,y) and adjusts score (only for empty cells).
+     * Directly sets pattern value on (x,y) and adjusts score
      */
     private void addCase(int x, int y, int st)
     {
@@ -352,7 +306,6 @@ public class Evaluator {
     /**
      * newAlignment
      * Update adjacent pattern values based on two offsets (dec1/dec2),
-     * used by connectInternal.
      */
     public void newAlignment(int dec1, int dec2, int st)
     {
@@ -367,8 +320,6 @@ public class Evaluator {
      * connectInternal
      * Connect the newly placed stone with adjacent stones in the same direction.
      * Extends and merges patterns, and detects five-in-a-row.
-     *
-     * (Original name: connect — now renamed for clarity)
      */
     public void connectInternal()
     {
@@ -422,7 +373,7 @@ public class Evaluator {
      * fillTwo
      * For each direction:
      * - Clear any existing pattern values on this cell.
-     * - Check whether blockers should be created (edge or remote blocks).
+     * - Check whether blockers should be created.
      */
     public void fillTwo()
     {
@@ -472,12 +423,6 @@ public class Evaluator {
     /**
      * createBlocker
      * Create a Blocker instance and add it to blockerList.
-     *
-     * Parameters:
-     *  - dir: direction index (0..3)
-     *  - sign: +1 or -1 indicating forward/backward
-     *
-     * Note: Keeps the original method names (bl1/bl2/update_block_info).
      */
     private void createBlocker(int dir, int sign)
     {
@@ -520,7 +465,7 @@ public class Evaluator {
 
     /**
      * saveVictory
-     * Set or toggle victory flag (used for five-in-a-row detection).
+     * Set or toggle victory flag.
      */
     private void saveVictory()
     {
@@ -546,10 +491,10 @@ public class Evaluator {
     }
 
     /**
-     * unconnectInternal
+     * unConnectInternal
      * Reverse-connect logic: rollback pattern values around the removed stone.
      */
-    public void unconnectInternal()
+    public void unConnectInternal()
     {
 
         int decp;
@@ -615,10 +560,10 @@ public class Evaluator {
     }
 
     /**
-     * unfillZero
-     * During undo: roll back pattern for nearby empty cells (original name: unfill0)
+     * unFillZero
+     * During undo: roll back pattern for nearby empty cells
      */
-    public void unfillZero(int x, int y, int dir)
+    public void unFillZero(int x, int y, int dir)
     {
         int cmp;
         if (inBoard(x+dirOffsets[dir][0], y+dirOffsets[dir][1]) &&
@@ -672,14 +617,9 @@ public class Evaluator {
         }
     }
 
-    // ----------------------
-    // Reset / cleanup methods
-    // ----------------------
-
     /**
      * resetStr
      * Reset all pattern arrays, clear blocker list, and reset victory + score.
-     * (Name preserved in case external classes call it)
      */
     public void resetStr()
     {
@@ -698,14 +638,4 @@ public class Evaluator {
         this.blockerList.clear();
         this.score.reset();
     }
-
-    // ----------------------
-    // Removed method documentation
-    // ----------------------
-    // For clarity and reduced coupling, debug/printing functions that were unused
-    // by other project components have been removed:
-    // - display_str / display / display_blockers / noCase
-    // - check_str / iscapt / check_capt
-    // These were only for debugging output and do not affect search logic.
-    // They can be restored if needed.
 }

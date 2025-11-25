@@ -2,11 +2,6 @@ package main.gomoku;
 
 import java.util.ArrayList;
 
-/*
- * The Gomoku class is the central controller for the entire Gomoku game.
-   It coordinates UI elements, manages the game flow, handles both human and AI moves, updates the board state, and maintains the game loop.
- */
-
 import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,9 +17,12 @@ import javafx.util.Duration;
 import java.io.File;
 import javafx.scene.image.Image;
 
+/*
+ * The Gomoku class is the central controller for the entire Gomoku game.
+   It coordinates UI elements, manages the game flow, handles both human and AI moves, updates the board state, and maintains the game loop.
+ */
 public class Gomoku {
 
-    // change background color to deep brown
     static final String backgroundColor = "#3E2723";
 
     private Point lastMove = null;
@@ -221,18 +219,16 @@ public class Gomoku {
         // create main layout
         Pane mainPane = new Pane();
 
-        // apply wood texture as repeating background (place a wood image at ./img/wood-texture.jpg)
         try {
-            Image wood = new Image(new File("./img/bg.jpg").toURI().toString());
-            BackgroundImage bimg = new BackgroundImage(
-                    wood,
+            Image image = new Image(new File("./img/bg.jpg").toURI().toString());
+            BackgroundImage backgroundImage = new BackgroundImage(
+                    image,
                     BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT,
                     BackgroundPosition.CENTER,
                     new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, true, true)
             );
-            mainPane.setBackground(new Background(bimg));
+            mainPane.setBackground(new Background(backgroundImage));
         } catch (Exception e) {
-            // fallback: solid deep brown if image not found
             e.printStackTrace();
             mainPane.setBackground(new Background(new BackgroundFill(javafx.scene.paint.Color.web(backgroundColor), null, null)));
         }

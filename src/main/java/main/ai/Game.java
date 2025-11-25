@@ -2,55 +2,35 @@ package main.ai;
 
 import main.utils.Point;
 
+// Represents the overall state of a game, acting as a “bridge layer”
+// between MinimaxEngine and the external UI / rules module.
 public class Game {
-
-    // Class description:
-    // Represents the overall state of a game, acting as a “bridge layer”
-    // between MinimaxEngine and the external UI / rules module.
-    // Responsible for:
-    // 1. Maintaining the board state (gameMap)
-    // 2. Updating the Evaluator
-    // 3. Invoking MinimaxEngine to perform searches (minimax / minimaxAB)
-    // 4. Managing difficulty parameters (maxDepth / maxCan / minCan)
-    // 5. Handling timing, search initialization, etc.
-
-    // Current MinimaxEngine instance (search tree)
+    // Current MinimaxEngine instance
     public MinimaxEngine m;
-
-    // Game board (2D array: 0=empty, 1=black, 2=white)
+    // Game board
     public int[][] gameMap;
-
-    // Evaluator for the current board state (stores pattern analysis)
+    // Evaluator for the current board state
     public Evaluator miniScore = new Evaluator();
-
     // Total number of moves made so far
     public int totalMove;
-
     // Last search evaluation value
     public Float val;
-
-    // Time spent on the current search (milliseconds)
+    // Time spent on the current search
     public long time;
-
-    // Rule name (e.g., "Gomoku")
+    // Rule name
     public String rules;
 
-    // Search depth (core difficulty parameter)
+    // Search depth
     static public int maxDepth = 10;
-
     // Max number of candidate moves per layer
     static public int maxCan = 7;
-
     // Minimum number of candidate moves per layer
     static public int minCan = 5;
-
-    // Whether fast-search mode is enabled (currently fixed at 0)
+    // Whether fast-search mode is enabled
     static public int fastSearch = 0;
 
 
-    //=================================
     // Constructor: initialize board and search engine
-    //=================================
     public Game(String rules, int boardSize) {
         gameMap = new int[boardSize][boardSize];
         totalMove = 0;
@@ -72,13 +52,8 @@ public class Game {
         }
     }
 
-
-    //=================================
-    // Search configuration (difficulty control)
-    //=================================
+    // Search configuration
     public void treeConfig(int level) {
-
-        // Level 1: Normal difficulty
         if (level == 1)
         {
             maxDepth = 10;
@@ -86,7 +61,6 @@ public class Game {
             minCan = 5;
             fastSearch = 0;
         }
-        // Level 2: Intermediate difficulty
         else if (level == 2)
         {
             maxDepth = 9;
@@ -94,7 +68,6 @@ public class Game {
             minCan = 6;
             fastSearch = 0;
         }
-        // Level 3: Very fast but shallow search
         else if (level == 3)
         {
             maxDepth = 3;
@@ -102,7 +75,6 @@ public class Game {
             minCan = 8;
             fastSearch = 0;
         }
-        // Level 4: More aggressive candidate expansion
         else if (level == 4)
         {
             maxDepth = 9;
@@ -112,25 +84,16 @@ public class Game {
         }
     }
 
-
-    //=================================
-    // Write a move (player or AI) into MinimaxEngine’s shared board
-    //=================================
+    // make a move
     public void move(Point point, int turn) {
-
         // Update global board (MinimaxEngine.board)
         MinimaxEngine.board[point.y][point.x] = turn;
-
         // Update evaluator (pattern recognition)
         miniScore.analyseMove(point.y, point.x, turn);
-
         totalMove++;
     }
 
-
-    //=================================
-    // Reset Minimax engine (for restart or new game)
-    //=================================
+    // Reset Minimax engine
     public void resetMinMax() {
         // Reset board
         for (int i = 0 ; i < 19 ; i++)
@@ -146,24 +109,17 @@ public class Game {
         miniScore.resetStr();
     }
 
-
-    //=================================
     // Copy gameMap into MinimaxEngine.board
-    //=================================
     private void initializeMap() {
         for (int i = 0 ; i < 19 ; i++)
             System.arraycopy(gameMap[i], 0, MinimaxEngine.board[i], 0, 19);
     }
 
-
-    //=================================
-    // Core API: Get AI's best move (Minimax entry point)
-    //=================================
+    // Get AI's best move
     public Point bestMove(int turn, int player, boolean display) {
 
         if (display)
-            System.out.printf("Call best_move turn %d player %d et nb move %d\n",
-                    turn, player, totalMove);
+            System.out.printf("Call best move turn %d player %d at total move %d\n", turn, player, totalMove);
 
         // First move: reset Minimax engine
         if (totalMove == 0)
@@ -183,7 +139,6 @@ public class Game {
             m.best = new Candidate.Coordinate(9, 9);
 
         else {
-
             // Load evaluator state into MinimaxEngine
             m.loadCurrentScore(miniScore, turn);
 
@@ -214,19 +169,13 @@ public class Game {
         return new Point(m.best.y, m.best.x);
     }
 
-
-    //=================================
-    // Print current board (debug)
-    //=================================
+    // Print current board
     private void displayAllBoardInfo() {
         MinimaxEngine.displayBoardStatic();
         System.out.println();
     }
 
-
-    //=================================
-    // Print search statistics (debug)
-    //=================================
+    // Print search statistics
     private void bestMoveStamp() {
         System.out.printf(
                 "AI move %d (Turn %d) at %d %d played in %f seconds (%d pos, %d depth, %d speed)\n",
@@ -241,5 +190,3 @@ public class Game {
         );
     }
 }
-
-

@@ -9,18 +9,6 @@ import javafx.scene.paint.Color;
 
 import java.io.File;
 
-/**
- * RightBox
- * Right-side end-game information panel: displays the victory message
- * and the end-game pop-up (which includes the replay and backHome buttons).
- *
- * - Responsible for showing/hiding the pop-up and enlarging/resetting the victory text size
- * - Handles resizing of this panel (called by Gomoku.updateGameDisplay)
- *
- * Extension:
- * Displays a white box image at the lower-middle area, and supports
- * applying/removing a highlight glow depending on which player is currently active.
- */
 public class RightBox {
 
     private final VBox rightBox;
@@ -69,14 +57,7 @@ public class RightBox {
         return rightBox;
     }
 
-    /**
-     * Sets the highlight state of the right-side box based on the active player.
-     * If currentPlayer corresponds to WHITE (PLAYER_WHITE), apply a golden glow.
-     * Otherwise, remove any glow.
-     *
-     * @param currentPlayer Identifier of the current active player
-     *                      (using constants PLAYER_BLACK / PLAYER_WHITE)
-     */
+    // Sets the highlight state of the right-side box based on the active player
     public void highlightForPlayer(int currentPlayer) {
         if (boxContainer == null) return;
         if (currentPlayer == 1) { // Assuming 1 represents WHITE
